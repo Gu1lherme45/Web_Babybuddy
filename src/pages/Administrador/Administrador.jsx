@@ -281,6 +281,7 @@ useEffect(() => {
 
 
   // ALTERAR IMAGEM
+  // eslint-disable-next-line no-unused-vars
   function alterarImagem(id, event) {
     const file = event.target.files[0];
 
@@ -421,7 +422,9 @@ useEffect(() => {
     className={styles.logoImage}
   />
 </div>
-        </div>
+</div>
+
+
 
    <div className={styles.menuArea}>
   <nav className={styles.nav}>

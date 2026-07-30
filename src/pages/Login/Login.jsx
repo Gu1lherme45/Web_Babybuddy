@@ -29,17 +29,36 @@ const Login = () => {
     });
   };
 
+const administradores = [
+  {
+    email: "admin01@babybuddy.com.br",
+    senha: "Admin@123"
+  },
+  {
+    email: "admin02@babybuddy.com.br",
+    senha: "Admin@456"
+  },
+  {
+    email: "admin03@babybuddy.com.br",
+    senha: "Admin@789"
+  }
+];
+
+  
+
   const handleSubmit = (e) => {
     e.preventDefault();
 
     // EMAIL DIGITADO
     const email = formData.email.toLowerCase();
 
-    // VERIFICA SE É ADMIN
-    const adminRegex =
-      /^admin0[1-6]@babybuddy\.com\.br$/;
+   const admin = administradores.find(
+  (item) =>
+    item.email === email &&
+    item.senha === formData.senha
+);
 
-    const isAdmin = adminRegex.test(email);
+const isAdmin = !!admin;
 
     // DADOS DO USUÁRIO
     const usuario = {

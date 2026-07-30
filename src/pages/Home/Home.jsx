@@ -312,7 +312,7 @@ export default function Home() {
 
           <div className={styles.featureItem}>
             <img src={informacoes} alt="Informações confiáveis" />
-            <h3>Informações Confiáveis para cada Etapa</h3>
+            <h3>Informações confiáveis</h3>
             <p>
               Receba conteúdos pensados para cada momento da gestação, com
               orientações que ajudam a tirar dúvidas e trazer mais segurança durante

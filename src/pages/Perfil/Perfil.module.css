@@ -19,7 +19,7 @@
 /* HEADER */
 .header {
   width: 100%;
-  max-width: 1200px;
+  max-width: 1200px; 
 
   margin-left: auto;
   margin-right: auto;
@@ -43,10 +43,18 @@
 
 .subtitle {
   color: #667085;
-  max-width: 520px;
-  font-size: 1.07rem;
-  line-height: 1.6;
+  max-width: 700px;
+  font-size: 1.2rem;
+  line-height: 1.4;
 }
+
+
+
+
+
+
+
+
 
 .avatar {
   width: 50px;
@@ -60,6 +68,621 @@
   font-weight: 700;
   font-size: 1.2rem;
 }
+
+/* AVATAR */
+.sidebarAvatar {
+  width: 95px;
+  height: 95px;
+  border-radius: 50%;
+  background: linear-gradient(
+    135deg,
+    #DC2B74,
+    #ec407a
+  );
+
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 38px;
+  font-weight: 600;
+  margin: 0 auto 15px;
+  
+}
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  z-index: 10;
+}
+
+
+.fecharTopo {
+  position: absolute;
+  top: 25px;
+  right: 25px;
+  border: none;
+  background: #fdecef;
+  color: #DC2B74;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  font-size: 25px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: 0.3s;
+}
+
+.fecharTopo:hover {
+  background: #DC2B74;
+  color: white;
+}
+
+
+/* SIDEBAR */
+.sidebar {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 420px;
+  height: 100vh;
+  background: #ffffff;
+  padding: 40px 35px;
+  box-shadow: -8px 0 25px rgba(0, 0, 0, 0.12);
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  animation: abrirSidebar 0.3s ease;
+}
+
+
+/* ANIMAÇÃO DE ENTRADA */
+@keyframes abrirSidebar {
+
+  from {
+    transform: translateX(100%);
+  }
+
+  to {
+    transform: translateX(0);
+  }
+
+}
+
+
+
+.informacoesUsuario {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+/* ÁREA PRINCIPAL DO PERFIL */
+.sidebarPerfil {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding-top: 55px;
+  padding-bottom: 25px;
+  border-bottom: 1px solid #f4dbe5;
+  margin-bottom: 25px;
+  line-height: 0.35px;
+}
+
+
+/* Nome do usuário */
+.sidebarPerfil h2 {
+  font-size: 26px;
+  color: #333;
+  margin: 8px 0 5px;
+  font-weight: 700;
+  text-align: center;
+}
+
+
+/* Texto Usuária BabyBuddy */
+.sidebarPerfil p {
+  font-size: 15px;
+  color: #a06b80;
+  margin: 0;
+  font-weight: 500;
+  text-align: center;
+}
+
+/* ÁREA DO PERFIL */
+.sidebarAvatar {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #DC2B74, #F06292);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 34px;
+  font-weight: 700;
+  margin: 0 auto 15px;
+  padding-bottom: 4px;
+}
+
+
+/* NOME */
+.sidebarAvatar h2 {
+  font-size: 40px;
+  color: #333;
+  margin: 0;
+  font-weight: 600;
+  text-align: center;
+}
+
+
+/* DESCRIÇÃO */
+.sidebarAvatar p {
+  color: #888;
+  font-size: 14px;
+  margin-bottom: 5px;
+}
+
+.statusUsuario {
+  font-size: 15px;
+  color: #a06b80;
+}
+
+.tipoUsuario {
+  font-size: 14px;
+  color: #a06b80;
+  margin-bottom: 5px;
+  font-weight: 500;
+  text-align: center;
+}
+
+
+
+/* MENU */
+.menuSidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+
+/* LINKS */
+.menuSidebar a {
+  text-decoration: none;
+  color: #444;
+  padding: 14px 16px;
+  border-radius: 12px;
+  transition: 0.3s;
+}
+
+
+/* PASSAR O MOUSE */
+.menuSidebar a:hover {
+  background: #fdecef;
+  color: #DC2B74;
+}
+
+
+/* BOTÃO FECHAR */
+.fecharTopo {
+  position: absolute;
+  top: 18px;
+  left: 18px;
+  width: 38px;
+  height: 38px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0;
+  border: 1px solid #DC2B74;
+  border-radius: 50%;
+  background: #fff;
+  color: #DC2B74;
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+  transition: .25s;
+}
+
+.fecharTopo:hover {
+  background: #DC2B74;
+  color: #fff;
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(220, 43, 116, 0.2);
+}
+
+.senhaContainer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+
+.senhaContainer p {
+  margin: 0;
+}
+
+
+.botaoOlho {
+  border: none;
+  background: transparent;
+  color: #DC2B74;
+  cursor: pointer;
+  padding: 5px;
+  border-radius: 50%;
+  transition: 0.3s;
+}
+
+
+.botaoOlho:hover {
+  background: #fdecef;
+}
+
+.infoItem {
+  background: #fff4f8;
+  border-radius: 12px;
+  padding: 12px 15px;
+  border: 1px solid #fde1eb;
+}
+
+
+
+.infoItem span {
+  font-size: 12px;
+  color: #a06b80;
+  margin-bottom: 4px;
+}
+
+
+.infoItem p {
+  font-size: 14px;
+  color: #333;
+  font-weight: 500;
+}
+
+
+.acoesSidebar {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+
+.sairConta {
+  display: block;
+  width: 280px;
+  margin: 25px auto 0;
+  padding: 11px 20px;
+  border: 1.5px solid #DC2B74;
+  border-radius: 30px;
+  background: #fff;
+  color: #DC2B74;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all .25s ease;
+  box-shadow: 0 2px 8px rgba(220, 43, 116, 0.12);
+}
+
+.sairConta:hover {
+  background: #DC2B74;
+  color: #fff;
+  border-color: #DC2B74;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(220, 43, 116, 0.25);
+}
+
+.sairConta:hover {
+  background: #b9215d;
+}
+
+
+.fecharSidebar {
+  background: #f7dce7;
+  color: #DC2B74;
+  border: none;
+  padding: 14px;
+  border-radius: 14px;
+  cursor: pointer;
+}
+
+/* ANIMAÇÃO DE SAÍDA */
+@keyframes fecharSidebar {
+
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(100%);
+  }
+
+}
+
+
+
+/* INFORMAÇÕES DO USUÁRIO */
+
+.informacoesUsuario {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+
+/* CARD DE CADA INFORMAÇÃO */
+.infoItem {
+  background: #fff5f9;
+  border: 1px solid #f6d8e5;
+  border-radius: 14px;
+  padding: 12px 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+
+/* TITULO DO CAMPO */
+.infoItem span {
+  font-size: 12px;
+  color: #a06b80;
+  font-weight: 600;
+}
+
+
+/* TEXTO NORMAL */
+.infoItem p {
+  margin: 0;
+  font-size: 15px;
+  color: #333;
+  font-weight: 500;
+}
+
+
+
+
+/* INPUTS DE EDIÇÃO */
+.infoItem input {
+  width: 90%;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid #e9bfd2;
+  backGround: white;
+  font-size: 14px;
+  outline: none;
+  margin-top: 5px;
+}
+
+
+.infoItem input:focus {
+  border-color: #DC2B74;
+  box-shadow: 0 0 0 3px #fdecef;
+}
+
+
+/* BOTÃO EDITAR PERFIL */
+.editarPerfil {
+    display: block;
+    width: fit-content;
+    margin: 0 auto 18px auto;
+    padding: 8px 18px;
+    border: 1px solid #DC2B74;
+    border-radius: 30px;
+    background: #fff;
+    color: #DC2B74;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: .25s ease;
+    box-shadow: 0 2px 8px rgba(220, 43, 116, 0.12);
+}
+
+.editarPerfil:hover{
+    background: #DC2B74;
+    color: white;
+    transform: translateY(-1px);
+}
+
+
+/* BOTÃO CANCELAR */
+.cancelarEdicao {
+  width: 50%;
+  padding: 10px;
+  margin: 8px auto 0;
+  border-radius: 10px;
+  border: 1px solid #DC2B74;
+  background: transparent;
+  color: #DC2B74;
+  font-size: 10px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+
+.cancelarEdicao:hover {
+  background: #fdecef;
+}
+
+
+/* SENHA */
+.senhaContainer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+
+.senhaContainer p {
+  margin: 0;
+}
+
+
+/* BOTÃO OLHO */
+.botaoOlho {
+  border: none;
+  background: transparent;
+  color: #DC2B74;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+/* ALTERAÇÃO DE SENHA */
+.botaoAlterarSenha {
+    width: 100%;
+    margin-top: 5px;
+    padding: 10px;
+    border: 1px solid #f2d3e1;
+    border-radius: 10px;
+    background: #fff;
+    color: #DC2B74;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: .25s ease;
+}
+
+.botaoAlterarSenha:hover {
+    background: #fdecef;
+    border-color: #DC2B74;
+}
+
+
+.areaSenha {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+
+.areaSenha input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 11px 12px;
+  border-radius: 10px;
+  border: 1px solid #e9bfd2;
+  background: white;
+  font-size: 14px;
+  outline: none;
+}
+
+
+.areaSenha input:focus {
+  border-color: #DC2B74;
+}
+
+
+
+/* BOTÃO CONFIRMAR SENHA */
+.salvarSenha {
+  width: 100%;
+  padding: 11px;
+  border-radius: 12px;
+  border: none;
+  background: #DC2B74;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+
+.salvarSenha:hover {
+  background: #b9205d;
+}
+
+
+/* CONFIRMAÇÃO */
+.confirmacaoSenha{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+    margin-top:10px;
+}
+
+.confirmacaoSenha p{
+    margin:0;
+    font-size:14px;
+    color:#555;
+}
+
+.botoesConfirmacao{
+    display:flex;
+    gap:10px;
+}
+
+.botoesConfirmacao button{
+    flex:1;
+    padding:9px;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+    font-weight:600;
+}
+
+.botoesConfirmacao button:first-child{
+    background:#f3f3f3;
+    color:#555;
+}
+
+.botoesConfirmacao button:last-child{
+    background:#DC2B74;
+    color:white;
+}
+
+
+.erroSenha {  
+    margin-top: -2px;
+    margin-bottom: 4px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    background: #fff2f2;
+    border: 1px solid #ffcaca;
+    color: #d32f2f;
+    font-size: 10px;
+    font-weight: 500;
+    text-align: center;
+}
+
+.salvarAlteracoes {
+    display: block;
+    width: 330px;
+    margin: 0 auto;
+    padding: 10px 18px;
+    border: 1.5px solid #DC2B74;
+    border-radius: 30px;
+    background: #fff;
+    color: #DC2B74;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all .25s ease;
+    box-shadow: 0 2px 8px rgba(220, 43, 116, 0.12);
+}
+
+
+.salvarAlteracoes:hover {
+    background: #DC2B74;
+    color: #fff;
+    border-color: #DC2B74;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 12px rgba(220, 43, 116, 0.25);
+}
+
+
+.salvarAlteracoes:active {
+    transform: scale(0.97);
+}
+
+
+
 
 
 
