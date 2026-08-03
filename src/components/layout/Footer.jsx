@@ -62,8 +62,7 @@ export default function Footer() {
       <h4>PRODUTO</h4>
       <Link to="/seguranca">Segurança</Link>
          <a 
-           href="https://mail.google.com/mail/?view=cm&fs=1&to=babybuddy159@gmail.com&su=Suporte%20-%20BabyBuddy&body=Olá,%20preciso%20de%20ajuda%20com%20o%20seguinte:%0A%0A•%20Descrição%20do%20problema:%0A•%20Dispositivo:%0A•%20Email%20para%20resposta:" 
-              target="_blank" 
+          href="https://mail.google.com/mail/?view=cm&fs=1&to=babybuddy159@gmail.com&su=Suporte%20-%20BabyBuddy&body=Olá,%20preciso%20de%20ajuda%20com%20o%20seguinte:%0A%0A•%20Problema:%0A%0A•%20E-mail%20para%20contato:"
               rel="noopener noreferrer"
             >
               Suporte

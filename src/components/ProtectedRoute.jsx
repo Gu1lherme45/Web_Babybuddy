@@ -1,14 +1,20 @@
 import { Navigate } from "react-router-dom";
 
-function PrivateRoute({ children }) {
+export default function ProtectedRoute({
+  children,
+  adminOnly = false,
+}) {
+  const usuario = JSON.parse(localStorage.getItem("usuario"));
 
-  const acesso = sessionStorage.getItem("acesso");
+  // Não está logado
+  if (!usuario) {
+    return <Navigate to="/login" replace />;
+  }
 
-  if (!acesso) {
-    return <Navigate to="/" />;
+  // Área exclusiva do administrador
+  if (adminOnly && !usuario.admin) {
+    return <Navigate to="/" replace />;
   }
 
   return children;
 }
-
-export default PrivateRoute;

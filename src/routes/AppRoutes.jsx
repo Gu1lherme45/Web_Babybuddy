@@ -123,14 +123,14 @@ export default function AppRoutes() {
           />
 
 
-          <Route
-            path="/administrador"
-            element={
-              <ProtectedRoute>
-                <Administrador />
-              </ProtectedRoute>
-            }
-          />
+        <Route
+  path="/administrador"
+  element={
+    <ProtectedRoute adminOnly>
+      <Administrador />
+    </ProtectedRoute>
+  }
+/>
 
 
         </Route>

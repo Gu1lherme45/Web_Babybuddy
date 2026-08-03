@@ -61,12 +61,13 @@ const administradores = [
 const isAdmin = !!admin;
 
     // DADOS DO USUÁRIO
-    const usuario = {
-      nome: formData.nome,
-      email: formData.email,
-      senha: formData.senha,
-      tipo: isAdmin ? 'admin' : 'usuario',
-    };
+ const usuario = {
+  nome: formData.nome,
+  email: formData.email,
+  senha: formData.senha,
+  tipo: isAdmin ? "admin" : "usuario",
+  admin: isAdmin,
+};
 
     // SALVA NO LOCALSTORAGE
     localStorage.setItem(
