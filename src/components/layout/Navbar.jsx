@@ -11,6 +11,8 @@ const isCadastro = location.pathname === "/cadastro";
 const isLogin = location.pathname === "/login";
 const isPerfil = location.pathname === "/perfil";
 const isAdministrador = location.pathname === "/administrador";
+const isTermosDeUso = location.pathname === "/termos-de-uso";
+const isPoliticaDePrivacidade = location.pathname === "/politica-de-privacidade";
 
 // esconde navbar nessas páginas
 if (
@@ -18,9 +20,11 @@ if (
   isCadastro ||
   isLogin ||
   isPerfil ||
-  isAdministrador
+  isAdministrador ||
+  isTermosDeUso ||
+  isPoliticaDePrivacidade
 )
-  return null;
+return null;
 
   return (
     <nav className={styles.navbar}>

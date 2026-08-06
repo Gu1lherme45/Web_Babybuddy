@@ -7,7 +7,7 @@ export default function TermosDeUso() {
       <div className={styles.header}>
         <h1>Termos de Uso</h1>
       </div>
-
+  
       <div className={styles.content}>
 
         <p><strong>Este Site é Apenas para Fins Informativos e Não Fornece Aconselhamento Médico.</strong></p>
@@ -62,9 +62,11 @@ export default function TermosDeUso() {
 
         <h3>Contato com a equipe</h3>
 
-        <p>E-mail: rm93892@estudante.fieb.edu.br</p>
+        <p>E-mail: babybuddy159@gmail.com</p>
 
         <p>Se tiver dúvidas, entre em contato conosco.</p>
+
+          <div className={styles.termosPage}></div>
 
       </div>
     </div>

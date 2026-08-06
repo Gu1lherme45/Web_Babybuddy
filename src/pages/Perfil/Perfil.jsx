@@ -16,8 +16,8 @@ import art3 from "../../assets/art3.png";
 export default function Perfil() { 
   const usuario =
   JSON.parse(localStorage.getItem("usuario")) || {
-    nome: "Kemilly Pinheiro",
-    email: "kemilly@email.com",
+    nome: "Usuario Nome",
+    email: "Usuario@email.com",
     senha: "123456"
   };
 
