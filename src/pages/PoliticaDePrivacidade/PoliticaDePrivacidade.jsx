@@ -8,7 +8,7 @@ export default function PoliticaDePrivacidade() {
         <h1>Política de Privacidade</h1>
       </div>
 
-      <div className={styles.content}>
+      <div className={styles.content}>   
 
         <h3>1. Visão Geral da Política de Privacidade</h3>
 
@@ -102,6 +102,7 @@ export default function PoliticaDePrivacidade() {
           <li>Direito de Saber: Você tem o direito de saber quais informações pessoais coletamos e processamos. Esta política tem como objetivo fornecer transparência em relação aos seus dados.</li>
         </ul>
 
+          <div className={styles.politicaDePrivacidade}></div>
       </div>
     </div>
   );

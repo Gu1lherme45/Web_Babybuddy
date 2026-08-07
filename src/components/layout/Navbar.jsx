@@ -14,6 +14,7 @@ const isAdministrador = location.pathname === "/administrador";
 const isTermosDeUso = location.pathname === "/termos-de-uso";
 const isPoliticaDePrivacidade = location.pathname === "/politica-de-privacidade";
 
+
 // esconde navbar nessas páginas
 if (
   isQuestionario ||
@@ -22,8 +23,9 @@ if (
   isPerfil ||
   isAdministrador ||
   isTermosDeUso ||
-  isPoliticaDePrivacidade
+  isPoliticaDePrivacidade 
 )
+
 return null;
 
   return (

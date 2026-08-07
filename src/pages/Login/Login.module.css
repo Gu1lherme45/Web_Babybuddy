@@ -225,6 +225,16 @@
   font-weight: 700;
 }
 
+.error {
+  color: red;
+  text-align: center;
+  font-weight: bold;
+  margin-top: 10px;
+}
+
+
+
+
 @media (max-width: 500px) {
   .card {
     max-width: 100%;

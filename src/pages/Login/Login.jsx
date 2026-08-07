@@ -31,16 +31,34 @@ const Login = () => {
 
 const administradores = [
   {
-    email: "admin01@babybuddy.com.br",
-    senha: "Admin@123"
+    nome: "Kemilly",
+    email: "administrador@babybuddy.com.br",
+    senha: "BabyBuddy2026"
   },
   {
-    email: "admin02@babybuddy.com.br",
-    senha: "Admin@456"
+    nome: "Laura", 
+    email: "administrador@babybuddy.com.br",
+    senha: "BabyBuddy2026"
   },
   {
-    email: "admin03@babybuddy.com.br",
-    senha: "Admin@789"
+    nome: "Guilherme",
+    email: "administrador@babybuddy.com.br",
+    senha: "BabyBuddy2026"
+  },
+  {
+    nome: "Nicolly",
+    email: "administrador@babybuddy.com.br",
+    senha: "BabyBuddy2026"
+  },
+  {
+    nome: "Vinicius",
+    email: "administrador@babybuddy.com.br",
+    senha: "BabyBuddy2026"
+  },
+  {
+    nome: "Giulia",
+    email: "administrador@babybuddy.com.br",
+    senha: "BabyBuddy2026"
   }
 ];
 
@@ -52,7 +70,7 @@ const administradores = [
     // EMAIL DIGITADO
     const email = formData.email.toLowerCase();
 
-   const admin = administradores.find(
+  const admin = administradores.find(
   (item) =>
     item.email === email &&
     item.senha === formData.senha
@@ -84,6 +102,10 @@ const isAdmin = !!admin;
       navigate('/perfil');
     }
   };
+
+
+
+
 
   return (
     <div className={styles.container}>
