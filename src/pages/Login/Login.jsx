@@ -1,21 +1,18 @@
 import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { FiUser, FiMail, FiLock, FiEye, FiEyeOff } from 'react-icons/fi';
 import styles from './Login.module.css';
 
-import { Link, useNavigate } from 'react-router-dom';
-
-import {
-  FiUser,
-  FiMail,
-  FiLock,
-  FiEye,
-  FiEyeOff,
-} from 'react-icons/fi';
+// Administrador
+const ADMIN = {
+  email: 'administrador@babybuddy.com.br',
+  senha: 'BabyBuddy2026',
+};
 
 const Login = () => {
   const navigate = useNavigate();
 
   const [showPassword, setShowPassword] = useState(false);
-
   const [formData, setFormData] = useState({
     nome: '',
     email: '',
@@ -29,73 +26,30 @@ const Login = () => {
     });
   };
 
-const administradores = [
-  {
-    nome: "Kemilly",
-    email: "administrador@babybuddy.com.br",
-    senha: "BabyBuddy2026"
-  },
-  {
-    nome: "Laura", 
-    email: "administrador@babybuddy.com.br",
-    senha: "BabyBuddy2026"
-  },
-  {
-    nome: "Guilherme",
-    email: "administrador@babybuddy.com.br",
-    senha: "BabyBuddy2026"
-  },
-  {
-    nome: "Nicolly",
-    email: "administrador@babybuddy.com.br",
-    senha: "BabyBuddy2026"
-  },
-  {
-    nome: "Vinicius",
-    email: "administrador@babybuddy.com.br",
-    senha: "BabyBuddy2026"
-  },
-  {
-    nome: "Giulia",
-    email: "administrador@babybuddy.com.br",
-    senha: "BabyBuddy2026"
-  }
-];
-
-  
-
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // EMAIL DIGITADO
+    // Email 
     const email = formData.email.toLowerCase();
 
-  const admin = administradores.find(
-  (item) =>
-    item.email === email &&
-    item.senha === formData.senha
-);
+    const isAdmin =
+      email === ADMIN.email && formData.senha === ADMIN.senha;
 
-const isAdmin = !!admin;
+    // Dados do usuário
+    const usuario = {
+      nome: formData.nome,
+      email: formData.email,
+      senha: formData.senha,
+      tipo: isAdmin ? 'admin' : 'usuario',
+      admin: isAdmin,
+    };
 
-    // DADOS DO USUÁRIO
- const usuario = {
-  nome: formData.nome,
-  email: formData.email,
-  senha: formData.senha,
-  tipo: isAdmin ? "admin" : "usuario",
-  admin: isAdmin,
-};
-
-    // SALVA NO LOCALSTORAGE
-    localStorage.setItem(
-      'usuario',
-      JSON.stringify(usuario)
-    );
+    // Salva no localStorage
+    localStorage.setItem('usuario', JSON.stringify(usuario));
 
     console.log(usuario);
 
-    // REDIRECIONAMENTO
+    // Redirecionamento
     if (isAdmin) {
       navigate('/administrador');
     } else {
@@ -103,32 +57,19 @@ const isAdmin = !!admin;
     }
   };
 
-
-
-
-
   return (
     <div className={styles.container}>
       <div className={styles.card}>
-
         <h1 className={styles.title}>Login</h1>
+        <p className={styles.subtitle}>Digite seus dados para acessar sua conta</p>
 
-        <p className={styles.subtitle}>
-          Digite seus dados para acessar sua conta
-        </p>
-
-        <form
-          onSubmit={handleSubmit}
-          className={styles.form}
-        >
+        <form onSubmit={handleSubmit} className={styles.form}>
 
           {/* NOME */}
           <div className={styles.inputGroup}>
             <label>Nome</label>
-
             <div className={styles.inputWrapper}>
               <FiUser className={styles.icon} />
-
               <input
                 type="text"
                 name="nome"
@@ -143,10 +84,8 @@ const isAdmin = !!admin;
           {/* EMAIL */}
           <div className={styles.inputGroup}>
             <label>E-mail</label>
-
             <div className={styles.inputWrapper}>
               <FiMail className={styles.icon} />
-
               <input
                 type="email"
                 name="email"
@@ -161,10 +100,8 @@ const isAdmin = !!admin;
           {/* SENHA */}
           <div className={styles.inputGroup}>
             <label>Senha</label>
-
             <div className={styles.inputWrapper}>
               <FiLock className={styles.icon} />
-
               <input
                 type={showPassword ? 'text' : 'password'}
                 name="senha"
@@ -173,27 +110,17 @@ const isAdmin = !!admin;
                 onChange={handleChange}
                 required
               />
-
               <button
                 type="button"
                 className={styles.eyeButton}
-                onClick={() =>
-                  setShowPassword(!showPassword)
-                }
+                onClick={() => setShowPassword(!showPassword)}
               >
-                {showPassword ? (
-                  <FiEyeOff />
-                ) : (
-                  <FiEye />
-                )}
+                {showPassword ? <FiEyeOff /> : <FiEye />}
               </button>
             </div>
           </div>
 
-          <button
-            type="submit"
-            className={styles.loginButton}
-          >
+          <button type="submit" className={styles.loginButton}>
             Login
           </button>
 
@@ -202,12 +129,8 @@ const isAdmin = !!admin;
           </div>
 
           <p className={styles.registerText}>
-            Ainda não tem uma conta?{' '}
-            <Link to="/cadastro">
-              Cadastre-se
-            </Link>
+            Ainda não tem uma conta? <Link to="/cadastro">Cadastre-se</Link>
           </p>
-
         </form>
       </div>
     </div>
