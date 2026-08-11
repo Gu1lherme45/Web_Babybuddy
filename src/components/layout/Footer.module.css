@@ -94,7 +94,7 @@
 /* BOTTOM */
 .bottom {
   margin-top: 40px;
-  font-size: 12px;
+  font-size: 14px;
   text-align: center;
 }
 
@@ -146,13 +146,11 @@
   }
 }
 
-/* ============================= */
-/* 🌊 FOOTER + ONDA CORRIGIDO */
-/* ============================= */
 
+ 
 .footer {
   position: relative;
-  overflow: visible; /* 🔥 NÃO corta mais conteúdo */
+  overflow: visible; 
 }
 
 /* ONDA */
@@ -175,7 +173,7 @@
 .footerContent {
   position: relative;
   z-index: 2;
-  padding-top: 120px; /* 🔥 espaço pra não sobrepor a onda */
+  padding-top: 120px; 
 }
 
 /* RESPONSIVO */
