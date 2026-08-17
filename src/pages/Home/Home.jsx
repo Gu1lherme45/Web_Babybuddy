@@ -5,7 +5,6 @@ import {
   ClipboardCheck,
   HeartPulse,
   BookOpen,
-  Users,
   Shield,
   BadgeCheck,
   HeartHandshake,
@@ -13,12 +12,12 @@ import {
   ShieldCheck,
   Heart,
   BarChart3,
-  ArrowRight,
+  ArrowRight, 
 } from "lucide-react";
 
 import styles from "./Home.module.css";
 
-import Mobile from "../../assets/imgmobile2.svg";
+import Mobile from "../../assets/mobile.svg";
 import imgGravida from "../../assets/imggravidahome3.svg";
 
 import art1 from "../../assets/art1.png";
@@ -172,16 +171,6 @@ export default function Home() {
                   Artigos e orientações desenvolvidos para cada etapa da
                   gravidez.
                 </p>
-              </div>
-            </div>
-
-            <div className={styles.sectionBabyItem}>
-              <div className={styles.sectionBabyIcon}>
-                <Users size={20} />
-              </div>
-              <div>
-                <h3>Compartilhamento familiar</h3>
-                <p>Permita que pessoas próximas acompanhem sua jornada.</p>
               </div>
             </div>
           </div>

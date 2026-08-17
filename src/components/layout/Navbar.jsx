@@ -14,7 +14,7 @@ const isAdministrador = location.pathname === "/administrador";
 const isTermosDeUso = location.pathname === "/termos-de-uso";
 const isPoliticaDePrivacidade = location.pathname === "/politica-de-privacidade";
 
-
+ 
 // esconde navbar nessas páginas
 if (
   isQuestionario ||
@@ -31,6 +31,12 @@ return null;
   return (
     <nav className={styles.navbar}>
       <div className={styles.container}>
+
+        <Link to="/" className={styles.logo}>
+            BabyBuddy
+        </Link>
+
+
 
         <div className={styles.links}>
           <Link to="/#inicio">Início</Link>
