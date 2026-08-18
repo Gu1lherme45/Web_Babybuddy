@@ -1,15 +1,20 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import { CalendarHeart, Search, Eye, EyeOff } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { CalendarHeart, Search, Eye, EyeOff, KeyRound } from "lucide-react";
 
 import styles from "./Perfil.module.css";
 import Sidebar from "../../components/Sidebar/Sidebar";
+import LogoutConfirm from "../../components/LogoutConfirm";
 
 import art1 from "../../assets/art1.png";
 import art2 from "../../assets/art2.png";
 import art3 from "../../assets/art3.png";
+import artSono from "../../assets/art6.png";
+import artAlimentacao from "../../assets/art5.png";
 
 export default function Perfil() {
+  const navigate = useNavigate();
+
   const usuario =
     JSON.parse(localStorage.getItem("usuario")) || {
       nome: "Usuario Nome",
@@ -48,6 +53,24 @@ export default function Perfil() {
       status: "ativo",
       rota: "/periodo-gestacional",
     },
+    {
+      id: 4,
+      titulo: "Sono do bebê",
+      categoria: "Sono",
+      descricao: "Rotina, fases e dicas para o bebê dormir a noite toda.",
+      imagem: artSono,
+      status: "ativo",
+      rota: "/artigos/sono",
+    },
+    {
+      id: 5,
+      titulo: "Alimentação do bebê",
+      categoria: "Alimentação",
+      descricao: "Do aleitamento à introdução alimentar, passo a passo.",
+      imagem: artAlimentacao,
+      status: "ativo",
+      rota: "/artigos/alimentacao",
+    },
   ];
 
   const [artigos, setArtigos] = useState([]);
@@ -59,8 +82,16 @@ export default function Perfil() {
   const [alterarSenha, setAlterarSenha] = useState(false);
   const [novaSenha, setNovaSenha] = useState("");
   const [confirmarSenha, setConfirmarSenha] = useState("");
-  const [confirmarAlteracaoSenha, setConfirmarAlteracaoSenha] = useState(false);
+  const [mostrarNovaSenha, setMostrarNovaSenha] = useState(false);
+  const [mostrarConfirmarSenha, setMostrarConfirmarSenha] = useState(false);
   const [erroSenha, setErroSenha] = useState("");
+  const [confirmarSaida, setConfirmarSaida] = useState(false);
+
+  function sairDaConta() {
+    localStorage.removeItem("usuario");
+    setConfirmarSaida(false);
+    navigate("/");
+  }
 
   // CARREGAR ARTIGOS
   function carregarArtigos() {
@@ -74,6 +105,24 @@ export default function Perfil() {
 
     // GARANTE ROTAS E STATUS
     artigosStorage = artigosStorage.map((artigo) => {
+      // sono (checar antes de "bebê", pois "Sono do bebê" contém a palavra)
+      if (artigo.titulo.toLowerCase().includes("sono")) {
+        return {
+          ...artigo,
+          rota: "/artigos/sono",
+          status: artigo.status || "ativo",
+        };
+      }
+
+      // alimentação (checar antes de "bebê", pelo mesmo motivo)
+      if (artigo.titulo.toLowerCase().includes("alimenta")) {
+        return {
+          ...artigo,
+          rota: "/artigos/alimentacao",
+          status: artigo.status || "ativo",
+        };
+      }
+
       // bebê
       if (artigo.titulo.toLowerCase().includes("bebê")) {
         return {
@@ -315,83 +364,106 @@ export default function Perfil() {
                     </div>
                   )}
 
-                  {/* EDIÇÃO */}
-                  {editando && !confirmarAlteracaoSenha && !alterarSenha && (
+                  {/* GATILHO */}
+                  {editando && !alterarSenha && (
                     <button
+                      type="button"
                       className={styles.botaoAlterarSenha}
-                      onClick={() => setConfirmarAlteracaoSenha(true)}
+                      onClick={() => setAlterarSenha(true)}
                     >
+                      <KeyRound size={15} />
                       Alterar senha
                     </button>
                   )}
 
-                  {/* CONFIRMAÇÃO */}
-                  {confirmarAlteracaoSenha && !alterarSenha && (
-                    <div className={styles.confirmacaoSenha}>
-                      <p>Deseja realmente alterar sua senha?</p>
-
-                      <div className={styles.botoesConfirmacao}>
-                        <button
-                          onClick={() => setConfirmarAlteracaoSenha(false)}
-                        >
-                          Cancelar
-                        </button>
-
-                        <button
-                          onClick={() => {
-                            setConfirmarAlteracaoSenha(false);
-                            setAlterarSenha(true);
-                          }}
-                        >
-                          Sim
-                        </button>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* INPUTS */}
+                  {/* FORMULÁRIO DE NOVA SENHA */}
                   {alterarSenha && (
                     <div className={styles.areaSenha}>
-                      <input
-                        type="password"
-                        placeholder="Nova senha"
-                        value={novaSenha}
-                        onChange={(e) => setNovaSenha(e.target.value)}
-                      />
+                      <div className={styles.campoSenha}>
+                        <input
+                          type={mostrarNovaSenha ? "text" : "password"}
+                          placeholder="Nova senha"
+                          value={novaSenha}
+                          onChange={(e) => setNovaSenha(e.target.value)}
+                        />
+                        <button
+                          type="button"
+                          className={styles.botaoOlhoInput}
+                          onClick={() => setMostrarNovaSenha(!mostrarNovaSenha)}
+                        >
+                          {mostrarNovaSenha ? <EyeOff size={16} /> : <Eye size={16} />}
+                        </button>
+                      </div>
 
-                      <input
-                        type="password"
-                        placeholder="Confirmar nova senha"
-                        value={confirmarSenha}
-                        onChange={(e) => setConfirmarSenha(e.target.value)}
-                      />
+                      <div className={styles.campoSenha}>
+                        <input
+                          type={mostrarConfirmarSenha ? "text" : "password"}
+                          placeholder="Confirmar nova senha"
+                          value={confirmarSenha}
+                          onChange={(e) => setConfirmarSenha(e.target.value)}
+                        />
+                        <button
+                          type="button"
+                          className={styles.botaoOlhoInput}
+                          onClick={() =>
+                            setMostrarConfirmarSenha(!mostrarConfirmarSenha)
+                          }
+                        >
+                          {mostrarConfirmarSenha ? (
+                            <EyeOff size={16} />
+                          ) : (
+                            <Eye size={16} />
+                          )}
+                        </button>
+                      </div>
 
                       {erroSenha && (
                         <p className={styles.erroSenha}>{erroSenha}</p>
                       )}
 
-                      <button
-                        className={styles.salvarSenha}
-                        onClick={() => {
-                          if (novaSenha !== confirmarSenha) {
-                            setErroSenha("As senhas não coincidem.");
-                            return;
-                          }
+                      <div className={styles.acoesSenha}>
+                        <button
+                          type="button"
+                          className={styles.cancelarSenha}
+                          onClick={() => {
+                            setAlterarSenha(false);
+                            setNovaSenha("");
+                            setConfirmarSenha("");
+                            setErroSenha("");
+                          }}
+                        >
+                          Cancelar
+                        </button>
 
-                          setErroSenha("");
+                        <button
+                          type="button"
+                          className={styles.salvarSenha}
+                          onClick={() => {
+                            if (!novaSenha || !confirmarSenha) {
+                              setErroSenha("Preencha os dois campos.");
+                              return;
+                            }
 
-                          setDadosUsuario({
-                            ...dadosUsuario,
-                            senha: novaSenha,
-                          });
+                            if (novaSenha !== confirmarSenha) {
+                              setErroSenha("As senhas não coincidem.");
+                              return;
+                            }
 
-                          setNovaSenha("");
-                          setConfirmarSenha("");
-                          setAlterarSenha(false);
-                        }}
-                      >
-                        Confirmar alteração
-                      </button>
+                            setErroSenha("");
+
+                            setDadosUsuario({
+                              ...dadosUsuario,
+                              senha: novaSenha,
+                            });
+
+                            setNovaSenha("");
+                            setConfirmarSenha("");
+                            setAlterarSenha(false);
+                          }}
+                        >
+                          Salvar nova senha
+                        </button>
+                      </div>
                     </div>
                   )}
                 </div>
@@ -409,10 +481,7 @@ export default function Perfil() {
                 ) : (
                   <button
                     className={styles.sairConta}
-                    onClick={() => {
-                      localStorage.removeItem("usuario");
-                      window.location.href = "/login";
-                    }}
+                    onClick={() => setConfirmarSaida(true)}
                   >
                     Sair da conta
                   </button>
@@ -420,6 +489,15 @@ export default function Perfil() {
               </div>
             </div>
           </>
+        )}
+
+        {confirmarSaida && (
+          <div className={styles.overlayConfirmarSaida}>
+            <LogoutConfirm
+              onConfirm={sairDaConta}
+              onCancel={() => setConfirmarSaida(false)}
+            />
+          </div>
         )}
       </div>
     </div>

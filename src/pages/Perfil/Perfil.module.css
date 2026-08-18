@@ -97,6 +97,17 @@
   z-index: 10;
 }
 
+.overlayConfirmarSaida {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 30;
+}
+
 
 .fecharTopo {
   position: absolute;
@@ -536,6 +547,10 @@
 
 /* ALTERAÇÃO DE SENHA */
 .botaoAlterarSenha {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
     width: 100%;
     margin-top: 5px;
     padding: 10px;
@@ -558,39 +573,104 @@
 .areaSenha {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
+  margin-top: 4px;
+  padding: 14px;
+  border: 1px solid #f2d3e1;
+  border-radius: 12px;
+  background: #fff9fb;
+  animation: apareceSenha 0.2s ease;
+}
+
+@keyframes apareceSenha {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 
-.areaSenha input {
+/* CAMPO COM BOTÃO DE VISIBILIDADE */
+.campoSenha {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.campoSenha input {
   width: 100%;
   box-sizing: border-box;
-  padding: 11px 12px;
+  padding: 11px 40px 11px 12px;
   border-radius: 10px;
   border: 1px solid #e9bfd2;
   background: white;
   font-size: 14px;
   outline: none;
+  transition: border-color .2s ease;
 }
 
-
-.areaSenha input:focus {
+.campoSenha input:focus {
   border-color: #DC2B74;
+  box-shadow: 0 0 0 3px #fdecef;
 }
 
+.botaoOlhoInput {
+  position: absolute;
+  right: 10px;
+  border: none;
+  background: transparent;
+  color: #a06b80;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.botaoOlhoInput:hover {
+  color: #DC2B74;
+}
+
+
+/* AÇÕES DO FORMULÁRIO */
+.acoesSenha {
+  display: flex;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.cancelarSenha {
+  flex: 1;
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid #DC2B74;
+  background: transparent;
+  color: #DC2B74;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: .25s ease;
+}
+
+.cancelarSenha:hover {
+  background: #fdecef;
+}
 
 
 /* BOTÃO CONFIRMAR SENHA */
 .salvarSenha {
-  width: 100%;
-  padding: 11px;
-  border-radius: 12px;
+  flex: 1;
+  padding: 10px;
+  border-radius: 10px;
   border: none;
   background: #DC2B74;
   color: white;
+  font-size: 13px;
   font-weight: 600;
   cursor: pointer;
-  transition: 0.3s;
+  transition: 0.25s ease;
 }
 
 
@@ -599,54 +679,14 @@
 }
 
 
-/* CONFIRMAÇÃO */
-.confirmacaoSenha{
-    display:flex;
-    flex-direction:column;
-    gap:12px;
-    margin-top:10px;
-}
-
-.confirmacaoSenha p{
-    margin:0;
-    font-size:14px;
-    color:#555;
-}
-
-.botoesConfirmacao{
-    display:flex;
-    gap:10px;
-}
-
-.botoesConfirmacao button{
-    flex:1;
-    padding:9px;
-    border:none;
-    border-radius:8px;
-    cursor:pointer;
-    font-weight:600;
-}
-
-.botoesConfirmacao button:first-child{
-    background:#f3f3f3;
-    color:#555;
-}
-
-.botoesConfirmacao button:last-child{
-    background:#DC2B74;
-    color:white;
-}
-
-
-.erroSenha {  
-    margin-top: -2px;
-    margin-bottom: 4px;
+.erroSenha {
+    margin: 0;
     padding: 8px 10px;
     border-radius: 8px;
     background: #fff2f2;
     border: 1px solid #ffcaca;
     color: #d32f2f;
-    font-size: 10px;
+    font-size: 12px;
     font-weight: 500;
     text-align: center;
 }

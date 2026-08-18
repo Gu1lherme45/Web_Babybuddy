@@ -12,10 +12,10 @@ import {
   ShieldCheck,
   Heart,
   BarChart3,
-  ArrowRight, 
 } from "lucide-react";
 
 import styles from "./Home.module.css";
+import AnimatedButton from "../../components/AnimatedButton";
 
 import Mobile from "../../assets/mobile.svg";
 import imgGravida from "../../assets/imggravidahome3.svg";
@@ -62,10 +62,7 @@ export default function Home() {
             </p>
 
             <Link to="/cadastro">
-              <button className={styles.button}>
-                Começar agora!
-                <ArrowRight size={20} />
-              </button>
+              <AnimatedButton>Começar agora!</AnimatedButton>
             </Link>
 
             {/* BENEFÍCIOS */}

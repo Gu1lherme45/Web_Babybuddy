@@ -19,17 +19,27 @@ const Login = () => {
     senha: '',
   });
 
+  // Deixa a primeira letra de cada nome maiúscula, mesmo digitado em minúsculo
+  const capitalizarNome = (texto) =>
+    texto
+      .toLowerCase()
+      .split(' ')
+      .map((palavra) => palavra.charAt(0).toUpperCase() + palavra.slice(1))
+      .join(' ');
+
   const handleChange = (e) => {
+    const { name, value } = e.target;
+
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value,
+      [name]: name === 'nome' ? capitalizarNome(value) : value,
     });
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // Email 
+    // Email
     const email = formData.email.toLowerCase();
 
     const isAdmin =

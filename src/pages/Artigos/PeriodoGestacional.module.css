@@ -12,14 +12,14 @@ body {
   padding: 190px 30px 70px; /* <-- ALTERADO AQUI */
   font-family: 'League Spartan', sans-serif;
   color: #2b2b2b;
-  line-height: 1.7;
+  line-height: 1.6;
   background-color: #ffffff;
   border-radius: 14px;
 }
 
 /* HEADER */
 .header {
-  margin-bottom: -60px;
+  margin-bottom: 20px;
 }
 
 /* BREADCRUMB */
@@ -75,20 +75,20 @@ body {
 
 /* SEÇÕES */
 .section {
-  margin-bottom: 45px;
+  margin-bottom: 28px;
 }
 
 .section h2 {
   font-size: 26px;
   font-weight: 700;
-  margin-bottom: 15px;
+  margin-bottom: 12px;
 }
 
 .section h3 {
   font-size: 18px;
   font-weight: 700;
-  margin-top: 15px;
-  margin-bottom: 5px;
+  margin-top: 12px;
+  margin-bottom: 6px;
 }
 
 .section p {
@@ -98,13 +98,13 @@ body {
 }
 
 .section ul {
-  margin-top: 10px;
+  margin-top: 8px;
   padding-left: 0;
 }
 
 .section li {
   list-style: disc;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
   position: relative;
   padding-left: 18px;
   font-size: 15px;
