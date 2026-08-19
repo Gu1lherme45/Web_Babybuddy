@@ -43,13 +43,17 @@ export default function Layout() {
 
   const isTermos = location.pathname === "/termos-de-uso";
   const isPolitica = location.pathname === "/politica-de-privacidade";
+  const isArtigo = ARTICLE_PATHS.includes(location.pathname);
 
   // "Início" e "Artigos" no menu são âncoras da própria Home ("/"),
   // então voltando de artigos, links da navbar (sobre/login/cadastro)
   // ou do footer pra Home, essa transição não deve mostrar o loader
   const skipLoader =
-    location.pathname === "/" &&
-    HOME_RETURN_SKIP_PATHS.includes(previousPathname);
+    // o Login já mostra sua própria animação de carregamento antes de
+    // navegar pra cá, então o loader de transição de página é redundante
+    location.pathname === "/administrador" ||
+    (location.pathname === "/" &&
+      HOME_RETURN_SKIP_PATHS.includes(previousPathname));
 
   const loaderDuration = FAST_LOADER_PATHS.includes(location.pathname)
     ? 500
@@ -70,7 +74,7 @@ export default function Layout() {
       </AnimatePresence>
 
       <Footer
-        waveColor={isTermos || isPolitica  ? "#f5f5f5" : "#ffffff"}
+        waveColor={isTermos || isPolitica || isArtigo ? "#f5f5f5" : "#ffffff"}
       />
     </>
   );

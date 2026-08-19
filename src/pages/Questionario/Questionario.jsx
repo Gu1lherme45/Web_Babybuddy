@@ -1,11 +1,17 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { AnimatePresence, motion } from "framer-motion";
 import styles from "./Questionario.module.css";
 
-import logo from "../../assets/logo2.svg";
+import logo from "../../assets/logoofc3.svg";
 import heartQuestion from "../../assets/heartquestion.png";
+import AnimatedButton from "../../components/AnimatedButton";
+import LiquidRadioGroup from "../../components/LiquidRadioGroup";
 
-import { ArrowRight } from "lucide-react";
+const FAIXAS_IDADE = ["15-25", "26-35", "36-44", "44+"];
+
+// formato YYYY-MM-DD (exigido pelo input date) respeitando o fuso local
+const hoje = new Date().toLocaleDateString("sv-SE");
 
 const TIPOS_SANGUINEOS = [
   "A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-",
@@ -20,7 +26,7 @@ const CONDICOES_SAUDE = [
 ];
 
 const ESTADO_INICIAL = {
-  idade: "",
+  idade: "15-25",
   tipoSanguineo: "",
   jaTeveParto: "",
   primeiraGestacao: "",
@@ -38,7 +44,12 @@ const ESTADO_INICIAL = {
 };
 
 const ETAPAS = [
-  { campo: "idade", pergunta: "Qual é a sua idade?", tipo: "number" },
+  {
+    campo: "idade",
+    pergunta: "Qual é a sua idade?",
+    tipo: "radio",
+    opcoes: FAIXAS_IDADE,
+  },
   {
     campo: "tipoSanguineo",
     pergunta: "Qual o seu tipo sanguíneo?",
@@ -134,6 +145,8 @@ export default function Questionario() {
 
   const etapaAtual = ETAPAS[step - 1];
   const progress = (step / ETAPAS.length) * 100;
+  const fase =
+    step === 0 ? "inicio" : step <= ETAPAS.length ? "perguntas" : "final";
 
   function handleChange(campo, valor) {
     setDados((prev) => ({ ...prev, [campo]: valor }));
@@ -145,18 +158,7 @@ export default function Questionario() {
     const { campo, tipo, condicional } = etapaAtual;
     const valor = dados[campo];
 
-    if (tipo === "number") {
-      const numero = Number(valor);
-
-      if (valor === "" || Number.isNaN(numero)) {
-        novosErros[campo] = "Preencha um número válido.";
-      } else if (campo === "idade" && (numero < 15 || numero > 60)) {
-        novosErros[campo] =
-          "É necessário ter no mínimo 15 anos para se cadastrar.";
-      }
-    }
-
-    if (tipo === "select" || tipo === "buttons") {
+    if (tipo === "select" || tipo === "buttons" || tipo === "radio") {
       if (!valor) {
         novosErros[campo] = "Selecione uma opção.";
       }
@@ -165,6 +167,8 @@ export default function Questionario() {
     if (tipo === "date") {
       if (!valor) {
         novosErros[campo] = "Selecione uma data válida.";
+      } else if (valor < hoje) {
+        novosErros[campo] = "A data não pode ser anterior a hoje.";
       }
     }
 
@@ -227,18 +231,14 @@ export default function Questionario() {
   function renderCampo() {
     const { campo, tipo, opcoes, condicional, linkTermos } = etapaAtual;
 
-    if (tipo === "number") {
+    if (tipo === "radio") {
       return (
         <div className={styles.fieldGroup}>
-          <input
-            type="number"
-            min={campo === "idade" ? 15 : undefined}
-            max={campo === "idade" ? 60 : undefined}
-            className={`${styles.input} ${
-              errors[campo] ? styles.inputError : ""
-            }`}
+          <LiquidRadioGroup
+            name={campo}
+            options={opcoes}
             value={dados[campo]}
-            onChange={(e) => handleChange(campo, e.target.value)}
+            onChange={(valor) => handleChange(campo, valor)}
           />
 
           {errors[campo] && (
@@ -253,6 +253,8 @@ export default function Questionario() {
         <div className={styles.fieldGroup}>
           <input
             type="date"
+            lang="pt-BR"
+            min={hoje}
             className={`${styles.input} ${
               errors[campo] ? styles.inputError : ""
             }`}
@@ -272,12 +274,14 @@ export default function Questionario() {
         <div className={styles.fieldGroup}>
           <select
             className={`${styles.select} ${
-              errors[campo] ? styles.inputError : ""
-            }`}
+              campo === "tipoSanguineo" ? styles.selectTipoSanguineo : ""
+            } ${errors[campo] ? styles.inputError : ""}`}
             value={dados[campo]}
             onChange={(e) => handleChange(campo, e.target.value)}
           >
-            <option value="">Selecionar</option>
+            <option value="" className={styles.selectPlaceholder}>
+              Selecionar
+            </option>
 
             {opcoes.map((opt, index) => (
               <option key={index} value={opt}>
@@ -402,102 +406,123 @@ export default function Questionario() {
 
   return (
     <div className={styles.container}>
-      {/* TELA INICIAL */}
-      {step === 0 && (
-        <section className={styles.firstSection}>
-          <div className={styles.iconArea}>
-            <img
-              src={heartQuestion}
-              alt="Heart"
-              className={styles.heartImage}
-            />
-          </div>
-
-          <h1>Sua saúde importa</h1>
-
-          <p>
-            Para oferecer a melhor experiência personalizada,
-            começaremos com um rápido questionário de saúde.
-          </p>
-
-          <button onClick={() => setStep(1)} className={styles.startButton}>
-            <span>INICIAR QUESTIONÁRIO DE SAÚDE</span>
-
-            <ArrowRight size={24} className={styles.arrowIcon} />
-          </button>
-        </section>
-      )}
-
-      {/* QUESTIONÁRIO */}
-      {step > 0 && step <= ETAPAS.length && (
-        <div className={styles.questionario}>
-          <div className={styles.top}>
-            <span className={styles.back} onClick={prevStep}>
-              ‹
-            </span>
-
-            <div className={styles.progressBar}>
-              <div
-                className={styles.progress}
-                style={{ width: `${progress}%` }}
+      <AnimatePresence mode="wait">
+        {/* TELA INICIAL */}
+        {fase === "inicio" && (
+          <motion.section
+            key="inicio"
+            className={styles.firstSection}
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -16 }}
+            transition={{ duration: 0.45, ease: [0.22, 0.9, 0.25, 1] }}
+          >
+            <div className={styles.iconArea}>
+              <img
+                src={heartQuestion}
+                alt="Heart"
+                className={styles.heartImage}
               />
             </div>
-          </div>
 
-          <img src={logo} alt="BabyBuddy" className={styles.logo} />
+            <h1>Sua saúde importa</h1>
 
-          <h2>{etapaAtual.pergunta}</h2>
+            <p>
+              Para oferecer a melhor experiência personalizada,
+              começaremos com um rápido questionário de saúde.
+            </p>
 
-          {renderCampo()}
+            <AnimatedButton large onClick={() => setStep(1)}>
+              INICIAR QUESTIONÁRIO DE SAÚDE
+            </AnimatedButton>
+          </motion.section>
+        )}
 
-          <button
-            className={styles.button}
-            onClick={nextStep}
-            disabled={enviando}
+        {/* QUESTIONÁRIO */}
+        {fase === "perguntas" && (
+          <motion.div
+            key="perguntas"
+            className={styles.questionario}
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -16 }}
+            transition={{ duration: 0.45, ease: [0.22, 0.9, 0.25, 1] }}
           >
-            {step === ETAPAS.length
-              ? enviando
-                ? "Enviando..."
-                : "Finalizar questionario"
-              : "Continuar"}
-          </button>
-        </div>
-      )}
+            <div className={styles.top}>
+              <span className={styles.back} onClick={prevStep}>
+                ‹
+              </span>
 
-      {/* FINAL */}
-      {step > ETAPAS.length && (
-        <div className={styles.finishContainer}>
-          <div className={styles.finishIllustration}>
-            <div className={styles.circle}></div>
-
-            <div className={styles.clipboard}>
-              <div className={styles.clipHeader}></div>
-
-              <div className={styles.clipLines}>
-                <span></span>
-                <span></span>
-                <span></span>
-                <span></span>
+              <div className={styles.progressBar}>
+                <div
+                  className={styles.progress}
+                  style={{ width: `${progress}%` }}
+                />
               </div>
             </div>
 
-            <div className={styles.checkIcon}>✓</div>
-          </div>
+            <img src={logo} alt="BabyBuddy" className={styles.logo} />
 
-          <h1 className={styles.finishTitle}>Tudo pronto!</h1>
+            <h2>{etapaAtual.pergunta}</h2>
 
-          <p className={styles.finishText}>
-            Sua jornada com o BabyBuddy acabou de começar.
-          </p>
+            {renderCampo()}
 
-          <button
-            className={styles.finishButton}
-            onClick={() => navigate("/login")}
+            <button
+              className={styles.button}
+              onClick={nextStep}
+              disabled={enviando}
+            >
+              {step === ETAPAS.length
+                ? enviando
+                  ? "Enviando..."
+                  : "Finalizar questionario"
+                : "Continuar"}
+            </button>
+          </motion.div>
+        )}
+
+        {/* FINAL */}
+        {fase === "final" && (
+          <motion.div
+            key="final"
+            className={styles.finishContainer}
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -16 }}
+            transition={{ duration: 0.45, ease: [0.22, 0.9, 0.25, 1] }}
           >
-            Ir para o login
-          </button>
-        </div>
-      )}
+            <div className={styles.finishIllustration}>
+              <div className={styles.circle}></div>
+
+              <div className={styles.clipboard}>
+                <div className={styles.clipHeader}></div>
+
+                <div className={styles.clipLines}>
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                </div>
+              </div>
+
+              <div className={styles.checkIcon}>✓</div>
+            </div>
+
+            <h1 className={styles.finishTitle}>Tudo pronto!</h1>
+
+            <p className={styles.finishText}>
+              Sua jornada com o BabyBuddy acabou de começar.
+            </p>
+
+            <button
+              className={styles.finishButton}
+              onClick={() => navigate("/login")}
+            >
+              Ir para o login
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

@@ -14,6 +14,8 @@ import {
 import art1 from "../../assets/art1.png";
 import art2 from "../../assets/art2.png";
 import art3 from "../../assets/art3.png";
+import art5 from "../../assets/art5.png";
+import art6 from "../../assets/art6.png";
 import logo2 from "../../assets/logo2.svg";
 
 // Artigos padrão exibidos quando não há nada salvo no localStorage
@@ -45,21 +47,57 @@ const artigosPadrao = [
     status: "ativo",
     rota: "/periodo-gestacional",
   },
+  {
+    id: 4,
+    titulo: "Sono do bebê",
+    categoria: "Sono",
+    descricao: "Rotina, fases e dicas para o bebê dormir a noite toda.",
+    imagem: art6,
+    status: "ativo",
+    rota: "/artigos/sono",
+  },
+  {
+    id: 5,
+    titulo: "Alimentação do bebê",
+    categoria: "Alimentação",
+    descricao: "Do aleitamento à introdução alimentar, passo a passo.",
+    imagem: art5,
+    status: "ativo",
+    rota: "/artigos/alimentacao",
+  },
 ];
+
+const rotasPadrao = new Set(artigosPadrao.map((a) => a.rota));
+
+// remove duplicados dos artigos padrão (por rota) e adiciona os que faltam,
+// sem mexer em artigos personalizados criados pelo admin
+function limparEComporArtigos(lista) {
+  const vistos = new Set();
+  const semDuplicados = [];
+
+  for (const artigo of lista) {
+    if (rotasPadrao.has(artigo.rota)) {
+      if (vistos.has(artigo.rota)) continue;
+      vistos.add(artigo.rota);
+    }
+    semDuplicados.push(artigo);
+  }
+
+  const faltantes = artigosPadrao.filter((a) => !vistos.has(a.rota));
+
+  return [...semDuplicados, ...faltantes];
+}
 
 export default function AdminDashboard() {
   const admin = localStorage.getItem("nome") || "Administrador";
 
   // Artigos (persistidos no localStorage)
   const [artigos, setArtigos] = useState(() => {
-    const artigosSalvos = JSON.parse(localStorage.getItem("artigos"));
+    const artigosSalvos = JSON.parse(localStorage.getItem("artigos")) || [];
+    const artigosCorrigidos = limparEComporArtigos(artigosSalvos);
 
-    if (!artigosSalvos || artigosSalvos.length === 0) {
-      localStorage.setItem("artigos", JSON.stringify(artigosPadrao));
-      return artigosPadrao;
-    }
-
-    return artigosSalvos;
+    localStorage.setItem("artigos", JSON.stringify(artigosCorrigidos));
+    return artigosCorrigidos;
   });
 
   const [pesquisa, setPesquisa] = useState("");

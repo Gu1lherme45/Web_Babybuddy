@@ -3,6 +3,7 @@ import imagem from "../../assets/art2.svg";
 
 export default function TentandoEngravidar() {
   return (
+    <div className={styles.page}>
     <div className={styles.container}>
 
       {/* NOVO HEADER (SUBSTITUI O HERO) */}
@@ -228,6 +229,7 @@ export default function TentandoEngravidar() {
         bem-estar físico e emocional durante toda a jornada.
       </div>
 
+    </div>
     </div>
   );
 }

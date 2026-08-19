@@ -3,6 +3,7 @@ import imagem from "../../assets/art6.png";
 
 export default function Sono() {
   return (
+    <div className={styles.page}>
     <div className={styles.container}>
 
       {/* HEADER */}
@@ -181,6 +182,7 @@ export default function Sono() {
         </ul>
       </section>
 
+    </div>
     </div>
   );
 }

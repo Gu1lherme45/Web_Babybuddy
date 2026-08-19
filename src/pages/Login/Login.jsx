@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FiUser, FiMail, FiLock, FiEye, FiEyeOff } from 'react-icons/fi';
 import styles from './Login.module.css';
+import LoadingWave from '../../components/LoadingWave';
+import WelcomeLoader from '../../components/WelcomeLoader';
 
 // Administrador
 const ADMIN = {
@@ -13,6 +15,8 @@ const Login = () => {
   const navigate = useNavigate();
 
   const [showPassword, setShowPassword] = useState(false);
+  const [carregandoAdmin, setCarregandoAdmin] = useState(false);
+  const [carregandoUsuario, setCarregandoUsuario] = useState(false);
   const [formData, setFormData] = useState({
     nome: '',
     email: '',
@@ -61,11 +65,33 @@ const Login = () => {
 
     // Redirecionamento
     if (isAdmin) {
-      navigate('/administrador');
+      setCarregandoAdmin(true);
+      setTimeout(() => {
+        navigate('/administrador');
+      }, 1400);
     } else {
-      navigate('/perfil');
+      setCarregandoUsuario(true);
+      setTimeout(() => {
+        navigate('/perfil');
+      }, 5000);
     }
   };
+
+  if (carregandoAdmin) {
+    return (
+      <div className={styles.container}>
+        <LoadingWave />
+      </div>
+    );
+  }
+
+  if (carregandoUsuario) {
+    return (
+      <div className={styles.container}>
+        <WelcomeLoader />
+      </div>
+    );
+  }
 
   return (
     <div className={styles.container}>

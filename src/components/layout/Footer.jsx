@@ -1,6 +1,8 @@
 import { Link } from 'react-router-dom';
 import styles from './Footer.module.css';
 import logo from '../../assets/logoofcc.png';
+import googlePlayBadge from '../../assets/googleplay-badge-ptbr.png';
+import appStoreBadge from '../../assets/appstore-badge-ptbr.svg';
 
 export default function Footer({ waveColor = "#ffffff" }) {
   return (
@@ -31,7 +33,7 @@ export default function Footer({ waveColor = "#ffffff" }) {
               rel="noopener noreferrer"
             >
               <img
-                src="https://raw.githubusercontent.com/ziadsarour/stores-badges/master/playstore/black/pt-br.png"
+                src={googlePlayBadge}
                 alt="Disponível no Google Play"
                 className={`${styles.storeIcon} ${styles.play}`}
               />
@@ -43,7 +45,7 @@ export default function Footer({ waveColor = "#ffffff" }) {
               rel="noopener noreferrer"
             >
               <img
-                src="https://raw.githubusercontent.com/ziadsarour/stores-badges/master/appstore/black/pt-br.svg"
+                src={appStoreBadge}
                 alt="Baixar na App Store"
                 className={`${styles.storeIcon} ${styles.apple}`}
               />

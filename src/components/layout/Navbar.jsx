@@ -1,9 +1,11 @@
 
 import styles from './Navbar.module.css';
 import { Link, useLocation } from 'react-router-dom';
+import logo from '../../assets/logoofc3.svg';
 
 export default function Navbar() {
   const location = useLocation();
+  const usuario = JSON.parse(localStorage.getItem("usuario"));
 
 // detecta páginas
 const isQuestionario = location.pathname === "/questionario";
@@ -32,9 +34,15 @@ return null;
     <nav className={styles.navbar}>
       <div className={styles.container}>
 
-        <Link to="/" className={styles.logo}>
-            BabyBuddy
-        </Link>
+        {usuario ? (
+          <Link to="/perfil" className={styles.logo}>
+            <img src={logo} alt="BabyBuddy" className={styles.logoImg} />
+          </Link>
+        ) : (
+          <span className={styles.logo}>
+            <img src={logo} alt="BabyBuddy" className={styles.logoImg} />
+          </span>
+        )}
 
 
 

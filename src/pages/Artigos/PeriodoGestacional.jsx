@@ -3,6 +3,7 @@ import imagem from "../../assets/art3.svg";
 
 export default function PeriodoGestacional() {
   return (
+    <div className={styles.page}>
     <div className={styles.container}>
 
       {/* HEADER */}
@@ -184,6 +185,7 @@ export default function PeriodoGestacional() {
         </ul>
       </section>
 
+    </div>
     </div>
   );
 }

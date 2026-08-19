@@ -3,6 +3,7 @@ import imagem from "../../assets/art5.png";
 
 export default function Alimentacao() {
   return (
+    <div className={styles.page}>
     <div className={styles.container}>
 
       {/* HEADER */}
@@ -174,6 +175,7 @@ export default function Alimentacao() {
         </ul>
       </section>
 
+    </div>
     </div>
   );
 }

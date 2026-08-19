@@ -3,6 +3,7 @@ import imagem from "../../assets/art1.svg";
 
 export default function CuidadosBebe() {
   return (
+    <div className={styles.page}>
     <div className={styles.container}>
 
       {/* HEADER */}
@@ -189,6 +190,7 @@ export default function CuidadosBebe() {
         saudável e para fortalecer o vínculo entre pais e bebê.
       </div>
 
+    </div>
     </div>
   );
 }

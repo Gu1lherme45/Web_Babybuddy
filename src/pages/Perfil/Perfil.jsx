@@ -61,6 +61,7 @@ export default function Perfil() {
       imagem: artSono,
       status: "ativo",
       rota: "/artigos/sono",
+      tempo: 9,
     },
     {
       id: 5,
@@ -70,6 +71,7 @@ export default function Perfil() {
       imagem: artAlimentacao,
       status: "ativo",
       rota: "/artigos/alimentacao",
+      tempo: 10,
     },
   ];
 
@@ -95,13 +97,24 @@ export default function Perfil() {
 
   // CARREGAR ARTIGOS
   function carregarArtigos() {
-    let artigosStorage = JSON.parse(localStorage.getItem("artigos"));
+    let artigosStorage = JSON.parse(localStorage.getItem("artigos")) || [];
 
-    // cria os artigos caso não existam
-    if (!artigosStorage || artigosStorage.length === 0) {
-      localStorage.setItem("artigos", JSON.stringify(artigosPadrao));
-      artigosStorage = artigosPadrao;
+    // remove duplicados dos artigos padrão (por rota) e adiciona os que
+    // faltam, sem mexer em artigos personalizados criados pelo admin
+    const rotasPadrao = new Set(artigosPadrao.map((a) => a.rota));
+    const vistos = new Set();
+    const semDuplicados = [];
+
+    for (const artigo of artigosStorage) {
+      if (rotasPadrao.has(artigo.rota)) {
+        if (vistos.has(artigo.rota)) continue;
+        vistos.add(artigo.rota);
+      }
+      semDuplicados.push(artigo);
     }
+
+    const faltantes = artigosPadrao.filter((a) => !vistos.has(a.rota));
+    artigosStorage = [...semDuplicados, ...faltantes];
 
     // GARANTE ROTAS E STATUS
     artigosStorage = artigosStorage.map((artigo) => {
@@ -151,6 +164,15 @@ export default function Perfil() {
       }
 
       return artigo;
+    });
+
+    // sincroniza o tempo de leitura com o valor padrão (ainda não é
+    // customizável pelo admin, então sempre reflete o artigo original)
+    artigosStorage = artigosStorage.map((artigo) => {
+      const padrao = artigosPadrao.find((a) => a.rota === artigo.rota);
+      if (padrao?.tempo === undefined) return artigo;
+
+      return { ...artigo, tempo: padrao.tempo };
     });
 
     // atualiza storage
@@ -266,6 +288,12 @@ export default function Perfil() {
                 <span>{artigo.categoria.toUpperCase()}</span>
                 <h3>{artigo.titulo.toUpperCase()}</h3>
                 <p>{artigo.descricao}</p>
+
+                {artigo.tempo && (
+                  <span className={styles.cardTempo}>
+                    ⏱️ {artigo.tempo} min de leitura
+                  </span>
+                )}
               </div>
             </Link>
           ))}
