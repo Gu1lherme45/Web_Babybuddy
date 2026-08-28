@@ -16,8 +16,12 @@ import {
 
 import styles from './Cadastro.module.css';
 import { CgPassword } from 'react-icons/cg';
+import { criarUsuario, ApiError } from '../../services/api';
+import { useAuth } from '../../context/AuthContext';
 
 export default function Cadastro() {
+
+  const { entrar } = useAuth();
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -91,112 +95,36 @@ export default function Cadastro() {
       return;
     }
 
-    // PEGA USUÁRIOS JÁ CADASTRADOS
-    const usuarios =
-      JSON.parse(
-        localStorage.getItem('usuarios')
-      ) || [];
+    const novoUsuario = {
+      nome,
+      username: email,
+      password: senha,
+      nivelAcesso: 'Gestante',
+    };
 
-    // VERIFICA SE EMAIL JÁ EXISTE
-    const usuarioExiste = usuarios.find(
-      (user) =>
-        user.email.toLowerCase() ===
-        email.toLowerCase()
-    );
+    try {
 
-    if (usuarioExiste) {
+      await criarUsuario(novoUsuario);
 
-      setError(
-        'Este e-mail já está cadastrado.'
+      // login automático com as credenciais recém-criadas, para que
+      // /questionario (rota protegida) já reconheça a sessão
+      await entrar(novoUsuario.username, novoUsuario.password);
+
+      setSuccess(
+        'Cadastro realizado com sucesso!'
       );
 
-      setLoading(false);
-      return;
-    }
+      // REDIRECIONA
+      setTimeout(() => {
+        navigate('/questionario');
+      }, 1000);
 
-    // NÂO MEXAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-    // NÂO MEXAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-    // NÂO MEXAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-    // NÂO MEXAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-    // NÂO MEXAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-    // NÂO MEXAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-    // NÂO MEXAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-    // NÂO MEXAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-const novoUsuario = {
-  nome,
-  username: email,
-  password: senha,
-  nivelAcesso: "USUARIO"
-};
-
-try {
-
-    
-
-  console.log(novoUsuario);
-  const response = await fetch(
-    'http://localhost:8080/api/usuarios',
-    {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(novoUsuario),
-    }
-  );
-
-  if (!response.ok) {
-
-    const msg = await response.text();
-
-    throw new Error(
-      msg || 'Erro ao cadastrar usuário.'
-    );
-  }
-
-  
-    // NÂO MEXAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-    // NÂO MEXAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-    // NÂO MEXAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-    // NÂO MEXAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-    // NÂO MEXAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-    // NÂO MEXAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-
-
-    // =========================
-  // LOCAL STORAGE
-  // =========================
-
-  usuarios.push(novoUsuario);
-
-  localStorage.setItem(
-    'usuarios',
-    JSON.stringify(usuarios)
-  );
-
-  localStorage.setItem(
-    'usuario',
-    JSON.stringify(novoUsuario)
-  );
-
-  console.log(
-    'Usuário cadastrado:',
-    novoUsuario
-  );
-
-  setSuccess(
-    'Cadastro realizado com sucesso!'
-  );
-
-  // REDIRECIONA
-  setTimeout(() => {
-    navigate('/questionario');
-  }, 1000);
-
-} catch (err) {
+    } catch (err) {
 
       setError(
-        'Erro ao cadastrar usuário.'
+        err instanceof ApiError
+          ? err.message
+          : 'Erro ao cadastrar usuário.'
       );
 
     } finally {

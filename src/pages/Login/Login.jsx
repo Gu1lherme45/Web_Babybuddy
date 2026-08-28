@@ -1,61 +1,76 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { FiUser, FiMail, FiLock, FiEye, FiEyeOff } from 'react-icons/fi';
+import { FiMail, FiLock, FiEye, FiEyeOff } from 'react-icons/fi';
 import styles from './Login.module.css';
-
-// Administrador
-const ADMIN = {
-  email: 'administrador@babybuddy.com.br',
-  senha: 'BabyBuddy2026',
-};
+import LoadingWave from '../../components/LoadingWave';
+import WelcomeLoader from '../../components/WelcomeLoader';
+import { useAuth } from '../../context/AuthContext';
+import { ApiError } from '../../services/api';
 
 const Login = () => {
   const navigate = useNavigate();
+  const { entrar } = useAuth();
 
   const [showPassword, setShowPassword] = useState(false);
+  const [carregandoAdmin, setCarregandoAdmin] = useState(false);
+  const [carregandoUsuario, setCarregandoUsuario] = useState(false);
+  const [enviando, setEnviando] = useState(false);
+  const [erro, setErro] = useState('');
   const [formData, setFormData] = useState({
-    nome: '',
     email: '',
     senha: '',
   });
 
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setErro('');
+    setEnviando(true);
 
-    // Email 
-    const email = formData.email.toLowerCase();
+    try {
+      const usuario = await entrar(formData.email, formData.senha);
+      const isAdmin = usuario?.nivelAcesso === 'ADMIN';
 
-    const isAdmin =
-      email === ADMIN.email && formData.senha === ADMIN.senha;
-
-    // Dados do usuário
-    const usuario = {
-      nome: formData.nome,
-      email: formData.email,
-      senha: formData.senha,
-      tipo: isAdmin ? 'admin' : 'usuario',
-      admin: isAdmin,
-    };
-
-    // Salva no localStorage
-    localStorage.setItem('usuario', JSON.stringify(usuario));
-
-    console.log(usuario);
-
-    // Redirecionamento
-    if (isAdmin) {
-      navigate('/administrador');
-    } else {
-      navigate('/perfil');
+      if (isAdmin) {
+        setCarregandoAdmin(true);
+        setTimeout(() => {
+          navigate('/administrador');
+        }, 1400);
+      } else {
+        setCarregandoUsuario(true);
+        setTimeout(() => {
+          navigate('/perfil');
+        }, 5000);
+      }
+    } catch (err) {
+      setErro(
+        err instanceof ApiError
+          ? err.message
+          : 'Não foi possível fazer login. Tente novamente.'
+      );
+      setEnviando(false);
     }
   };
+
+  if (carregandoAdmin) {
+    return (
+      <div className={styles.container}>
+        <LoadingWave />
+      </div>
+    );
+  }
+
+  if (carregandoUsuario) {
+    return (
+      <div className={styles.container}>
+        <WelcomeLoader />
+      </div>
+    );
+  }
 
   return (
     <div className={styles.container}>
@@ -63,23 +78,9 @@ const Login = () => {
         <h1 className={styles.title}>Login</h1>
         <p className={styles.subtitle}>Digite seus dados para acessar sua conta</p>
 
-        <form onSubmit={handleSubmit} className={styles.form}>
+        {erro && <div className={styles.error}>{erro}</div>}
 
-          {/* NOME */}
-          <div className={styles.inputGroup}>
-            <label>Nome</label>
-            <div className={styles.inputWrapper}>
-              <FiUser className={styles.icon} />
-              <input
-                type="text"
-                name="nome"
-                placeholder="Digite seu nome"
-                value={formData.nome}
-                onChange={handleChange}
-                required
-              />
-            </div>
-          </div>
+        <form onSubmit={handleSubmit} className={styles.form}>
 
           {/* EMAIL */}
           <div className={styles.inputGroup}>
@@ -120,8 +121,8 @@ const Login = () => {
             </div>
           </div>
 
-          <button type="submit" className={styles.loginButton}>
-            Login
+          <button type="submit" className={styles.loginButton} disabled={enviando}>
+            {enviando ? 'Entrando...' : 'Login'}
           </button>
 
           <div className={styles.divider}>

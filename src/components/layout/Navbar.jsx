@@ -1,9 +1,12 @@
 
 import styles from './Navbar.module.css';
 import { Link, useLocation } from 'react-router-dom';
+import logo from '../../assets/logoofc3.svg';
+import { useAuth } from '../../context/AuthContext';
 
 export default function Navbar() {
   const location = useLocation();
+  const { usuario } = useAuth();
 
 // detecta páginas
 const isQuestionario = location.pathname === "/questionario";
@@ -14,7 +17,7 @@ const isAdministrador = location.pathname === "/administrador";
 const isTermosDeUso = location.pathname === "/termos-de-uso";
 const isPoliticaDePrivacidade = location.pathname === "/politica-de-privacidade";
 
-
+ 
 // esconde navbar nessas páginas
 if (
   isQuestionario ||
@@ -31,6 +34,18 @@ return null;
   return (
     <nav className={styles.navbar}>
       <div className={styles.container}>
+
+        {usuario ? (
+          <Link to="/perfil" className={styles.logo}>
+            <img src={logo} alt="BabyBuddy" className={styles.logoImg} />
+          </Link>
+        ) : (
+          <span className={styles.logo}>
+            <img src={logo} alt="BabyBuddy" className={styles.logoImg} />
+          </span>
+        )}
+
+
 
         <div className={styles.links}>
           <Link to="/#inicio">Início</Link>

@@ -10,57 +10,59 @@ import {
   Plus,
 } from "lucide-react";
 
+import { useAuth } from "../../context/AuthContext";
+import {
+  listarMateriais,
+  criarMaterial,
+  atualizarMaterial,
+  inativarMaterial,
+  ativarMaterial,
+  excluirMaterial,
+  listarUsuarios,
+  ApiError,
+} from "../../services/api";
+
 // Imagens
 import art1 from "../../assets/art1.png";
 import art2 from "../../assets/art2.png";
 import art3 from "../../assets/art3.png";
+import art5 from "../../assets/art5.png";
+import art6 from "../../assets/art6.png";
 import logo2 from "../../assets/logo2.svg";
 
-// Artigos padrão exibidos quando não há nada salvo no localStorage
-const artigosPadrao = [
-  {
-    id: 1,
-    titulo: "Cuidados com o bebê",
-    categoria: "Bebê",
-    descricao: "Tudo que você precisa saber para cuidar do seu bebê.",
-    imagem: art1,
-    status: "ativo",
-    rota: "/cuidados-bebe",
-  },
-  {
-    id: 2,
-    titulo: "Tentando engravidar?",
-    categoria: "Fertilidade",
-    descricao: "Quanto tempo demora a fecundação após a relação sexual?",
-    imagem: art2,
-    status: "ativo",
-    rota: "/tentando-engravidar",
-  },
-  {
-    id: 3,
-    titulo: "Período gestacional",
-    categoria: "Gestação",
-    descricao: "Tudo que você precisa saber sobre o período gestacional.",
-    imagem: art3,
-    status: "ativo",
-    rota: "/periodo-gestacional",
-  },
-];
+// imagem padrão só para os artigos de conteúdo fixo do site — os demais
+// usam o que estiver salvo em `arquivo` (upload feito no modal de edição)
+const IMAGENS_POR_ROTA = {
+  "/cuidados-bebe": art1,
+  "/tentando-engravidar": art2,
+  "/periodo-gestacional": art3,
+  "/artigos/sono": art6,
+  "/artigos/alimentacao": art5,
+};
+
+// Material (backend) -> formato usado pela grade do dashboard
+function materialParaArtigo(material) {
+  return {
+    id: material.id,
+    titulo: material.titulo,
+    categoria: material.categoria,
+    descricao: material.descricao,
+    imagem: material.arquivo || IMAGENS_POR_ROTA[material.link] || "",
+    arquivo: material.arquivo,
+    status: material.statusMaterial === "ATIVO" ? "ativo" : "suspenso",
+    rota: material.link,
+    autor: material.autor,
+    statusMaterial: material.statusMaterial,
+  };
+}
 
 export default function AdminDashboard() {
-  const admin = localStorage.getItem("nome") || "Administrador";
+  const { usuario } = useAuth();
+  const admin = usuario?.nome || "Administrador";
 
-  // Artigos (persistidos no localStorage)
-  const [artigos, setArtigos] = useState(() => {
-    const artigosSalvos = JSON.parse(localStorage.getItem("artigos"));
-
-    if (!artigosSalvos || artigosSalvos.length === 0) {
-      localStorage.setItem("artigos", JSON.stringify(artigosPadrao));
-      return artigosPadrao;
-    }
-
-    return artigosSalvos;
-  });
+  const [artigos, setArtigos] = useState([]);
+  const [carregandoArtigos, setCarregandoArtigos] = useState(true);
+  const [erroArtigos, setErroArtigos] = useState("");
 
   const [pesquisa, setPesquisa] = useState("");
   const [totalUsuarios, setTotalUsuarios] = useState(0);
@@ -72,21 +74,33 @@ export default function AdminDashboard() {
   const [novaDescricao, setNovaDescricao] = useState("");
   const [novaCategoria, setNovaCategoria] = useState("");
   const [novaImagem, setNovaImagem] = useState("");
+  const [salvandoEdicao, setSalvandoEdicao] = useState(false);
 
-  // Salva artigos no localStorage sempre que mudarem
+  // Busca os materiais (artigos) no backend
   useEffect(() => {
-    localStorage.setItem("artigos", JSON.stringify(artigos));
-    window.dispatchEvent(new Event("artigosAtualizados"));
-  }, [artigos]);
+    async function carregarMateriais() {
+      try {
+        const materiais = await listarMateriais();
+        setArtigos(materiais.map(materialParaArtigo));
+      } catch (error) {
+        setErroArtigos(
+          error instanceof ApiError
+            ? error.message
+            : "Não foi possível carregar os artigos."
+        );
+      } finally {
+        setCarregandoArtigos(false);
+      }
+    }
+
+    carregarMateriais();
+  }, []);
 
   // Busca total de usuários no backend
   useEffect(() => {
     async function carregarUsuarios() {
       try {
-        const response = await fetch("http://localhost:8080/api/usuarios");
-        if (!response.ok) return;
-
-        const usuarios = await response.json();
+        const usuarios = await listarUsuarios();
         setTotalUsuarios(usuarios.length);
       } catch (error) {
         console.error("Erro ao buscar usuários:", error);
@@ -104,27 +118,43 @@ export default function AdminDashboard() {
     setNovoTitulo(artigo.titulo);
     setNovaDescricao(artigo.descricao);
     setNovaCategoria(artigo.categoria);
-    setNovaImagem(artigo.imagem);
+    // preview usa o fallback de imagem, mas o que é persistido é o
+    // `arquivo` real — não o caminho de um asset local usado só de exibição
+    setNovaImagem(artigo.arquivo || "");
     setModalEditar(true);
   }
 
-  function salvarEdicao() {
-    const artigosAtualizados = artigos.map((artigo) =>
-      artigo.id === artigoEditando.id
-        ? {
-            ...artigo,
-            titulo: novoTitulo,
-            descricao: novaDescricao,
-            categoria: novaCategoria,
-            imagem: novaImagem,
-          }
-        : artigo
-    );
+  async function salvarEdicao() {
+    setSalvandoEdicao(true);
 
-    setArtigos(artigosAtualizados);
-    localStorage.setItem("artigos", JSON.stringify(artigosAtualizados));
-    window.dispatchEvent(new Event("artigosAtualizados"));
-    setModalEditar(false);
+    try {
+      const atualizado = await atualizarMaterial(artigoEditando.id, {
+        titulo: novoTitulo,
+        descricao: novaDescricao,
+        categoria: novaCategoria,
+        link: artigoEditando.rota,
+        arquivo: novaImagem || null,
+        autor: artigoEditando.autor,
+        statusMaterial: artigoEditando.statusMaterial,
+      });
+
+      const artigoAtualizado = materialParaArtigo(atualizado);
+
+      setArtigos((atual) =>
+        atual.map((artigo) =>
+          artigo.id === artigoAtualizado.id ? artigoAtualizado : artigo
+        )
+      );
+      setModalEditar(false);
+    } catch (error) {
+      setErroArtigos(
+        error instanceof ApiError
+          ? error.message
+          : "Não foi possível salvar o artigo."
+      );
+    } finally {
+      setSalvandoEdicao(false);
+    }
   }
 
   function carregarImagemEdicao(event) {
@@ -136,40 +166,66 @@ export default function AdminDashboard() {
     reader.readAsDataURL(file);
   }
 
-  function excluirArtigo(id) {
+  async function excluirArtigo(id) {
     const confirmar = window.confirm(
       "Deseja realmente excluir este artigo?"
     );
     if (!confirmar) return;
 
-    setArtigos(artigos.filter((artigo) => artigo.id !== id));
+    try {
+      await excluirMaterial(id);
+      setArtigos((atual) => atual.filter((artigo) => artigo.id !== id));
+    } catch (error) {
+      setErroArtigos(
+        error instanceof ApiError
+          ? error.message
+          : "Não foi possível excluir o artigo."
+      );
+    }
   }
 
-  function suspenderArtigo(id) {
-    const artigosAtualizados = artigos.map((artigo) =>
-      artigo.id === id
-        ? {
-            ...artigo,
-            status: artigo.status === "ativo" ? "suspenso" : "ativo",
-          }
-        : artigo
-    );
+  async function suspenderArtigo(id) {
+    const artigo = artigos.find((a) => a.id === id);
+    if (!artigo) return;
 
-    setArtigos(artigosAtualizados);
+    try {
+      const atualizado =
+        artigo.status === "ativo"
+          ? await inativarMaterial(id)
+          : await ativarMaterial(id);
+
+      const artigoAtualizado = materialParaArtigo(atualizado);
+      setArtigos((atual) =>
+        atual.map((a) => (a.id === id ? artigoAtualizado : a))
+      );
+    } catch (error) {
+      setErroArtigos(
+        error instanceof ApiError
+          ? error.message
+          : "Não foi possível alterar o status do artigo."
+      );
+    }
   }
 
-  function adicionarArtigo() {
-    const novoArtigo = {
-      id: Date.now(),
-      titulo: "Novo artigo",
-      categoria: "Categoria",
-      descricao: "Descrição do novo artigo.",
-      imagem: "",
-      status: "ativo",
-      rota: "/",
-    };
+  async function adicionarArtigo() {
+    try {
+      const criado = await criarMaterial({
+        titulo: "Novo artigo",
+        descricao: "Descrição do novo artigo.",
+        categoria: "Categoria",
+        link: "/",
+        arquivo: null,
+        autor: admin,
+      });
 
-    setArtigos([novoArtigo, ...artigos]);
+      setArtigos((atual) => [materialParaArtigo(criado), ...atual]);
+    } catch (error) {
+      setErroArtigos(
+        error instanceof ApiError
+          ? error.message
+          : "Não foi possível criar o artigo."
+      );
+    }
   }
 
   const artigosFiltrados = artigos.filter((artigo) =>
@@ -232,6 +288,8 @@ export default function AdminDashboard() {
           </div>
         </header>
 
+        {erroArtigos && <p className={styles.erroArtigos}>{erroArtigos}</p>}
+
         {/* STATS */}
         <section className={styles.stats}>
           <div className={styles.statCard}>
@@ -273,75 +331,79 @@ export default function AdminDashboard() {
         </div>
 
         {/* GRID DE ARTIGOS */}
-        <div className={styles.grid}>
-          {artigosFiltrados.map((artigo) => (
-            <div
-              key={artigo.id}
-              className={`${styles.card} ${
-                artigo.status === "suspenso" ? styles.suspended : ""
-              }`}
-            >
-              {artigo.imagem ? (
-                <img src={artigo.imagem} alt={artigo.titulo} />
-              ) : (
-                <div className={styles.semImagem}>📷</div>
-              )}
+        {carregandoArtigos ? (
+          <p>Carregando artigos...</p>
+        ) : (
+          <div className={styles.grid}>
+            {artigosFiltrados.map((artigo) => (
+              <div
+                key={artigo.id}
+                className={`${styles.card} ${
+                  artigo.status === "suspenso" ? styles.suspended : ""
+                }`}
+              >
+                {artigo.imagem ? (
+                  <img src={artigo.imagem} alt={artigo.titulo} />
+                ) : (
+                  <div className={styles.semImagem}>📷</div>
+                )}
 
-              <div className={styles.cardContent}>
-                <span>{artigo.categoria}</span>
-                <h3>{artigo.titulo}</h3>
-                <p>{artigo.descricao}</p>
+                <div className={styles.cardContent}>
+                  <span>{artigo.categoria}</span>
+                  <h3>{artigo.titulo}</h3>
+                  <p>{artigo.descricao}</p>
 
-                <div className={styles.statusArea}>
-                  <div
-                    className={`${styles.status} ${
-                      artigo.status === "ativo"
-                        ? styles.activeStatus
-                        : styles.suspendedStatus
-                    }`}
-                  >
-                    {artigo.status === "ativo" ? "ATIVO" : "SUSPENSO"}
+                  <div className={styles.statusArea}>
+                    <div
+                      className={`${styles.status} ${
+                        artigo.status === "ativo"
+                          ? styles.activeStatus
+                          : styles.suspendedStatus
+                      }`}
+                    >
+                      {artigo.status === "ativo" ? "ATIVO" : "SUSPENSO"}
+                    </div>
                   </div>
                 </div>
+
+                <div className={styles.actions}>
+                  <button
+                    className={styles.editBtn}
+                    onClick={() => editarArtigo(artigo.id)}
+                  >
+                    <Pencil size={16} />
+                    Editar
+                  </button>
+
+                  <button
+                    className={styles.suspendBtn}
+                    onClick={() => suspenderArtigo(artigo.id)}
+                  >
+                    {artigo.status === "ativo" ? (
+                      <>
+                        <Ban size={16} />
+                        Suspender
+                      </>
+                    ) : (
+                      <>
+                        <CheckCircle2 size={16} />
+                        Ativar
+                      </>
+                    )}
+                  </button>
+
+                  <button
+                    className={styles.deleteBtn}
+                    onClick={() => excluirArtigo(artigo.id)}
+                  >
+                    <Trash2 size={16} />
+                    Excluir
+                  </button>
+                </div>
               </div>
-
-              <div className={styles.actions}>
-                <button
-                  className={styles.editBtn}
-                  onClick={() => editarArtigo(artigo.id)}
-                >
-                  <Pencil size={16} />
-                  Editar
-                </button>
-
-                <button
-                  className={styles.suspendBtn}
-                  onClick={() => suspenderArtigo(artigo.id)}
-                >
-                  {artigo.status === "ativo" ? (
-                    <>
-                      <Ban size={16} />
-                      Suspender
-                    </>
-                  ) : (
-                    <>
-                      <CheckCircle2 size={16} />
-                      Ativar
-                    </>
-                  )}
-                </button>
-
-                <button
-                  className={styles.deleteBtn}
-                  onClick={() => excluirArtigo(artigo.id)}
-                >
-                  <Trash2 size={16} />
-                  Excluir
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
 
         {/* MODAL DE EDIÇÃO */}
         {modalEditar && (
@@ -403,8 +465,12 @@ export default function AdminDashboard() {
                     Cancelar
                   </button>
 
-                  <button className={styles.saveBtn} onClick={salvarEdicao}>
-                    Salvar artigo
+                  <button
+                    className={styles.saveBtn}
+                    onClick={salvarEdicao}
+                    disabled={salvandoEdicao}
+                  >
+                    {salvandoEdicao ? "Salvando..." : "Salvar artigo"}
                   </button>
                 </div>
               </div>
