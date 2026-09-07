@@ -12,12 +12,11 @@ import Perfil from '../pages/Perfil/Perfil';
 import Administrador from '../pages/Administrador/Administrador';
 import Seguranca from '../pages/Seguranca/Seguranca';
 
-import PeriodoGestacional from '../pages/PeriodoGestacional/PeriodoGestacional';
-import CuidadosBebe from '../pages/CuidadosBebe/CuidadosBebe';
-import TentandoEngravidar from '../pages/TentandoEngravidar/TentandoEngravidar';
-
-import Alimentacao from '../pages/artigos/Alimentação';
-import SonoArtigo from '../pages/artigos/Sono';
+import PeriodoGestacional from '../pages/Artigos/PeriodoGestacional';
+import CuidadosBebe from '../pages/Artigos/CuidadosBebe';
+import TentandoEngravidar from '../pages/Artigos/TentandoEngravidar';
+import Alimentacao from '../pages/Artigos/Alimentação';
+import SonoArtigo from '../pages/Artigos/Sono';
 
 import Questionario from '../pages/Questionario/Questionario';
 

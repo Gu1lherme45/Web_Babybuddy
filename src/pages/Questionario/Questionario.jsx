@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion as Motion } from "framer-motion";
 import styles from "./Questionario.module.css";
 
 import logo from "../../assets/logoofc3.svg";
@@ -476,7 +476,7 @@ export default function Questionario() {
       <AnimatePresence mode="wait">
         {/* TELA INICIAL */}
         {fase === "inicio" && (
-          <motion.section
+          <Motion.section
             key="inicio"
             className={styles.firstSection}
             initial={{ opacity: 0, y: 16 }}
@@ -502,12 +502,12 @@ export default function Questionario() {
             <AnimatedButton large onClick={() => setStep(1)}>
               INICIAR QUESTIONÁRIO DE SAÚDE
             </AnimatedButton>
-          </motion.section>
+          </Motion.section>
         )}
 
         {/* QUESTIONÁRIO */}
         {fase === "perguntas" && (
-          <motion.div
+          <Motion.div
             key="perguntas"
             className={styles.questionario}
             initial={{ opacity: 0, y: 16 }}
@@ -545,12 +545,12 @@ export default function Questionario() {
                   : "Finalizar questionario"
                 : "Continuar"}
             </button>
-          </motion.div>
+          </Motion.div>
         )}
 
         {/* FINAL */}
         {fase === "final" && (
-          <motion.div
+          <Motion.div
             key="final"
             className={styles.finishContainer}
             initial={{ opacity: 0, y: 16 }}
@@ -587,7 +587,7 @@ export default function Questionario() {
             >
               Ir para o login
             </button>
-          </motion.div>
+          </Motion.div>
         )}
       </AnimatePresence>
     </div>
