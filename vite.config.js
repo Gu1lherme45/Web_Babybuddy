@@ -26,7 +26,12 @@ export default defineConfig({
   },
   test: {
     environment: 'jsdom',
-    setupFiles: ['./src/setupTests.js', './src/test/setup.js'],
+    setupFiles: ['./src/setupTests.js'],
+    environmentOptions: {
+      jsdom: {
+        url: 'http://localhost/',
+      },
+    },
     globals: true,
     exclude: ['e2e/**', 'node_modules/**'],
     fileParallelism: false,

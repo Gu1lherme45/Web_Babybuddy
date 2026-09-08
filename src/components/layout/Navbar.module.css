@@ -11,6 +11,12 @@
   padding-top: 60px;
 }
 
+.navbarInFlow {
+  position: relative;
+  padding: 20px 0;
+  background: #fff7fb;
+}
+
 .container {
   width: min(1100px, 90%);
   background: rgba(255, 255, 255, 0.9);
@@ -90,6 +96,12 @@
 
 .cadastro:hover {
   filter: brightness(1.05);
+}
+
+.actionButton {
+  border: 0;
+  cursor: pointer;
+  font-family: inherit;
 }
 
 @media (max-width: 1024px) {

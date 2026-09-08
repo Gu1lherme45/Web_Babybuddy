@@ -18,7 +18,7 @@ export default function PageWrapper({ children, skipLoader = false, duration = L
     if (skipLoader) return;
     const timer = setTimeout(() => setLoading(false), duration);
     return () => clearTimeout(timer);
-  }, []);
+  }, [duration, skipLoader]);
 
   return (
     <AnimatePresence>

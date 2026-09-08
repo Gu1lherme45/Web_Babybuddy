@@ -917,6 +917,8 @@
 .artigosContainer {
   width: 100%;
   max-width: 1200px;
+  scroll-margin-top: 24px;
+  outline: none;
 
   margin-left: auto;
   margin-right: auto;

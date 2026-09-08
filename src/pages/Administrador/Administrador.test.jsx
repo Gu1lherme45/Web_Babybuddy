@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { setupServer } from 'msw/node';
 import { http, HttpResponse } from 'msw';
 import { MemoryRouter } from 'react-router-dom';
-import { beforeAll, afterEach, afterAll, describe, test, expect } from 'vitest';
+import { beforeAll, afterEach, afterAll, describe, test, expect, vi } from 'vitest';
 import Administrador from './Administrador';
 import { AuthProvider } from '../../context/AuthContext';
 
@@ -32,13 +32,24 @@ const server = setupServer(
   http.get('/api/materiais', () => HttpResponse.json([MATERIAL_EXISTENTE], { status: 200 }))
 );
 
-beforeAll(() => server.listen({ onUnhandledRequest: 'error' }));
-afterEach(() => server.resetHandlers());
+const scrollIntoViewMock = vi.fn();
+
+beforeAll(() => {
+  server.listen({ onUnhandledRequest: 'error' });
+  Object.defineProperty(HTMLElement.prototype, 'scrollIntoView', {
+    configurable: true,
+    value: scrollIntoViewMock,
+  });
+});
+afterEach(() => {
+  server.resetHandlers();
+  scrollIntoViewMock.mockClear();
+});
 afterAll(() => server.close());
 
-function renderAdministrador() {
+function renderAdministrador(initialEntries = ['/']) {
   return render(
-    <MemoryRouter>
+    <MemoryRouter initialEntries={initialEntries}>
       <AuthProvider>
         <Administrador />
       </AuthProvider>
@@ -50,6 +61,21 @@ describe('Administrador — CRUD de materiais via backend (/api/materiais)', () 
   test('lista os materiais vindos de GET /api/materiais', async () => {
     renderAdministrador();
     expect(await screen.findByText('Cuidados com o Bebê')).toBeInTheDocument();
+  });
+
+  test('abre diretamente o gerenciamento quando a URL possui hash', async () => {
+    renderAdministrador(['/administrador#artigos']);
+
+    const titulo = await screen.findByRole('heading', {
+      name: /gerenciamento de artigos/i,
+    });
+    const secao = titulo.closest('#artigos');
+
+    expect(scrollIntoViewMock).toHaveBeenCalledWith({
+      behavior: 'smooth',
+      block: 'start',
+    });
+    expect(secao).toHaveFocus();
   });
 
   test('criar artigo dispara POST /api/materiais', async () => {

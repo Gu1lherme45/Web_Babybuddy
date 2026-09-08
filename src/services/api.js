@@ -20,6 +20,12 @@ async function parseErrorMessage(response) {
   }
 }
 
+function notifyUnauthorized() {
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent('babybuddy:unauthorized'));
+  }
+}
+
 async function request(path, { method = 'GET', body, headers } = {}) {
   const response = await fetch(`${API_BASE}${path}`, {
     method,
@@ -32,6 +38,7 @@ async function request(path, { method = 'GET', body, headers } = {}) {
   });
 
   if (!response.ok) {
+    if (response.status === 401) notifyUnauthorized();
     throw new ApiError(response.status, await parseErrorMessage(response));
   }
 

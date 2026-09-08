@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { CalendarHeart, Search, Eye, EyeOff, KeyRound } from "lucide-react";
 
@@ -6,7 +6,17 @@ import styles from "./Perfil.module.css";
 import Sidebar from "../../components/Sidebar/Sidebar";
 import LogoutConfirm from "../../components/LogoutConfirm";
 import { useAuth } from "../../context/AuthContext";
-import { atualizarUsuario, trocarSenha, ApiError } from "../../services/api";
+import {
+  atualizarUsuario,
+  listarMateriais,
+  trocarSenha,
+  ApiError,
+} from "../../services/api";
+import {
+  persistMaterialsCache,
+  readMaterialsCache,
+} from "../../services/browserStorage";
+import useHashScroll from "../../hooks/useHashScroll";
 
 import art1 from "../../assets/art1.png";
 import art2 from "../../assets/art2.png";
@@ -17,9 +27,10 @@ import artAlimentacao from "../../assets/art5.png";
 export default function Perfil() {
   const navigate = useNavigate();
   const { usuario, sair, refresh } = useAuth();
+  useHashScroll(Boolean(usuario));
 
   // ARTIGOS PADRÃO
-  const artigosPadrao = [
+  const artigosPadrao = useMemo(() => [
     {
       id: 1,
       titulo: "Cuidados com o bebê",
@@ -67,7 +78,7 @@ export default function Perfil() {
       rota: "/artigos/alimentacao",
       tempo: 10,
     },
-  ];
+  ], []);
 
   const [artigos, setArtigos] = useState([]);
   const [pesquisa, setPesquisa] = useState("");
@@ -93,105 +104,65 @@ export default function Perfil() {
     navigate("/");
   }
 
-  // CARREGAR ARTIGOS
-  function carregarArtigos() {
-    let artigosStorage = JSON.parse(localStorage.getItem("artigos")) || [];
+  useEffect(() => {
+    let active = true;
 
-    // remove duplicados dos artigos padrão (por rota) e adiciona os que
-    // faltam, sem mexer em artigos personalizados criados pelo admin
-    const rotasPadrao = new Set(artigosPadrao.map((a) => a.rota));
-    const vistos = new Set();
-    const semDuplicados = [];
+    function exibirMateriais(materiais) {
+      const artigosBackend = materiais.map((material) => {
+        const rota = material.link ?? material.rota ?? "/";
+        const padrao = artigosPadrao.find((artigo) => artigo.rota === rota);
 
-    for (const artigo of artigosStorage) {
-      if (rotasPadrao.has(artigo.rota)) {
-        if (vistos.has(artigo.rota)) continue;
-        vistos.add(artigo.rota);
-      }
-      semDuplicados.push(artigo);
+        return {
+          id: material.id,
+          titulo: material.titulo,
+          categoria: material.categoria,
+          descricao: material.descricao,
+          imagem: material.arquivo || padrao?.imagem || "",
+          status:
+            material.statusMaterial === "INATIVO" ||
+            material.status === "suspenso"
+              ? "suspenso"
+              : "ativo",
+          rota,
+          tempo: padrao?.tempo,
+        };
+      });
+
+      const rotasRecebidas = new Set(artigosBackend.map((artigo) => artigo.rota));
+      const faltantes = artigosPadrao.filter(
+        (artigo) => !rotasRecebidas.has(artigo.rota)
+      );
+      const ativos = [...artigosBackend, ...faltantes].filter(
+        (artigo) => artigo.status === "ativo"
+      );
+
+      if (active) setArtigos(ativos);
     }
 
-    const faltantes = artigosPadrao.filter((a) => !vistos.has(a.rota));
-    artigosStorage = [...semDuplicados, ...faltantes];
-
-    // GARANTE ROTAS E STATUS
-    artigosStorage = artigosStorage.map((artigo) => {
-      // sono (checar antes de "bebê", pois "Sono do bebê" contém a palavra)
-      if (artigo.titulo.toLowerCase().includes("sono")) {
-        return {
-          ...artigo,
-          rota: "/artigos/sono",
-          status: artigo.status || "ativo",
-        };
+    async function carregarArtigos() {
+      try {
+        const materiais = await listarMateriais();
+        persistMaterialsCache(materiais);
+        exibirMateriais(materiais);
+      } catch {
+        exibirMateriais(readMaterialsCache());
       }
+    }
 
-      // alimentação (checar antes de "bebê", pelo mesmo motivo)
-      if (artigo.titulo.toLowerCase().includes("alimenta")) {
-        return {
-          ...artigo,
-          rota: "/artigos/alimentacao",
-          status: artigo.status || "ativo",
-        };
-      }
-
-      // bebê
-      if (artigo.titulo.toLowerCase().includes("bebê")) {
-        return {
-          ...artigo,
-          rota: "/cuidados-bebe",
-          status: artigo.status || "ativo",
-        };
-      }
-
-      // engravidar
-      if (artigo.titulo.toLowerCase().includes("engravidar")) {
-        return {
-          ...artigo,
-          rota: "/tentando-engravidar",
-          status: artigo.status || "ativo",
-        };
-      }
-
-      // gestacional
-      if (artigo.titulo.toLowerCase().includes("gestacional")) {
-        return {
-          ...artigo,
-          rota: "/periodo-gestacional",
-          status: artigo.status || "ativo",
-        };
-      }
-
-      return artigo;
-    });
-
-    // sincroniza o tempo de leitura com o valor padrão (ainda não é
-    // customizável pelo admin, então sempre reflete o artigo original)
-    artigosStorage = artigosStorage.map((artigo) => {
-      const padrao = artigosPadrao.find((a) => a.rota === artigo.rota);
-      if (padrao?.tempo === undefined) return artigo;
-
-      return { ...artigo, tempo: padrao.tempo };
-    });
-
-    // atualiza storage
-    localStorage.setItem("artigos", JSON.stringify(artigosStorage));
-
-    // somente ativos
-    const ativos = artigosStorage.filter((artigo) => artigo.status === "ativo");
-
-    setArtigos(ativos);
-  }
-
-  useEffect(() => {
-    // LIMPA STORAGE ANTIGO
-    carregarArtigos();
-
-    window.addEventListener("artigosAtualizados", carregarArtigos);
-
-    return () => {
-      window.removeEventListener("artigosAtualizados", carregarArtigos);
+    const onMaterialsUpdated = (event) => {
+      exibirMateriais(event.detail?.items ?? readMaterialsCache());
     };
-  }, []);
+
+    carregarArtigos();
+    window.addEventListener("babybuddy:materials-updated", onMaterialsUpdated);
+    return () => {
+      active = false;
+      window.removeEventListener(
+        "babybuddy:materials-updated",
+        onMaterialsUpdated
+      );
+    };
+  }, [artigosPadrao]);
 
   // mantém o formulário sincronizado com os dados reais do backend
   // (ex.: depois de um refresh() pós-salvamento)
@@ -301,7 +272,11 @@ export default function Perfil() {
       </section>
 
       {/* ARTIGOS */}
-      <div className={styles.artigosContainer}>
+      <div
+        id="artigos"
+        className={styles.artigosContainer}
+        tabIndex={-1}
+      >
         <h2 className={styles.artigosTitle}>Artigos pensados para você</h2>
 
         <div className={styles.artigosGrid}>

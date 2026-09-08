@@ -21,6 +21,8 @@ import {
   listarUsuarios,
   ApiError,
 } from "../../services/api";
+import { persistMaterialsCache } from "../../services/browserStorage";
+import useHashScroll from "../../hooks/useHashScroll";
 
 // Imagens
 import art1 from "../../assets/art1.png";
@@ -59,6 +61,7 @@ function materialParaArtigo(material) {
 export default function AdminDashboard() {
   const { usuario } = useAuth();
   const admin = usuario?.nome || "Administrador";
+  useHashScroll(Boolean(usuario));
 
   const [artigos, setArtigos] = useState([]);
   const [carregandoArtigos, setCarregandoArtigos] = useState(true);
@@ -81,6 +84,7 @@ export default function AdminDashboard() {
     async function carregarMateriais() {
       try {
         const materiais = await listarMateriais();
+        persistMaterialsCache(materiais);
         setArtigos(materiais.map(materialParaArtigo));
       } catch (error) {
         setErroArtigos(
@@ -140,11 +144,11 @@ export default function AdminDashboard() {
 
       const artigoAtualizado = materialParaArtigo(atualizado);
 
-      setArtigos((atual) =>
-        atual.map((artigo) =>
-          artigo.id === artigoAtualizado.id ? artigoAtualizado : artigo
-        )
+      const proximosArtigos = artigos.map((artigo) =>
+        artigo.id === artigoAtualizado.id ? artigoAtualizado : artigo
       );
+      setArtigos(proximosArtigos);
+      persistMaterialsCache(proximosArtigos);
       setModalEditar(false);
     } catch (error) {
       setErroArtigos(
@@ -174,7 +178,9 @@ export default function AdminDashboard() {
 
     try {
       await excluirMaterial(id);
-      setArtigos((atual) => atual.filter((artigo) => artigo.id !== id));
+      const proximosArtigos = artigos.filter((artigo) => artigo.id !== id);
+      setArtigos(proximosArtigos);
+      persistMaterialsCache(proximosArtigos);
     } catch (error) {
       setErroArtigos(
         error instanceof ApiError
@@ -195,9 +201,11 @@ export default function AdminDashboard() {
           : await ativarMaterial(id);
 
       const artigoAtualizado = materialParaArtigo(atualizado);
-      setArtigos((atual) =>
-        atual.map((a) => (a.id === id ? artigoAtualizado : a))
+      const proximosArtigos = artigos.map((artigoAtual) =>
+        artigoAtual.id === id ? artigoAtualizado : artigoAtual
       );
+      setArtigos(proximosArtigos);
+      persistMaterialsCache(proximosArtigos);
     } catch (error) {
       setErroArtigos(
         error instanceof ApiError
@@ -218,7 +226,9 @@ export default function AdminDashboard() {
         autor: admin,
       });
 
-      setArtigos((atual) => [materialParaArtigo(criado), ...atual]);
+      const proximosArtigos = [materialParaArtigo(criado), ...artigos];
+      setArtigos(proximosArtigos);
+      persistMaterialsCache(proximosArtigos);
     } catch (error) {
       setErroArtigos(
         error instanceof ApiError
@@ -318,7 +328,11 @@ export default function AdminDashboard() {
         </section>
 
         {/* HEADER DA LISTA */}
-        <div className={styles.sectionHeader}>
+        <div
+          id="artigos"
+          className={styles.sectionHeader}
+          tabIndex={-1}
+        >
           <div>
             <h2>Gerenciamento de Artigos</h2>
             <p>Controle completo dos conteúdos publicados.</p>

@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { setupServer } from 'msw/node';
 import { http, HttpResponse } from 'msw';
 import { MemoryRouter } from 'react-router-dom';
-import { beforeAll, afterEach, afterAll, describe, test, expect } from 'vitest';
+import { beforeAll, afterEach, afterAll, describe, test, expect, vi } from 'vitest';
 import Perfil from './Perfil';
 import { AuthProvider } from '../../context/AuthContext';
 
@@ -19,13 +19,24 @@ const server = setupServer(
   http.get('/api/materiais', () => HttpResponse.json([], { status: 200 }))
 );
 
-beforeAll(() => server.listen({ onUnhandledRequest: 'error' }));
-afterEach(() => server.resetHandlers());
+const scrollIntoViewMock = vi.fn();
+
+beforeAll(() => {
+  server.listen({ onUnhandledRequest: 'error' });
+  Object.defineProperty(HTMLElement.prototype, 'scrollIntoView', {
+    configurable: true,
+    value: scrollIntoViewMock,
+  });
+});
+afterEach(() => {
+  server.resetHandlers();
+  scrollIntoViewMock.mockClear();
+});
 afterAll(() => server.close());
 
-function renderPerfil() {
+function renderPerfil(initialEntries = ['/']) {
   return render(
-    <MemoryRouter>
+    <MemoryRouter initialEntries={initialEntries}>
       <AuthProvider>
         <Perfil />
       </AuthProvider>
@@ -37,6 +48,21 @@ describe('Perfil — persistência via backend (PUT /api/usuarios/{id})', () => 
   test('carrega os dados do usuário logado via GET /api/usuarios/me', async () => {
     renderPerfil();
     expect(await screen.findByText('Lorena Souza')).toBeInTheDocument();
+  });
+
+  test('abre diretamente a secao de artigos quando a URL possui hash', async () => {
+    renderPerfil(['/perfil#artigos']);
+
+    const titulo = await screen.findByRole('heading', {
+      name: /artigos pensados para/i,
+    });
+    const secao = titulo.closest('#artigos');
+
+    expect(scrollIntoViewMock).toHaveBeenCalledWith({
+      behavior: 'smooth',
+      block: 'start',
+    });
+    expect(secao).toHaveFocus();
   });
 
   test('editar e salvar altera o nome e o e-mail via PUT, mantendo a senha atual', async () => {

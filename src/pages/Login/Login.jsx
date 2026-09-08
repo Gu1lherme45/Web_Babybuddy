@@ -9,7 +9,7 @@ import { ApiError } from '../../services/api';
 
 const Login = () => {
   const navigate = useNavigate();
-  const { entrar } = useAuth();
+  const { entrar, mensagemSessao } = useAuth();
 
   const [showPassword, setShowPassword] = useState(false);
   const [carregandoAdmin, setCarregandoAdmin] = useState(false);
@@ -78,7 +78,9 @@ const Login = () => {
         <h1 className={styles.title}>Login</h1>
         <p className={styles.subtitle}>Digite seus dados para acessar sua conta</p>
 
-        {erro && <div className={styles.error}>{erro}</div>}
+        {(erro || mensagemSessao) && (
+          <div className={styles.error}>{erro || mensagemSessao}</div>
+        )}
 
         <form onSubmit={handleSubmit} className={styles.form}>
 
