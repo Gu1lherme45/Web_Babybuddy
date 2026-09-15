@@ -120,6 +120,29 @@ describe('Cadastro — envio ao backend (POST /api/usuarios + login automático)
     expect(screen.queryByText('Cadastro realizado com sucesso!')).not.toBeInTheDocument();
   });
 
+  test('mantém o cadastro como concluído quando apenas o login automático falha', async () => {
+    server.use(
+      http.post('/login', () =>
+        HttpResponse.json({ error: 'Sessão indisponível' }, { status: 401 })
+      )
+    );
+
+    const user = userEvent.setup();
+    renderCadastro();
+
+    await preencherFormulario(user, { email: 'conta.criada@gmail.com' });
+    await user.click(screen.getByRole('button', { name: /criar minha conta/i }));
+
+    expect(
+      await screen.findByText('Cadastro realizado com sucesso!')
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        'Sua conta foi criada, mas não foi possível iniciar a sessão automaticamente. Entre para continuar.'
+      )
+    ).toBeInTheDocument();
+  });
+
   test('bloqueia o envio quando as senhas não coincidem, sem chamar a API', async () => {
     let chamouApi = false;
     server.use(

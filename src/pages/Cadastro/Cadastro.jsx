@@ -103,18 +103,29 @@ export default function Cadastro() {
 
       await criarUsuario(novoUsuario);
 
-      // login automático com as credenciais recém-criadas, para que
-      // /questionario (rota protegida) já reconheça a sessão
-      await entrar(novoUsuario.username, novoUsuario.password);
+      try {
+        // login automático com as credenciais recém-criadas, para que
+        // /questionario (rota protegida) já reconheça a sessão
+        await entrar(novoUsuario.username, novoUsuario.password);
 
-      setSuccess(
-        'Cadastro realizado com sucesso!'
-      );
+        setSuccess(
+          'Cadastro realizado com sucesso!'
+        );
 
-      // REDIRECIONA
-      setTimeout(() => {
-        navigate('/questionario');
-      }, 1000);
+        // REDIRECIONA
+        setTimeout(() => {
+          navigate('/questionario');
+        }, 1000);
+      } catch {
+        // O cadastro já terminou. Falha de cookie ou sessão não significa que
+        // a conta não foi criada e não deve provocar um segundo cadastro.
+        setSuccess(
+          'Cadastro realizado com sucesso!'
+        );
+        setError(
+          'Sua conta foi criada, mas não foi possível iniciar a sessão automaticamente. Entre para continuar.'
+        );
+      }
 
     } catch (err) {
 
