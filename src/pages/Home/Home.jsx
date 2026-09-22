@@ -277,6 +277,7 @@ export default function Home() {
 
         <div className={styles.artigosContainer}>
           <h2 className={styles.artigosTitle}>Principais Artigos</h2>
+          <Link to="/artigos" className={styles.verTodosArtigos}>Ver todos os artigos</Link>
 
           <div className={styles.artigosGrid}>
             <Link

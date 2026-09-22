@@ -1,50 +1,24 @@
-
 import styles from './Navbar.module.css';
 import { Link, useLocation } from 'react-router-dom';
 import logo from '../../assets/logoofc3.svg';
+import useAuth from '../../auth/useAuth';
 
 export default function Navbar() {
   const location = useLocation();
-  const usuario = JSON.parse(localStorage.getItem("usuario"));
+  const { user } = useAuth();
+  const hidden = [
+    '/questionario', '/cadastro', '/login', '/perfil',
+    '/termos-de-uso', '/politica-de-privacidade',
+  ].includes(location.pathname) || location.pathname.startsWith('/administrador');
 
-// detecta páginas
-const isQuestionario = location.pathname === "/questionario";
-const isCadastro = location.pathname === "/cadastro";
-const isLogin = location.pathname === "/login";
-const isPerfil = location.pathname === "/perfil";
-const isAdministrador = location.pathname === "/administrador";
-const isTermosDeUso = location.pathname === "/termos-de-uso";
-const isPoliticaDePrivacidade = location.pathname === "/politica-de-privacidade";
-
- 
-// esconde navbar nessas páginas
-if (
-  isQuestionario ||
-  isCadastro ||
-  isLogin ||
-  isPerfil ||
-  isAdministrador ||
-  isTermosDeUso ||
-  isPoliticaDePrivacidade 
-)
-
-return null;
+  if (hidden) return null;
 
   return (
     <nav className={styles.navbar}>
       <div className={styles.container}>
-
-        {usuario ? (
-          <Link to="/perfil" className={styles.logo}>
-            <img src={logo} alt="BabyBuddy" className={styles.logoImg} />
-          </Link>
-        ) : (
-          <span className={styles.logo}>
-            <img src={logo} alt="BabyBuddy" className={styles.logoImg} />
-          </span>
-        )}
-
-
+        <Link to={user ? '/perfil' : '/'} className={styles.logo}>
+          <img src={logo} alt="BabyBuddy" className={styles.logoImg} />
+        </Link>
 
         <div className={styles.links}>
           <Link to="/#inicio">Início</Link>
@@ -53,15 +27,17 @@ return null;
         </div>
 
         <div className={styles.actions}>
-          <Link to="/login" className={styles.login}>
-            Login
-          </Link>
-
-          <Link to="/cadastro" className={styles.cadastro}> 
-            Cadastre-se
-          </Link>
+          {user ? (
+            <Link to={user.nivelAcesso?.toUpperCase() === 'ADMIN' ? '/administrador' : '/perfil'} className={styles.login}>
+              Minha conta
+            </Link>
+          ) : (
+            <>
+              <Link to="/login" className={styles.login}>Login</Link>
+              <Link to="/cadastro" className={styles.cadastro}>Cadastre-se</Link>
+            </>
+          )}
         </div>
-
       </div>
     </nav>
   );

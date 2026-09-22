@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion as Motion, AnimatePresence } from "framer-motion";
 import Loader from "./Loader";
 
 const pageVariants = {
@@ -18,12 +18,12 @@ export default function PageWrapper({ children, skipLoader = false, duration = L
     if (skipLoader) return;
     const timer = setTimeout(() => setLoading(false), duration);
     return () => clearTimeout(timer);
-  }, []);
+  }, [duration, skipLoader]);
 
   return (
     <AnimatePresence>
       {loading ? (
-        <motion.div
+        <Motion.div
           key="loader"
           initial={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -41,9 +41,9 @@ export default function PageWrapper({ children, skipLoader = false, duration = L
           <div style={{ width: LOADER_SIZE, aspectRatio: "64 / 48" }}>
             <Loader />
           </div>
-        </motion.div>
+        </Motion.div>
       ) : (
-        <motion.div
+        <Motion.div
           key="content"
           variants={pageVariants}
           initial="initial"
@@ -52,7 +52,7 @@ export default function PageWrapper({ children, skipLoader = false, duration = L
           transition={{ duration: 0.2, ease: "easeInOut" }}
         >
           {children}
-        </motion.div>
+        </Motion.div>
       )}
     </AnimatePresence>
   );

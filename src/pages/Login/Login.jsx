@@ -1,176 +1,74 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { FiUser, FiMail, FiLock, FiEye, FiEyeOff } from 'react-icons/fi';
+import { useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { FiMail, FiLock, FiEye, FiEyeOff } from 'react-icons/fi';
 import styles from './Login.module.css';
 import LoadingWave from '../../components/LoadingWave';
 import WelcomeLoader from '../../components/WelcomeLoader';
+import useAuth from '../../auth/useAuth';
 
-// Administrador
-const ADMIN = {
-  email: 'administrador@babybuddy.com.br',
-  senha: 'BabyBuddy2026',
-};
-
-const Login = () => {
+export default function Login() {
   const navigate = useNavigate();
-
+  const location = useLocation();
+  const { login } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
-  const [carregandoAdmin, setCarregandoAdmin] = useState(false);
-  const [carregandoUsuario, setCarregandoUsuario] = useState(false);
-  const [formData, setFormData] = useState({
-    nome: '',
-    email: '',
-    senha: '',
-  });
+  const [loadingRole, setLoadingRole] = useState(null);
+  const [error, setError] = useState('');
+  const [form, setForm] = useState({ email: '', password: '' });
 
-  // Deixa a primeira letra de cada nome maiúscula, mesmo digitado em minúsculo
-  const capitalizarNome = (texto) =>
-    texto
-      .toLowerCase()
-      .split(' ')
-      .map((palavra) => palavra.charAt(0).toUpperCase() + palavra.slice(1))
-      .join(' ');
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-
-    setFormData({
-      ...formData,
-      [name]: name === 'nome' ? capitalizarNome(value) : value,
-    });
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-
-    // Email
-    const email = formData.email.toLowerCase();
-
-    const isAdmin =
-      email === ADMIN.email && formData.senha === ADMIN.senha;
-
-    // Dados do usuário
-    const usuario = {
-      nome: formData.nome,
-      email: formData.email,
-      senha: formData.senha,
-      tipo: isAdmin ? 'admin' : 'usuario',
-      admin: isAdmin,
-    };
-
-    // Salva no localStorage
-    localStorage.setItem('usuario', JSON.stringify(usuario));
-
-    console.log(usuario);
-
-    // Redirecionamento
-    if (isAdmin) {
-      setCarregandoAdmin(true);
-      setTimeout(() => {
-        navigate('/administrador');
-      }, 1400);
-    } else {
-      setCarregandoUsuario(true);
-      setTimeout(() => {
-        navigate('/perfil');
-      }, 5000);
+  async function handleSubmit(event) {
+    event.preventDefault();
+    setError('');
+    try {
+      const user = await login(form.email, form.password);
+      const isAdmin = user.nivelAcesso?.toUpperCase() === 'ADMIN';
+      setLoadingRole(isAdmin ? 'admin' : 'user');
+      const requested = location.state?.from?.pathname;
+      const destination = requested && (!requested.startsWith('/administrador') || isAdmin)
+        ? requested
+        : isAdmin ? '/administrador' : '/perfil';
+      window.setTimeout(() => navigate(destination, { replace: true }), isAdmin ? 700 : 1200);
+    } catch (requestError) {
+      setError(requestError.response?.status === 401
+        ? 'E-mail ou senha inválidos.'
+        : 'Não foi possível entrar. Tente novamente.');
     }
-  };
-
-  if (carregandoAdmin) {
-    return (
-      <div className={styles.container}>
-        <LoadingWave />
-      </div>
-    );
   }
 
-  if (carregandoUsuario) {
-    return (
-      <div className={styles.container}>
-        <WelcomeLoader />
-      </div>
-    );
-  }
+  if (loadingRole === 'admin') return <div className={styles.container}><LoadingWave /></div>;
+  if (loadingRole === 'user') return <div className={styles.container}><WelcomeLoader /></div>;
 
   return (
     <div className={styles.container}>
       <div className={styles.card}>
         <h1 className={styles.title}>Login</h1>
         <p className={styles.subtitle}>Digite seus dados para acessar sua conta</p>
-
+        {error && <p className={styles.error} role="alert">{error}</p>}
         <form onSubmit={handleSubmit} className={styles.form}>
-
-          {/* NOME */}
           <div className={styles.inputGroup}>
-            <label>Nome</label>
-            <div className={styles.inputWrapper}>
-              <FiUser className={styles.icon} />
-              <input
-                type="text"
-                name="nome"
-                placeholder="Digite seu nome"
-                value={formData.nome}
-                onChange={handleChange}
-                required
-              />
-            </div>
-          </div>
-
-          {/* EMAIL */}
-          <div className={styles.inputGroup}>
-            <label>E-mail</label>
+            <label htmlFor="login-email">E-mail</label>
             <div className={styles.inputWrapper}>
               <FiMail className={styles.icon} />
-              <input
-                type="email"
-                name="email"
-                placeholder="seu@email.com"
-                value={formData.email}
-                onChange={handleChange}
-                required
-              />
+              <input id="login-email" type="email" autoComplete="username" value={form.email}
+                onChange={(event) => setForm({ ...form, email: event.target.value })} required />
             </div>
           </div>
-
-          {/* SENHA */}
           <div className={styles.inputGroup}>
-            <label>Senha</label>
+            <label htmlFor="login-password">Senha</label>
             <div className={styles.inputWrapper}>
               <FiLock className={styles.icon} />
-              <input
-                type={showPassword ? 'text' : 'password'}
-                name="senha"
-                placeholder="Digite sua senha"
-                value={formData.senha}
-                onChange={handleChange}
-                required
-              />
-              <button
-                type="button"
-                className={styles.eyeButton}
-                onClick={() => setShowPassword(!showPassword)}
-              >
+              <input id="login-password" type={showPassword ? 'text' : 'password'} autoComplete="current-password"
+                value={form.password} onChange={(event) => setForm({ ...form, password: event.target.value })} required />
+              <button type="button" className={styles.eyeButton} onClick={() => setShowPassword((value) => !value)}
+                aria-label={showPassword ? 'Ocultar senha' : 'Mostrar senha'}>
                 {showPassword ? <FiEyeOff /> : <FiEye />}
               </button>
             </div>
           </div>
-
-          <button type="submit" className={styles.loginButton}>
-            Login
-          </button>
-
-          <div className={styles.divider}>
-            <span>ou</span>
-          </div>
-
-          <p className={styles.registerText}>
-            Ainda não tem uma conta? <Link to="/cadastro">Cadastre-se</Link>
-          </p>
+          <button type="submit" className={styles.loginButton}>Login</button>
+          <div className={styles.divider}><span>ou</span></div>
+          <p className={styles.registerText}>Ainda não tem uma conta? <Link to="/cadastro">Cadastre-se</Link></p>
         </form>
       </div>
     </div>
   );
-};
-
-export default Login;
+}

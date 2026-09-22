@@ -1,20 +1,15 @@
-import { Navigate } from "react-router-dom";
+import { Navigate, useLocation } from 'react-router-dom';
+import useAuth from '../auth/useAuth';
+import LoadingWave from './LoadingWave';
 
-export default function ProtectedRoute({
-  children,
-  adminOnly = false,
-}) {
-  const usuario = JSON.parse(localStorage.getItem("usuario"));
+export default function ProtectedRoute({ children, adminOnly = false }) {
+  const { user, loading } = useAuth();
+  const location = useLocation();
 
-  // Não está logado
-  if (!usuario) {
-    return <Navigate to="/login" replace />;
+  if (loading) return <LoadingWave />;
+  if (!user) return <Navigate to="/login" replace state={{ from: location }} />;
+  if (adminOnly && user.nivelAcesso?.toUpperCase() !== 'ADMIN') {
+    return <Navigate to="/perfil" replace />;
   }
-
-  // Área exclusiva do administrador
-  if (adminOnly && !usuario.admin) {
-    return <Navigate to="/" replace />;
-  }
-
   return children;
 }
