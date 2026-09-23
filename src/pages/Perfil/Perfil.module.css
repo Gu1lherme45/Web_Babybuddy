@@ -735,6 +735,71 @@
 
 
 
+.healthCard {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto 24px;
+  padding: 24px 28px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  border: 1px solid #f4c8da;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #fff8fb, #fff);
+  box-shadow: 0 8px 24px rgba(218, 29, 107, 0.08);
+}
+
+.healthIcon {
+  width: 54px;
+  height: 54px;
+  flex: 0 0 54px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #fde8f0;
+  color: #da1d6b;
+}
+
+.healthContent {
+  flex: 1;
+}
+
+.healthContent span {
+  color: #da1d6b;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.healthContent h2 {
+  margin: 4px 0 6px;
+  color: #1d2939;
+  font-size: 1.35rem;
+}
+
+.healthContent p {
+  margin: 0;
+  color: #667085;
+  line-height: 1.45;
+}
+
+.healthLink {
+  flex: 0 0 auto;
+  padding: 13px 20px;
+  border-radius: 14px;
+  background: #da1d6b;
+  color: #fff;
+  text-decoration: none;
+  font-weight: 700;
+  text-align: center;
+}
+
+.healthLink:hover {
+  background: #bd175b;
+}
+
 .searchContainer {
   position: relative;
 
@@ -899,6 +964,19 @@
 
 /* RESPONSIVO */
 @media (max-width: 900px) {
+  .healthCard {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .healthContent {
+    min-width: calc(100% - 74px);
+  }
+
+  .healthLink {
+    width: 100%;
+  }
+
   .wrapper {
     flex-direction: column;
     align-items: center;

@@ -57,6 +57,41 @@
   font-weight: 400;
 }
 
+.introActions {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.laterButton {
+  border: 0;
+  background: transparent;
+  color: #8b365b;
+  font: inherit;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.laterButton:hover {
+  color: #dc2b74;
+}
+
+.loadingText {
+  color: #667085;
+  font-size: 20px;
+}
+
+.firstSection .loadError {
+  margin: -18px 0 24px;
+  color: #b42318;
+  font-size: 16px;
+}
+
 .startButton {
   width: 100%;
   max-width: 510px;
@@ -699,7 +734,7 @@ h2 {
 
   .finishButton {
     width: 100%;
-    max-width: 30px;
+    max-width: 320px;
   }
 }
 

@@ -214,6 +214,11 @@ export default function Questionario() {
   const [dados, setDados] = useState(ESTADO_INICIAL);
   const [errors, setErrors] = useState({});
   const [enviando, setEnviando] = useState(false);
+  const [carregando, setCarregando] = useState(true);
+  const [erroCarregamento, setErroCarregamento] = useState("");
+  const [gestanteExistente, setGestanteExistente] = useState(null);
+  const [questionarioExistente, setQuestionarioExistente] = useState(null);
+  const [resultado, setResultado] = useState("criado");
 
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -222,6 +227,51 @@ export default function Questionario() {
   const progress = (step / ETAPAS.length) * 100;
   const fase =
     step === 0 ? "inicio" : step <= ETAPAS.length ? "perguntas" : "final";
+
+  useEffect(() => {
+    let ativo = true;
+
+    async function carregarQuestionario() {
+      try {
+        const gestantes = await listarGestantes();
+        const gestante = gestantes.find((item) => item.usuario?.id === user.id);
+        if (!ativo || !gestante) return;
+
+        setGestanteExistente(gestante);
+        const questionarios = await listarQuestionariosPorGestante(gestante.id);
+        if (!ativo || questionarios.length === 0) {
+          setDados((atuais) => ({
+            ...atuais,
+            dataNascimento: gestante.dataNascimento || "",
+            tipoSanguineo: gestante.tipoSanguineo || "",
+          }));
+          return;
+        }
+
+        const maisRecente = [...questionarios].sort((a, b) => {
+          const dataA = new Date(a.dataPreenchimento || 0).getTime();
+          const dataB = new Date(b.dataPreenchimento || 0).getTime();
+          return dataB - dataA || (b.id || 0) - (a.id || 0);
+        })[0];
+
+        setQuestionarioExistente(maisRecente);
+        setDados(dadosExistentes(gestante, maisRecente));
+      } catch (error) {
+        if (ativo) {
+          setErroCarregamento(
+            error instanceof ApiError
+              ? error.message
+              : "Não foi possível carregar suas informações de saúde.",
+          );
+        }
+      } finally {
+        if (ativo) setCarregando(false);
+      }
+    }
+
+    carregarQuestionario();
+    return () => { ativo = false; };
+  }, [user.id]);
 
   function handleChange(campo, valor) {
     setDados((prev) => ({ ...prev, [campo]: valor }));
@@ -271,21 +321,22 @@ export default function Questionario() {
     return Object.keys(novosErros).length === 0;
   }
 
-  // garante que existe uma Gestante vinculada ao usuário logado,
-  // criando uma se ainda não houver (reaproveita se já existir)
   async function obterOuCriarGestante() {
-    const gestantes = await listarGestantes();
-    const existente = gestantes.find((g) => g.usuario?.id === user.id);
-
-    if (existente) return existente.id;
-
-    const nova = await criarGestante({
+    const payload = {
       usuario: { id: user.id },
       dataNascimento: dados.dataNascimento,
-      observacoes: "",
+      observacoes: gestanteExistente?.observacoes || "",
       tipoSanguineo: dados.tipoSanguineo,
-    });
+    };
 
+    if (gestanteExistente) {
+      const atualizada = await atualizarGestante(gestanteExistente.id, payload);
+      setGestanteExistente(atualizada);
+      return gestanteExistente.id;
+    }
+
+    const nova = await criarGestante(payload);
+    setGestanteExistente(nova);
     return nova.id;
   }
 
@@ -309,7 +360,19 @@ export default function Questionario() {
       aceiteTermos: dados.aceitouTermos,
     };
 
-    await criarQuestionario(payload);
+    if (questionarioExistente) {
+      const atualizado = await atualizarQuestionario(
+        questionarioExistente.id,
+        payload,
+      );
+      setQuestionarioExistente(atualizado);
+      setResultado("atualizado");
+      return;
+    }
+
+    const criado = await criarQuestionario(payload);
+    setQuestionarioExistente(criado);
+    setResultado("criado");
   }
 
   async function nextStep() {
@@ -522,6 +585,16 @@ export default function Questionario() {
     return null;
   }
 
+  if (carregando) {
+    return (
+      <div className={styles.container}>
+        <p className={styles.loadingText} role="status">
+          Carregando suas informações de saúde...
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div className={styles.container}>
       <AnimatePresence mode="wait">
@@ -543,16 +616,38 @@ export default function Questionario() {
               />
             </div>
 
-            <h1>Sua saúde importa</h1>
+            <h1>
+              {questionarioExistente
+                ? "Atualize suas informações de saúde"
+                : "Sua saúde importa"}
+            </h1>
 
             <p>
-              Para oferecer a melhor experiência personalizada,
-              começaremos com um rápido questionário de saúde.
+              {questionarioExistente
+                ? "Revise suas respostas quando quiser para manter seu acompanhamento atualizado."
+                : "Para oferecer a melhor experiência personalizada, começaremos com um rápido questionário de saúde."}
             </p>
 
-            <AnimatedButton large onClick={() => setStep(1)}>
-              INICIAR QUESTIONÁRIO DE SAÚDE
-            </AnimatedButton>
+            {erroCarregamento && (
+              <p className={styles.loadError} role="alert">
+                {erroCarregamento}
+              </p>
+            )}
+
+            <div className={styles.introActions}>
+              <AnimatedButton large onClick={() => setStep(1)}>
+                {questionarioExistente
+                  ? "REVISAR QUESTIONÁRIO DE SAÚDE"
+                  : "INICIAR QUESTIONÁRIO DE SAÚDE"}
+              </AnimatedButton>
+              <button
+                type="button"
+                className={styles.laterButton}
+                onClick={() => navigate("/perfil")}
+              >
+                Agora não
+              </button>
+            </div>
           </Motion.section>
         )}
 
@@ -626,17 +721,23 @@ export default function Questionario() {
               <div className={styles.checkIcon}>✓</div>
             </div>
 
-            <h1 className={styles.finishTitle}>Tudo pronto!</h1>
+            <h1 className={styles.finishTitle}>
+              {resultado === "atualizado"
+                ? "Informações atualizadas!"
+                : "Tudo pronto!"}
+            </h1>
 
             <p className={styles.finishText}>
-              Sua jornada com o BabyBuddy acabou de começar.
+              {resultado === "atualizado"
+                ? "Suas informações de saúde foram atualizadas com sucesso."
+                : "Seu questionário foi salvo. Você pode alterá-lo quando quiser pelo seu perfil."}
             </p>
 
             <button
               className={styles.finishButton}
-              onClick={() => navigate("/login")}
+              onClick={() => navigate("/perfil")}
             >
-              Ir para o login
+              Voltar para meu perfil
             </button>
           </Motion.div>
         )}

@@ -27,5 +27,7 @@ describe('Perfil', () => {
 
     expect(screen.getByText('maria')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Abrir perfil' })).toHaveTextContent('M');
+    expect(screen.getByRole('link', { name: 'Preencher ou atualizar questionário' }))
+      .toHaveAttribute('href', '/questionario');
   });
 });

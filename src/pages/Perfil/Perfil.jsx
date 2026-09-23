@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Search, KeyRound } from 'lucide-react';
+import { Search, KeyRound, ClipboardList } from 'lucide-react';
 import styles from './Perfil.module.css';
 import LogoutConfirm from '../../components/LogoutConfirm';
 import artFallback from '../../assets/art3.png';
@@ -71,6 +71,20 @@ export default function Perfil() {
           {avatarInitial}
         </button>
       </header>
+
+      <section className={styles.healthCard} aria-labelledby="health-questionnaire-title">
+        <div className={styles.healthIcon} aria-hidden="true">
+          <ClipboardList size={26} />
+        </div>
+        <div className={styles.healthContent}>
+          <span>Saúde e bem-estar</span>
+          <h2 id="health-questionnaire-title">Questionário de saúde</h2>
+          <p>Preencha quando quiser ou atualize suas respostas para manter o acompanhamento personalizado.</p>
+        </div>
+        <Link to="/questionario" className={styles.healthLink}>
+          Preencher ou atualizar questionário
+        </Link>
+      </section>
 
       <label className={styles.searchContainer}>
         <Search size={18} strokeWidth={1.5} className={styles.searchIcon} />

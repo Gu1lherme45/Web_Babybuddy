@@ -14,6 +14,8 @@ export default function Cadastro() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [accountCreated, setAccountCreated] = useState(false);
+  const [sessionReady, setSessionReady] = useState(false);
 
   useEffect(() => {
     if (location.hash) document.getElementById(location.hash.slice(1))?.scrollIntoView({ behavior: 'smooth' });
@@ -33,17 +35,22 @@ export default function Cadastro() {
     setLoading(true);
     try {
       await register({ nome: form.nome.trim(), username: form.email, password: form.senha });
-      await login(form.email, form.senha);
-      setSuccess('Cadastro realizado com sucesso!');
-      window.setTimeout(() => navigate('/questionario'), 700);
+      setAccountCreated(true);
+      try {
+        await login(form.email, form.senha);
+        setSessionReady(true);
+        setSuccess('Cadastro realizado com sucesso!');
+      } catch {
+        setSuccess('Sua conta foi criada. Entre para continuar.');
+      }
     } catch (requestError) {
-      const status = requestError.response?.status;
+      const status = requestError.status || requestError.response?.status;
       const backendMessage = requestError.response?.data?.error || requestError.response?.data?.message;
       setError(status === 409
         ? 'Este e-mail já está cadastrado.'
         : status === 401
           ? 'Não foi possível validar a sessão segura. Atualize a página e tente novamente.'
-          : backendMessage || 'Não foi possível concluir o cadastro. Confira os dados e tente novamente.');
+          : backendMessage || requestError.message || 'Não foi possível concluir o cadastro. Confira os dados e tente novamente.');
     } finally {
       setLoading(false);
     }
@@ -72,47 +79,73 @@ export default function Cadastro() {
 
       <div className={styles.right}>
         <div className={styles.card} id="formulario">
-          <h2 className={styles.title}>Criar conta</h2>
-          <p className={styles.subtitle}>Preencha os campos abaixo para se cadastrar</p>
+          <h2 className={styles.title}>{accountCreated ? 'Conta criada!' : 'Criar conta'}</h2>
+          <p className={styles.subtitle}>
+            {accountCreated
+              ? 'Você decide quando quer completar suas informações de saúde.'
+              : 'Preencha os campos abaixo para se cadastrar'}
+          </p>
           {success && <div className={styles.success} role="status">{success}</div>}
           {error && <div className={styles.error} role="alert">{error}</div>}
-          <form onSubmit={handleSubmit} className={styles.form}>
-            <Field label="Nome completo" icon={<FiUser />}>
-              <input value={form.nome} onChange={(event) => update('nome', event.target.value)} autoComplete="name" required />
-            </Field>
-            <Field label="E-mail" icon={<FiMail />}>
-              <input type="email" value={form.email} onChange={(event) => update('email', event.target.value)} autoComplete="username" required />
-            </Field>
-            <Field label="Telefone (opcional, não armazenado)" icon={<FiPhone />}>
-              <input type="tel" value={form.telefone} onChange={(event) => update('telefone', event.target.value)} autoComplete="tel" />
-            </Field>
-            <Field label="Senha" icon={<FiLock />}>
-              <input type={showPassword ? 'text' : 'password'} value={form.senha}
-                onChange={(event) => update('senha', event.target.value)} autoComplete="new-password" minLength={8} required />
-              <FiEyeButton visible={showPassword} onClick={() => setShowPassword((value) => !value)} />
-            </Field>
-            <Field label="Confirmar senha" icon={<FiLock />}>
-              <input type={showConfirmation ? 'text' : 'password'} value={form.confirmarSenha}
-                onChange={(event) => update('confirmarSenha', event.target.value)} autoComplete="new-password" minLength={8} required />
-              <FiEyeButton visible={showConfirmation} onClick={() => setShowConfirmation((value) => !value)} />
-            </Field>
-            <div className={styles.terms}>
-              <input type="checkbox" required aria-label="Aceitar termos" />
-              <p>Eu concordo com os <Link to="/termos-de-uso" className={styles.link}>Termos de Uso</Link> e a{' '}
-                <Link to="/politica-de-privacidade" className={styles.link}>Política de Privacidade</Link>.</p>
+          {accountCreated ? (
+            <div className={styles.completion}>
+              <FiClipboard className={styles.completionIcon} aria-hidden="true" />
+              {sessionReady ? (
+                <>
+                  <p>O questionário ajuda a personalizar o acompanhamento e continuará disponível no seu perfil.</p>
+                  <div className={styles.completionActions}>
+                    <Link to="/questionario" className={styles.primaryAction}>Preencher questionário agora</Link>
+                    <Link to="/perfil" className={styles.secondaryAction}>Fazer isso depois</Link>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <p>Faça login para acessar seu perfil e preencher o questionário quando preferir.</p>
+                  <Link to="/login" className={styles.primaryAction}>Ir para o login</Link>
+                </>
+              )}
             </div>
-            <button type="submit" disabled={loading} className={styles.btn}>{loading ? 'Cadastrando...' : 'Criar minha conta'}</button>
-          </form>
-          <div className={styles.divider}><span /><p>ou</p><span /></div>
-          <p className={styles.loginText}>Já tem uma conta? <span onClick={() => navigate('/login')}>Entrar</span></p>
+          ) : (
+            <>
+              <form onSubmit={handleSubmit} className={styles.form}>
+                <Field label="Nome completo" htmlFor="nome" icon={<FiUser />}>
+                  <input id="nome" name="nome" placeholder="Seu nome completo" value={form.nome} onChange={(event) => update('nome', event.target.value)} autoComplete="name" required />
+                </Field>
+                <Field label="E-mail" htmlFor="email" icon={<FiMail />}>
+                  <input id="email" name="email" placeholder="seu@email.com" type="email" value={form.email} onChange={(event) => update('email', event.target.value)} autoComplete="username" required />
+                </Field>
+                <Field label="Telefone (opcional, não armazenado)" htmlFor="telefone" icon={<FiPhone />}>
+                  <input id="telefone" name="telefone" placeholder="(00) 00000-0000" type="tel" value={form.telefone} onChange={(event) => update('telefone', event.target.value)} autoComplete="tel" />
+                </Field>
+                <Field label="Senha" htmlFor="senha" icon={<FiLock />}>
+                  <input id="senha" name="senha" placeholder="Mínimo de 8 caracteres" type={showPassword ? 'text' : 'password'} value={form.senha}
+                    onChange={(event) => update('senha', event.target.value)} autoComplete="new-password" minLength={8} required />
+                  <FiEyeButton visible={showPassword} onClick={() => setShowPassword((value) => !value)} />
+                </Field>
+                <Field label="Confirmar senha" htmlFor="confirmarSenha" icon={<FiLock />}>
+                  <input id="confirmarSenha" name="confirmarSenha" placeholder="Digite sua senha novamente" type={showConfirmation ? 'text' : 'password'} value={form.confirmarSenha}
+                    onChange={(event) => update('confirmarSenha', event.target.value)} autoComplete="new-password" minLength={8} required />
+                  <FiEyeButton visible={showConfirmation} onClick={() => setShowConfirmation((value) => !value)} />
+                </Field>
+                <div className={styles.terms}>
+                  <input type="checkbox" required aria-label="Aceitar termos" />
+                  <p>Eu concordo com os <Link to="/termos-de-uso" className={styles.link}>Termos de Uso</Link> e a{' '}
+                    <Link to="/politica-de-privacidade" className={styles.link}>Política de Privacidade</Link>.</p>
+                </div>
+                <button type="submit" disabled={loading} className={styles.btn}>{loading ? 'Cadastrando...' : 'Criar minha conta'}</button>
+              </form>
+              <div className={styles.divider}><span /><p>ou</p><span /></div>
+              <p className={styles.loginText}>Já tem uma conta? <span onClick={() => navigate('/login')}>Entrar</span></p>
+            </>
+          )}
         </div>
       </div>
     </div>
   );
 }
 
-function Field({ label, icon, children }) {
-  return <div className={styles.inputGroup}><label>{label}</label><div className={styles.inputBox}>{icon}{children}</div></div>;
+function Field({ label, htmlFor, icon, children }) {
+  return <div className={styles.inputGroup}><label htmlFor={htmlFor}>{label}</label><div className={styles.inputBox}>{icon}{children}</div></div>;
 }
 
 function FiEyeButton({ visible, onClick }) {
