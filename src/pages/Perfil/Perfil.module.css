@@ -67,6 +67,14 @@
   justify-content: center;
   font-weight: 700;
   font-size: 1.2rem;
+  border: 0;
+  cursor: pointer;
+}
+
+.profileMessage {
+  max-width: 1200px;
+  margin: -8px auto 20px;
+  color: #8b365b;
 }
 
 /* AVATAR */

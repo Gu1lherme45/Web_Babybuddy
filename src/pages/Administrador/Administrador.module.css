@@ -262,8 +262,6 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  scroll-margin-top: 24px;
-  outline: none;
 
   margin-bottom: 22px;
 }
@@ -824,4 +822,30 @@
   font-size: 3rem;
 
   color: #DC2B74;
+}
+
+.feedback {
+  min-height: 24px;
+  margin-bottom: 16px;
+  color: #8b5d71;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+}
+
+.actions button:disabled {
+  cursor: wait;
+  opacity: 0.55;
+}
+
+.actions button:focus-visible,
+.addButton:focus-visible,
+.nav button:focus-visible {
+  outline: 3px solid rgba(220, 43, 116, 0.25);
+  outline-offset: 2px;
 }

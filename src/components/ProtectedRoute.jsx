@@ -1,31 +1,15 @@
-import { Navigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
-import Loader from "./Loader";
+import { Navigate, useLocation } from 'react-router-dom';
+import useAuth from '../auth/useAuth';
+import LoadingWave from './LoadingWave';
 
-export default function ProtectedRoute({
-  children,
-  adminOnly = false,
-}) {
-  const { usuario, loading } = useAuth();
+export default function ProtectedRoute({ children, adminOnly = false }) {
+  const { user, loading } = useAuth();
+  const location = useLocation();
 
-  // Ainda verificando a sessão com o backend
-  if (loading) {
-    return (
-      <div style={{ width: "100%", height: "100vh" }}>
-        <Loader />
-      </div>
-    );
+  if (loading) return <LoadingWave />;
+  if (!user) return <Navigate to="/login" replace state={{ from: location }} />;
+  if (adminOnly && user.nivelAcesso?.toUpperCase() !== 'ADMIN') {
+    return <Navigate to="/perfil" replace />;
   }
-
-  // Não está logado
-  if (!usuario) {
-    return <Navigate to="/login" replace />;
-  }
-
-  // Área exclusiva do administrador
-  if (adminOnly && usuario.nivelAcesso !== "ADMIN") {
-    return <Navigate to="/" replace />;
-  }
-
   return children;
 }

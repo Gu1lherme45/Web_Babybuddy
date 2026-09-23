@@ -7,7 +7,7 @@ import logo from "../../assets/logoofc3.svg";
 import heartQuestion from "../../assets/heartquestion.png";
 import AnimatedButton from "../../components/AnimatedButton";
 import LiquidRadioGroup from "../../components/LiquidRadioGroup";
-import { useAuth } from "../../context/AuthContext";
+import useAuth from "../../auth/useAuth";
 import { criarGestante, criarQuestionario, listarGestantes, ApiError } from "../../services/api";
 
 // formato YYYY-MM-DD (exigido pelo input date) respeitando o fuso local
@@ -165,7 +165,7 @@ export default function Questionario() {
   const [enviando, setEnviando] = useState(false);
 
   const navigate = useNavigate();
-  const { usuario } = useAuth();
+  const { user } = useAuth();
 
   const etapaAtual = ETAPAS[step - 1];
   const progress = (step / ETAPAS.length) * 100;
@@ -224,12 +224,12 @@ export default function Questionario() {
   // criando uma se ainda não houver (reaproveita se já existir)
   async function obterOuCriarGestante() {
     const gestantes = await listarGestantes();
-    const existente = gestantes.find((g) => g.usuario?.id === usuario.id);
+    const existente = gestantes.find((g) => g.usuario?.id === user.id);
 
     if (existente) return existente.id;
 
     const nova = await criarGestante({
-      usuario: { id: usuario.id },
+      usuario: { id: user.id },
       dataNascimento: dados.dataNascimento,
       observacoes: "",
       tipoSanguineo: dados.tipoSanguineo,

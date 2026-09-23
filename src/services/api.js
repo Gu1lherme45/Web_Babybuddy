@@ -1,4 +1,11 @@
-const API_BASE = import.meta.env.VITE_API_URL ?? '';
+import axios from 'axios';
+
+export const API_URL = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
+
+const api = axios.create({
+  baseURL: API_URL,
+  withCredentials: true,
+});
 
 export class ApiError extends Error {
   constructor(status, message) {
@@ -8,136 +15,130 @@ export class ApiError extends Error {
   }
 }
 
-async function parseErrorMessage(response) {
-  const texto = await response.text();
-  if (!texto) return `Erro ${response.status}`;
+function asApiError(error) {
+  if (error instanceof ApiError) return error;
+  const status = error.response?.status;
+  const payload = error.response?.data;
+  const message = payload?.error || payload?.message || (typeof payload === 'string' ? payload : null)
+    || error.message || `Erro ${status || 'na requisição'}`;
+  return new ApiError(status, message);
+}
 
+async function compatibleRequest(request) {
   try {
-    const json = JSON.parse(texto);
-    return json.error || json.message || texto;
-  } catch {
-    return texto;
+    const response = await request();
+    return response.data;
+  } catch (error) {
+    throw asApiError(error);
   }
 }
 
-function notifyUnauthorized() {
-  if (typeof window !== 'undefined') {
-    window.dispatchEvent(new CustomEvent('babybuddy:unauthorized'));
-  }
+async function csrfHeaders() {
+  const { data } = await api.get('/api/csrf', { skipAuthRedirect: true });
+  return { [data.headerName]: data.token };
 }
 
-async function request(path, { method = 'GET', body, headers } = {}) {
-  const response = await fetch(`${API_BASE}${path}`, {
-    method,
-    credentials: 'include',
-    headers: {
-      ...(body !== undefined ? { 'Content-Type': 'application/json' } : {}),
-      ...headers,
-    },
-    body: body !== undefined ? JSON.stringify(body) : undefined,
-  });
-
-  if (!response.ok) {
-    if (response.status === 401) notifyUnauthorized();
-    throw new ApiError(response.status, await parseErrorMessage(response));
-  }
-
-  if (response.status === 204) return null;
-
-  const texto = await response.text();
-  return texto ? JSON.parse(texto) : null;
+export async function requestWithCsrf(config) {
+  const headers = await csrfHeaders();
+  return api.request({ ...config, headers: { ...headers, ...config.headers } });
 }
 
-/* ================= AUTENTICAÇÃO ================= */
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    const isLogin = error.config?.url === '/login';
+    if (error.response?.status === 401 && !isLogin && !error.config?.skipAuthRedirect) {
+      window.dispatchEvent(new CustomEvent('babybuddy:unauthorized'));
+    }
+    return Promise.reject(error);
+  },
+);
 
-export async function login(username, password) {
-  const params = new URLSearchParams({ username, password });
+export function absoluteApiUrl(path) {
+  if (!path) return '';
+  return /^https?:\/\//i.test(path) ? path : `${API_URL}${path.startsWith('/') ? '' : '/'}${path}`;
+}
 
-  const response = await fetch(`${API_BASE}/login`, {
-    method: 'POST',
-    credentials: 'include',
+// Compatibilidade para os fluxos de gestante/questionário e para os testes
+// existentes na branch conexao-banco. Novos módulos podem usar `api` e
+// `requestWithCsrf` diretamente.
+export function login(username, password) {
+  const data = new URLSearchParams({ username, password });
+  return compatibleRequest(() => requestWithCsrf({
+    method: 'post',
+    url: '/login',
+    data,
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: params,
-  });
-
-  if (!response.ok) {
-    throw new ApiError(response.status, await parseErrorMessage(response));
-  }
-
-  return response.json();
+    skipAuthRedirect: true,
+  }));
 }
 
 export function logout() {
-  return request('/logout', { method: 'POST' });
+  return compatibleRequest(() => requestWithCsrf({ method: 'post', url: '/logout', skipAuthRedirect: true }));
 }
 
-/* ================= USUÁRIO ================= */
-
 export function getMe() {
-  return request('/api/usuarios/me');
+  return compatibleRequest(() => api.get('/api/usuarios/me', { skipAuthRedirect: true }));
 }
 
 export function listarUsuarios() {
-  return request('/api/usuarios');
+  return compatibleRequest(() => api.get('/api/usuarios'));
 }
 
 export function criarUsuario(dados) {
-  return request('/api/usuarios', { method: 'POST', body: dados });
+  return compatibleRequest(() => requestWithCsrf({ method: 'post', url: '/api/usuarios', data: dados }));
 }
 
 export function atualizarUsuario(id, dados) {
-  return request(`/api/usuarios/${id}`, { method: 'PUT', body: dados });
+  return compatibleRequest(() => requestWithCsrf({ method: 'put', url: `/api/usuarios/${id}`, data: dados }));
 }
 
 export function trocarSenha(id, novaSenha) {
-  return request(`/api/usuarios/${id}/senha`, {
-    method: 'PATCH',
-    body: { senha: novaSenha },
-  });
+  return compatibleRequest(() => requestWithCsrf({
+    method: 'patch',
+    url: `/api/usuarios/${id}/senha`,
+    data: { senha: novaSenha },
+  }));
 }
 
-/* ================= GESTANTE ================= */
-
 export function listarGestantes() {
-  return request('/api/gestantes');
+  return compatibleRequest(() => api.get('/api/gestantes'));
 }
 
 export function criarGestante(dados) {
-  return request('/api/gestantes', { method: 'POST', body: dados });
+  return compatibleRequest(() => requestWithCsrf({ method: 'post', url: '/api/gestantes', data: dados }));
 }
 
 export function atualizarGestante(id, dados) {
-  return request(`/api/gestantes/${id}`, { method: 'PUT', body: dados });
+  return compatibleRequest(() => requestWithCsrf({ method: 'put', url: `/api/gestantes/${id}`, data: dados }));
 }
-
-/* ================= QUESTIONÁRIO ================= */
 
 export function criarQuestionario(dados) {
-  return request('/api/questionarios', { method: 'POST', body: dados });
+  return compatibleRequest(() => requestWithCsrf({ method: 'post', url: '/api/questionarios', data: dados }));
 }
 
-/* ================= MATERIAL ================= */
-
 export function listarMateriais() {
-  return request('/api/materiais');
+  return compatibleRequest(() => api.get('/api/materiais'));
 }
 
 export function criarMaterial(dados) {
-  return request('/api/materiais', { method: 'POST', body: dados });
+  return compatibleRequest(() => requestWithCsrf({ method: 'post', url: '/api/materiais', data: dados }));
 }
 
 export function atualizarMaterial(id, dados) {
-  return request(`/api/materiais/${id}`, { method: 'PUT', body: dados });
+  return compatibleRequest(() => requestWithCsrf({ method: 'put', url: `/api/materiais/${id}`, data: dados }));
 }
 
 export function inativarMaterial(id) {
-  return request(`/api/materiais/${id}/inativar`, { method: 'PATCH' });
+  return compatibleRequest(() => requestWithCsrf({ method: 'patch', url: `/api/materiais/${id}/inativar` }));
 }
 
 export function ativarMaterial(id) {
-  return request(`/api/materiais/${id}/ativar`, { method: 'PATCH' });
+  return compatibleRequest(() => requestWithCsrf({ method: 'patch', url: `/api/materiais/${id}/ativar` }));
 }
 
 export function excluirMaterial(id) {
-  return request(`/api/materiais/${id}`, { method: 'DELETE' });
+  return compatibleRequest(() => requestWithCsrf({ method: 'delete', url: `/api/materiais/${id}` }));
 }
+
+export default api;

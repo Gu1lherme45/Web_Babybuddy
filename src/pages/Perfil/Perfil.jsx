@@ -1,539 +1,139 @@
-import { useEffect, useMemo, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { CalendarHeart, Search, Eye, EyeOff, KeyRound } from "lucide-react";
-
-import styles from "./Perfil.module.css";
-import Sidebar from "../../components/Sidebar/Sidebar";
-import LogoutConfirm from "../../components/LogoutConfirm";
-import { useAuth } from "../../context/AuthContext";
-import {
-  atualizarUsuario,
-  listarMateriais,
-  trocarSenha,
-  ApiError,
-} from "../../services/api";
-import {
-  persistMaterialsCache,
-  readMaterialsCache,
-} from "../../services/browserStorage";
-import useHashScroll from "../../hooks/useHashScroll";
-
-import art1 from "../../assets/art1.png";
-import art2 from "../../assets/art2.png";
-import art3 from "../../assets/art3.png";
-import artSono from "../../assets/art6.png";
-import artAlimentacao from "../../assets/art5.png";
+import { useEffect, useMemo, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Search, KeyRound } from 'lucide-react';
+import styles from './Perfil.module.css';
+import LogoutConfirm from '../../components/LogoutConfirm';
+import artFallback from '../../assets/art3.png';
+import useAuth from '../../auth/useAuth';
+import { absoluteApiUrl } from '../../services/api';
+import { listPublicMaterials } from '../../services/materialService';
 
 export default function Perfil() {
   const navigate = useNavigate();
-  const { usuario, sair, refresh } = useAuth();
-  useHashScroll(Boolean(usuario));
-
-  // ARTIGOS PADRÃO
-  const artigosPadrao = useMemo(() => [
-    {
-      id: 1,
-      titulo: "Cuidados com o bebê",
-      categoria: "Bebê",
-      descricao: "Tudo que você precisa saber para cuidar do seu bebê.",
-      imagem: art1,
-      status: "ativo",
-      rota: "/cuidados-bebe",
-    },
-    {
-      id: 2,
-      titulo: "Tentando engravidar?",
-      categoria: "Fertilidade",
-      descricao: "Quanto tempo demora a fecundação após a relação sexual?",
-      imagem: art2,
-      status: "ativo",
-      rota: "/tentando-engravidar",
-    },
-    {
-      id: 3,
-      titulo: "Período gestacional",
-      categoria: "Gestação",
-      descricao: "Tudo que você precisa saber sobre o período gestacional!",
-      imagem: art3,
-      status: "ativo",
-      rota: "/periodo-gestacional",
-    },
-    {
-      id: 4,
-      titulo: "Sono do bebê",
-      categoria: "Sono",
-      descricao: "Rotina, fases e dicas para o bebê dormir a noite toda.",
-      imagem: artSono,
-      status: "ativo",
-      rota: "/artigos/sono",
-      tempo: 9,
-    },
-    {
-      id: 5,
-      titulo: "Alimentação do bebê",
-      categoria: "Alimentação",
-      descricao: "Do aleitamento à introdução alimentar, passo a passo.",
-      imagem: artAlimentacao,
-      status: "ativo",
-      rota: "/artigos/alimentacao",
-      tempo: 10,
-    },
-  ], []);
-
-  const [artigos, setArtigos] = useState([]);
-  const [pesquisa, setPesquisa] = useState("");
+  const { user, updateProfile, changePassword, logout } = useAuth();
+  const displayName = user?.nome?.trim() || user?.username?.split('@')[0] || 'Usuária';
+  const avatarInitial = displayName.charAt(0).toUpperCase();
+  const [materials, setMaterials] = useState([]);
+  const [query, setQuery] = useState('');
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [editando, setEditando] = useState(false);
-  const [dadosUsuario, setDadosUsuario] = useState({
-    nome: usuario?.nome ?? "",
-    email: usuario?.username ?? "",
-  });
-  const [salvando, setSalvando] = useState(false);
-  const [erroPerfil, setErroPerfil] = useState("");
-  const [alterarSenha, setAlterarSenha] = useState(false);
-  const [novaSenha, setNovaSenha] = useState("");
-  const [confirmarSenha, setConfirmarSenha] = useState("");
-  const [mostrarNovaSenha, setMostrarNovaSenha] = useState(false);
-  const [mostrarConfirmarSenha, setMostrarConfirmarSenha] = useState(false);
-  const [erroSenha, setErroSenha] = useState("");
-  const [confirmarSaida, setConfirmarSaida] = useState(false);
-
-  async function sairDaConta() {
-    await sair();
-    setConfirmarSaida(false);
-    navigate("/");
-  }
+  const [editing, setEditing] = useState(false);
+  const [profile, setProfile] = useState({ nome: displayName, username: user?.username || '' });
+  const [passwordOpen, setPasswordOpen] = useState(false);
+  const [password, setPassword] = useState('');
+  const [confirmation, setConfirmation] = useState('');
+  const [message, setMessage] = useState('');
+  const [confirmLogout, setConfirmLogout] = useState(false);
 
   useEffect(() => {
-    let active = true;
+    listPublicMaterials().then(setMaterials).catch(() => setMessage('Não foi possível carregar os artigos.'));
+  }, []);
 
-    function exibirMateriais(materiais) {
-      const artigosBackend = materiais.map((material) => {
-        const rota = material.link ?? material.rota ?? "/";
-        const padrao = artigosPadrao.find((artigo) => artigo.rota === rota);
+  useEffect(() => setProfile({ nome: displayName, username: user?.username || '' }), [displayName, user?.username]);
 
-        return {
-          id: material.id,
-          titulo: material.titulo,
-          categoria: material.categoria,
-          descricao: material.descricao,
-          imagem: material.arquivo || padrao?.imagem || "",
-          status:
-            material.statusMaterial === "INATIVO" ||
-            material.status === "suspenso"
-              ? "suspenso"
-              : "ativo",
-          rota,
-          tempo: padrao?.tempo,
-        };
-      });
+  const filtered = useMemo(() => {
+    const normalized = query.trim().toLocaleLowerCase('pt-BR');
+    return materials.filter((item) => !normalized
+      || `${item.titulo} ${item.categoria} ${item.descricao || ''}`.toLocaleLowerCase('pt-BR').includes(normalized));
+  }, [materials, query]);
+  const featured = filtered[0] || materials[0];
 
-      const rotasRecebidas = new Set(artigosBackend.map((artigo) => artigo.rota));
-      const faltantes = artigosPadrao.filter(
-        (artigo) => !rotasRecebidas.has(artigo.rota)
-      );
-      const ativos = [...artigosBackend, ...faltantes].filter(
-        (artigo) => artigo.status === "ativo"
-      );
-
-      if (active) setArtigos(ativos);
-    }
-
-    async function carregarArtigos() {
-      try {
-        const materiais = await listarMateriais();
-        persistMaterialsCache(materiais);
-        exibirMateriais(materiais);
-      } catch {
-        exibirMateriais(readMaterialsCache());
-      }
-    }
-
-    const onMaterialsUpdated = (event) => {
-      exibirMateriais(event.detail?.items ?? readMaterialsCache());
-    };
-
-    carregarArtigos();
-    window.addEventListener("babybuddy:materials-updated", onMaterialsUpdated);
-    return () => {
-      active = false;
-      window.removeEventListener(
-        "babybuddy:materials-updated",
-        onMaterialsUpdated
-      );
-    };
-  }, [artigosPadrao]);
-
-  // mantém o formulário sincronizado com os dados reais do backend
-  // (ex.: depois de um refresh() pós-salvamento)
-  useEffect(() => {
-    if (usuario) {
-      setDadosUsuario({ nome: usuario.nome, email: usuario.username });
-    }
-  }, [usuario]);
-
-  const artigosFiltrados = artigos.filter(
-    (artigo) =>
-      artigo.titulo.toLowerCase().includes(pesquisa.toLowerCase()) ||
-      artigo.categoria.toLowerCase().includes(pesquisa.toLowerCase()) ||
-      artigo.descricao.toLowerCase().includes(pesquisa.toLowerCase())
-  );
-
-  async function salvarAlteracoes() {
-    setSalvando(true);
-    setErroPerfil("");
-
+  async function saveProfile() {
     try {
-      await atualizarUsuario(usuario.id, {
-        nome: dadosUsuario.nome,
-        username: dadosUsuario.email,
-        nivelAcesso: usuario.nivelAcesso,
-      });
-      await refresh();
-      setEditando(false);
-    } catch (err) {
-      setErroPerfil(
-        err instanceof ApiError
-          ? err.message
-          : "Não foi possível salvar as alterações."
-      );
-    } finally {
-      setSalvando(false);
+      await updateProfile(profile);
+      setEditing(false);
+      setMessage('Perfil atualizado.');
+    } catch (error) {
+      setMessage(error.response?.data?.message || 'Não foi possível atualizar o perfil.');
     }
   }
 
-  // ProtectedRoute só renderiza Perfil depois que a sessão é confirmada,
-  // mas guardamos contra o instante inicial em que ainda não resolveu
-  if (!usuario) return null;
+  async function savePassword() {
+    if (password.length < 8) return setMessage('A senha deve ter ao menos 8 caracteres.');
+    if (password !== confirmation) return setMessage('As senhas não coincidem.');
+    try {
+      await changePassword(password);
+      setPassword(''); setConfirmation(''); setPasswordOpen(false);
+      setMessage('Senha alterada com sucesso.');
+    } catch { setMessage('Não foi possível alterar a senha.'); }
+  }
 
-  const nomeUsuario = usuario.nome;
+  async function signOut() {
+    await logout();
+    navigate('/', { replace: true });
+  }
 
   return (
     <div className={styles.container}>
-      {/* HEADER */}
-      <div className={styles.header}>
-        <div>
-          <h1 className={styles.title}>
-            Olá, <span>{nomeUsuario} </span>
-          </h1>
+      <header className={styles.header}>
+        <div><h1 className={styles.title}>Olá, <span>{displayName}</span></h1>
+          <p className={styles.subtitle}>Este é o seu espaço personalizado para acompanhar cada etapa dessa fase tão importante.</p></div>
+        <button type="button" className={styles.avatar} onClick={() => setSidebarOpen(true)} aria-label="Abrir perfil">
+          {avatarInitial}
+        </button>
+      </header>
 
-          <p className={styles.subtitle}>
-            Este é o seu espaço personalizado dentro do BabyBuddy, criado para
-            acompanhar cada etapa dessa fase tão importante.
-          </p>
-        </div>
-
-        <div className={styles.avatar} onClick={() => setSidebarOpen(true)}>
-          {nomeUsuario.charAt(0).toUpperCase()}
-        </div>
-      </div>
-
-      <div className={styles.searchContainer}>
+      <label className={styles.searchContainer}>
         <Search size={18} strokeWidth={1.5} className={styles.searchIcon} />
+        <input type="search" placeholder="Pesquisar artigos..." value={query} onChange={(e) => setQuery(e.target.value)} className={styles.searchInput} />
+      </label>
+      {message && <p className={styles.profileMessage} role="status">{message}</p>}
 
-        <input
-          type="text"
-          placeholder="Pesquisar artigos..."
-          value={pesquisa}
-          onChange={(e) => setPesquisa(e.target.value)}
-          className={styles.searchInput}
-        />
-      </div>
-
-      {/* DESTAQUE */}
-      <section className={styles.highlight}>
+      {featured && <section className={styles.highlight}>
         <div className={styles.card}>
-          <div className={styles.image}>
-            <img src={art3} alt="Artigo em destaque" />
-          </div>
+          <div className={styles.image}><img src={featured.imagem || featured.capa ? absoluteApiUrl(featured.imagem || featured.capa) : artFallback} alt={`Imagem de ${featured.titulo}`} /></div>
+          <div className={styles.content}><span className={styles.category}>{featured.categoria}</span><h2>{featured.titulo}</h2>
+            <p>{featured.descricao}</p><div className={styles.footer}><span>Por {featured.autor}</span>
+              <Link to={materialPath(featured)} className={styles.button}>Ler agora</Link></div></div>
+        </div>
+      </section>}
 
-          <div className={styles.content}>
-            <span className={styles.category}>DESENVOLVIMENTO</span>
-
-            <h2>Período Gestacional: Transformações e Cuidados na Gravidez</h2>
-
-            <p>
-              O período gestacional é a fase da gravidez em que ocorrem
-              mudanças no corpo da mulher e o desenvolvimento do bebê, sendo
-              essencial o acompanhamento e os cuidados com a saúde.
-            </p>
-
-            <div className={styles.footer}>
-              <span>6 min de leitura</span>
-              <span>•</span>
-              <span>Equipe Materna</span>
-
-              <Link to="/periodo-gestacional" className={styles.button}>
-                Ler agora
-              </Link>
-            </div>
-          </div>
+      <section className={styles.artigosContainer}>
+        <h2 className={styles.artigosTitle}>Artigos pensados para você</h2>
+        <div className={styles.artigosGrid}>
+          {filtered.map((material) => <Link key={material.id} to={materialPath(material)} className={styles.artigoCard} onClick={() => window.scrollTo(0, 0)}>
+            <img src={material.imagem || material.capa ? absoluteApiUrl(material.imagem || material.capa) : artFallback} alt={`Imagem de ${material.titulo}`} />
+            <div className={styles.cardContent}><span>{material.categoria.toUpperCase()}</span><h3>{material.titulo.toUpperCase()}</h3><p>{material.descricao}</p></div>
+          </Link>)}
         </div>
       </section>
 
-      {/* ARTIGOS */}
-      <div
-        id="artigos"
-        className={styles.artigosContainer}
-        tabIndex={-1}
-      >
-        <h2 className={styles.artigosTitle}>Artigos pensados para você</h2>
-
-        <div className={styles.artigosGrid}>
-          {artigosFiltrados.map((artigo) => (
-            <Link
-              key={artigo.id}
-              to={artigo.rota || "/"}
-              className={styles.artigoCard}
-              onClick={() => window.scrollTo(0, 0)}
-            >
-              <img src={artigo.imagem} alt={artigo.titulo} />
-
-              <div className={styles.cardContent}>
-                <span>{artigo.categoria.toUpperCase()}</span>
-                <h3>{artigo.titulo.toUpperCase()}</h3>
-                <p>{artigo.descricao}</p>
-
-                {artigo.tempo && (
-                  <span className={styles.cardTempo}>
-                    ⏱️ {artigo.tempo} min de leitura
-                  </span>
-                )}
-              </div>
-            </Link>
-          ))}
-        </div>
-
-        {sidebarOpen && (
-          <>
-            <div
-              className={styles.overlay}
-              onClick={() => setSidebarOpen(false)}
-            />
-
-            <div className={styles.sidebar}>
-              <button
-                className={styles.fecharTopo}
-                onClick={() => setSidebarOpen(false)}
-              >
-                ×
-              </button>
-
-              {/* PERFIL DO USUÁRIO */}
-              <div className={styles.sidebarPerfil}>
-                <div className={styles.sidebarAvatar}>
-                  {nomeUsuario.charAt(0).toUpperCase()}
-                </div>
-
-                <p>Usuária BabyBuddy</p>
-
-                <h2>{nomeUsuario}</h2>
-
-                <button
-                  className={styles.editarPerfil}
-                  onClick={() => setEditando(!editando)}
-                >
-                  {editando ? "Cancelar" : "Editar perfil"}
-                </button>
-              </div>
-
-              {/* INFORMAÇÕES DO USUÁRIO */}
-              <div className={styles.informacoesUsuario}>
-                <div className={styles.infoItem}>
-                  <span>Nome completo</span>
-
-                  {editando ? (
-                    <input
-                      value={dadosUsuario.nome}
-                      onChange={(e) =>
-                        setDadosUsuario({
-                          ...dadosUsuario,
-                          nome: e.target.value,
-                        })
-                      }
-                    />
-                  ) : (
-                    <p>{dadosUsuario.nome}</p>
-                  )}
-                </div>
-
-                <div className={styles.infoItem}>
-                  <span>E-mail</span>
-                  {editando ? (
-                    <input
-                      type="email"
-                      value={dadosUsuario?.email || ""}
-                      onChange={(e) =>
-                        setDadosUsuario({
-                          ...dadosUsuario,
-                          email: e.target.value,
-                        })
-                      }
-                    />
-                  ) : (
-                    <p>{dadosUsuario?.email || "Não informado"}</p>
-                  )}
-                </div>
-
-                <div className={styles.infoItem}>
-                  <span>Senha</span>
-
-                  {/* DADOS NORMAL — a senha real nunca é devolvida pelo
-                      backend, então só é possível trocá-la, não exibi-la */}
-                  {!editando && (
-                    <div className={styles.senhaContainer}>
-                      <p>••••••••</p>
-                    </div>
-                  )}
-
-                  {/* GATILHO */}
-                  {editando && !alterarSenha && (
-                    <button
-                      type="button"
-                      className={styles.botaoAlterarSenha}
-                      onClick={() => setAlterarSenha(true)}
-                    >
-                      <KeyRound size={15} />
-                      Alterar senha
-                    </button>
-                  )}
-
-                  {/* FORMULÁRIO DE NOVA SENHA */}
-                  {alterarSenha && (
-                    <div className={styles.areaSenha}>
-                      <div className={styles.campoSenha}>
-                        <input
-                          type={mostrarNovaSenha ? "text" : "password"}
-                          placeholder="Nova senha"
-                          value={novaSenha}
-                          onChange={(e) => setNovaSenha(e.target.value)}
-                        />
-                        <button
-                          type="button"
-                          className={styles.botaoOlhoInput}
-                          onClick={() => setMostrarNovaSenha(!mostrarNovaSenha)}
-                        >
-                          {mostrarNovaSenha ? <EyeOff size={16} /> : <Eye size={16} />}
-                        </button>
-                      </div>
-
-                      <div className={styles.campoSenha}>
-                        <input
-                          type={mostrarConfirmarSenha ? "text" : "password"}
-                          placeholder="Confirmar nova senha"
-                          value={confirmarSenha}
-                          onChange={(e) => setConfirmarSenha(e.target.value)}
-                        />
-                        <button
-                          type="button"
-                          className={styles.botaoOlhoInput}
-                          onClick={() =>
-                            setMostrarConfirmarSenha(!mostrarConfirmarSenha)
-                          }
-                        >
-                          {mostrarConfirmarSenha ? (
-                            <EyeOff size={16} />
-                          ) : (
-                            <Eye size={16} />
-                          )}
-                        </button>
-                      </div>
-
-                      {erroSenha && (
-                        <p className={styles.erroSenha}>{erroSenha}</p>
-                      )}
-
-                      <div className={styles.acoesSenha}>
-                        <button
-                          type="button"
-                          className={styles.cancelarSenha}
-                          onClick={() => {
-                            setAlterarSenha(false);
-                            setNovaSenha("");
-                            setConfirmarSenha("");
-                            setErroSenha("");
-                          }}
-                        >
-                          Cancelar
-                        </button>
-
-                        <button
-                          type="button"
-                          className={styles.salvarSenha}
-                          onClick={async () => {
-                            if (!novaSenha || !confirmarSenha) {
-                              setErroSenha("Preencha os dois campos.");
-                              return;
-                            }
-
-                            if (novaSenha !== confirmarSenha) {
-                              setErroSenha("As senhas não coincidem.");
-                              return;
-                            }
-
-                            setErroSenha("");
-
-                            try {
-                              await trocarSenha(usuario.id, novaSenha);
-                            } catch (err) {
-                              setErroSenha(
-                                err instanceof ApiError
-                                  ? err.message
-                                  : "Não foi possível trocar a senha."
-                              );
-                              return;
-                            }
-
-                            setNovaSenha("");
-                            setConfirmarSenha("");
-                            setAlterarSenha(false);
-                          }}
-                        >
-                          Salvar nova senha
-                        </button>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* BOTÕES */}
-              <div className={styles.acoesSidebar}>
-                {editando ? (
-                  <>
-                    {erroPerfil && (
-                      <p className={styles.erroSenha}>{erroPerfil}</p>
-                    )}
-                    <button
-                      className={styles.salvarAlteracoes}
-                      onClick={salvarAlteracoes}
-                      disabled={salvando}
-                    >
-                      {salvando ? "Salvando..." : "Salvar alterações"}
-                    </button>
-                  </>
-                ) : (
-                  <button
-                    className={styles.sairConta}
-                    onClick={() => setConfirmarSaida(true)}
-                  >
-                    Sair da conta
-                  </button>
-                )}
-              </div>
-            </div>
-          </>
-        )}
-
-        {confirmarSaida && (
-          <div className={styles.overlayConfirmarSaida}>
-            <LogoutConfirm
-              onConfirm={sairDaConta}
-              onCancel={() => setConfirmarSaida(false)}
-            />
+      {sidebarOpen && <><div className={styles.overlay} onClick={() => setSidebarOpen(false)} />
+        <aside className={styles.sidebar} aria-label="Dados da conta">
+          <button className={styles.fecharTopo} onClick={() => setSidebarOpen(false)} aria-label="Fechar perfil">×</button>
+          <div className={styles.sidebarPerfil}><div className={styles.sidebarAvatar}>{avatarInitial}</div>
+            <p>Usuária BabyBuddy</p><h2>{displayName}</h2>
+            <button className={styles.editarPerfil} onClick={() => setEditing((value) => !value)}>{editing ? 'Cancelar' : 'Editar perfil'}</button>
           </div>
-        )}
-      </div>
+          <div className={styles.informacoesUsuario}>
+            <ProfileField label="Nome completo" editing={editing} value={profile.nome} onChange={(value) => setProfile({ ...profile, nome: value })} />
+            <ProfileField label="E-mail" editing={editing} value={profile.username} type="email" onChange={(value) => setProfile({ ...profile, username: value })} />
+            <div className={styles.infoItem}><span>Senha</span>
+              {!passwordOpen && <button type="button" className={styles.botaoAlterarSenha} onClick={() => setPasswordOpen(true)}><KeyRound size={15} /> Alterar senha</button>}
+              {passwordOpen && <div className={styles.areaSenha}>
+                <div className={styles.campoSenha}><input type="password" placeholder="Nova senha" value={password} onChange={(e) => setPassword(e.target.value)} /></div>
+                <div className={styles.campoSenha}><input type="password" placeholder="Confirmar nova senha" value={confirmation} onChange={(e) => setConfirmation(e.target.value)} /></div>
+                <div className={styles.acoesSenha}><button className={styles.cancelarSenha} onClick={() => setPasswordOpen(false)}>Cancelar</button>
+                  <button className={styles.salvarSenha} onClick={savePassword}>Salvar nova senha</button></div>
+              </div>}
+            </div>
+          </div>
+          <div className={styles.acoesSidebar}>
+            {editing ? <button className={styles.salvarAlteracoes} onClick={saveProfile}>Salvar alterações</button>
+              : <button className={styles.sairConta} onClick={() => setConfirmLogout(true)}>Sair da conta</button>}
+          </div>
+        </aside></>}
+
+      {confirmLogout && <div className={styles.overlayConfirmarSaida}><LogoutConfirm onConfirm={signOut} onCancel={() => setConfirmLogout(false)} /></div>}
     </div>
   );
+}
+
+function materialPath(material) {
+  return material.arquivo ? `/artigos/${material.id}` : material.link || `/artigos/${material.id}`;
+}
+
+function ProfileField({ label, editing, value, onChange, type = 'text' }) {
+  return <div className={styles.infoItem}><span>{label}</span>{editing
+    ? <input type={type} value={value} onChange={(event) => onChange(event.target.value)} />
+    : <p>{value}</p>}</div>;
 }
