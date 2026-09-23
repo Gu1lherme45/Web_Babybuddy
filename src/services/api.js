@@ -34,7 +34,17 @@ async function compatibleRequest(request) {
 }
 
 async function csrfHeaders() {
-  const { data } = await api.get('/api/csrf', { skipAuthRedirect: true });
+  let response;
+  try {
+    response = await api.get('/api/csrf', { skipAuthRedirect: true });
+  } catch (error) {
+    // Depois de reiniciar o backend, o navegador pode manter um JSESSIONID
+    // inválido. A primeira resposta 401 renova o cookie; a segunda tentativa
+    // então obtém o token CSRF da sessão atual.
+    if (error.response?.status !== 401) throw error;
+    response = await api.get('/api/csrf', { skipAuthRedirect: true });
+  }
+  const { data } = response;
   return { [data.headerName]: data.token };
 }
 
@@ -86,7 +96,12 @@ export function listarUsuarios() {
 }
 
 export function criarUsuario(dados) {
-  return compatibleRequest(() => requestWithCsrf({ method: 'post', url: '/api/usuarios', data: dados }));
+  return compatibleRequest(() => requestWithCsrf({
+    method: 'post',
+    url: '/api/usuarios',
+    data: dados,
+    skipAuthRedirect: true,
+  }));
 }
 
 export function atualizarUsuario(id, dados) {
@@ -115,6 +130,18 @@ export function atualizarGestante(id, dados) {
 
 export function criarQuestionario(dados) {
   return compatibleRequest(() => requestWithCsrf({ method: 'post', url: '/api/questionarios', data: dados }));
+}
+
+export function listarQuestionariosPorGestante(gestanteId) {
+  return compatibleRequest(() => api.get(`/api/questionarios/gestante/${gestanteId}`));
+}
+
+export function atualizarQuestionario(id, dados) {
+  return compatibleRequest(() => requestWithCsrf({
+    method: 'put',
+    url: `/api/questionarios/${id}`,
+    data: dados,
+  }));
 }
 
 export function listarMateriais() {

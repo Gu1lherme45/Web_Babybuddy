@@ -37,9 +37,13 @@ export default function Cadastro() {
       setSuccess('Cadastro realizado com sucesso!');
       window.setTimeout(() => navigate('/questionario'), 700);
     } catch (requestError) {
-      setError(requestError.response?.status === 409
+      const status = requestError.response?.status;
+      const backendMessage = requestError.response?.data?.error || requestError.response?.data?.message;
+      setError(status === 409
         ? 'Este e-mail já está cadastrado.'
-        : 'Não foi possível concluir o cadastro. Confira os dados e tente novamente.');
+        : status === 401
+          ? 'Não foi possível validar a sessão segura. Atualize a página e tente novamente.'
+          : backendMessage || 'Não foi possível concluir o cadastro. Confira os dados e tente novamente.');
     } finally {
       setLoading(false);
     }

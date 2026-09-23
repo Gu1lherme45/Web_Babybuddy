@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { AnimatePresence, motion as Motion } from "framer-motion";
 import styles from "./Questionario.module.css";
@@ -8,7 +8,15 @@ import heartQuestion from "../../assets/heartquestion.png";
 import AnimatedButton from "../../components/AnimatedButton";
 import LiquidRadioGroup from "../../components/LiquidRadioGroup";
 import useAuth from "../../auth/useAuth";
-import { criarGestante, criarQuestionario, listarGestantes, ApiError } from "../../services/api";
+import {
+  atualizarGestante,
+  atualizarQuestionario,
+  criarGestante,
+  criarQuestionario,
+  listarGestantes,
+  listarQuestionariosPorGestante,
+  ApiError,
+} from "../../services/api";
 
 // formato YYYY-MM-DD (exigido pelo input date) respeitando o fuso local
 const hoje = new Date().toLocaleDateString("sv-SE");
@@ -66,6 +74,49 @@ const ESTADO_INICIAL = {
   autorizaUsoDados: "",
   aceitouTermos: false,
 };
+
+function respostaSimNao(valor) {
+  const normalizado = semAcento(String(valor || "")).toLowerCase();
+  if (normalizado === "sim") return "Sim";
+  if (normalizado === "nao") return "Não";
+  return "";
+}
+
+function respostaComAcentos(valor) {
+  const normalizado = semAcento(String(valor || "")).toLowerCase();
+  const respostas = {
+    nao: "Não",
+    hipertensao: "Hipertensão",
+    "diabetes gestacional": "Diabetes gestacional",
+    anemia: "Anemia",
+    outra: "Outra",
+    sim: "Sim",
+    "ainda nao iniciei": "Ainda não iniciei",
+  };
+  return respostas[normalizado] || valor || "";
+}
+
+function dadosExistentes(gestante, questionario) {
+  return {
+    ...ESTADO_INICIAL,
+    dataNascimento: gestante?.dataNascimento || "",
+    tipoSanguineo: questionario?.tipoSanguineo || gestante?.tipoSanguineo || "",
+    primeiraGestacao: respostaSimNao(questionario?.primeiraGestacao),
+    semanaGestacao: questionario?.semanaGestacional
+      ? String(questionario.semanaGestacional)
+      : "",
+    dpp: questionario?.dataPrevistaParto || "",
+    possuiProblemaSaude: questionario?.condicaoSaude
+      ? (respostaComAcentos(questionario.condicaoSaude) === "Não" ? "Não" : "Sim")
+      : "",
+    condicaoSaude: respostaComAcentos(questionario?.condicaoSaude),
+    outraCondicao: questionario?.condicaoSaudeOutra || "",
+    acompanhamentoPreNatal: respostaComAcentos(questionario?.prenatalRegular),
+    possuiAlergia: respostaSimNao(questionario?.possuiAlergia),
+    alergia: questionario?.alergiaEspecificacao || "",
+    aceitouTermos: Boolean(questionario?.aceiteTermos),
+  };
+}
 
 const ETAPAS = [
   {
