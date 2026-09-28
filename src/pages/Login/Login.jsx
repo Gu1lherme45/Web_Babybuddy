@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { FiMail, FiLock, FiEye, FiEyeOff } from 'react-icons/fi';
 import styles from './Login.module.css';
-import LoadingWave from '../../components/LoadingWave';
 import WelcomeLoader from '../../components/WelcomeLoader';
 import useAuth from '../../auth/useAuth';
 
@@ -21,12 +20,16 @@ export default function Login() {
     try {
       const user = await login(form.email, form.password);
       const isAdmin = user.nivelAcesso?.toUpperCase() === 'ADMIN';
-      setLoadingRole(isAdmin ? 'admin' : 'user');
+      if (isAdmin) {
+        navigate('/administrador', { replace: true });
+        return;
+      }
+      setLoadingRole('user');
       const requested = location.state?.from?.pathname;
-      const destination = requested && (!requested.startsWith('/administrador') || isAdmin)
+      const destination = requested && !requested.startsWith('/administrador')
         ? requested
-        : isAdmin ? '/administrador' : '/perfil';
-      window.setTimeout(() => navigate(destination, { replace: true }), isAdmin ? 700 : 1200);
+        : '/perfil';
+      window.setTimeout(() => navigate(destination, { replace: true }), 1200);
     } catch (requestError) {
       setError(requestError.response?.status === 401
         ? 'E-mail ou senha inválidos.'
@@ -34,7 +37,6 @@ export default function Login() {
     }
   }
 
-  if (loadingRole === 'admin') return <div className={styles.container}><LoadingWave /></div>;
   if (loadingRole === 'user') return <div className={styles.container}><WelcomeLoader /></div>;
 
   return (

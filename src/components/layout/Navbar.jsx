@@ -6,21 +6,24 @@ import useAuth from '../../auth/useAuth';
 export default function Navbar() {
   const location = useLocation();
   const { user } = useAuth();
+  const isAdmin = user?.nivelAcesso?.toUpperCase() === 'ADMIN';
+  const accountPath = isAdmin ? '/administrador' : '/perfil';
   const hidden = [
     '/questionario', '/cadastro', '/login', '/perfil',
     '/termos-de-uso', '/politica-de-privacidade',
-  ].includes(location.pathname) || location.pathname.startsWith('/administrador');
+  ].includes(location.pathname);
 
   if (hidden) return null;
 
   return (
     <nav className={styles.navbar}>
       <div className={styles.container}>
-        <Link to={user ? '/perfil' : '/'} className={styles.logo}>
+        <Link to={user ? accountPath : '/'} className={styles.logo}>
           <img src={logo} alt="BabyBuddy" className={styles.logoImg} />
         </Link>
 
         <div className={styles.links}>
+          {isAdmin && <Link to="/administrador">Dashboard Administrativo</Link>}
           <Link to="/#inicio">Início</Link>
           <Link to="/sobre">Sobre</Link>
           <Link to="/#artigoshome">Artigos</Link>

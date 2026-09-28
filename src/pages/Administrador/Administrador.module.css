@@ -755,8 +755,26 @@
 /* RESPONSIVO */
 
 @media (max-width: 1100px) {
+  .container {
+    flex-direction: column;
+  }
+
   .sidebar {
+    width: 100%;
+    padding: 16px 20px;
+  }
+
+  .logoArea {
     display: none;
+  }
+
+  .menuArea {
+    margin-top: 0;
+    padding-bottom: 0;
+  }
+
+  .nav {
+    flex-direction: row;
   }
 
   .content {

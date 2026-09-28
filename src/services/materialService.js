@@ -65,6 +65,15 @@ export async function getMaterialContent(id) {
   return data;
 }
 
+export async function replaceMaterialImage(id, image, onUploadProgress) {
+  const body = new FormData();
+  body.append('imagem', image);
+  const { data } = await requestWithCsrf({
+    method: 'put', url: `/api/materiais/${id}/imagem`, data: body, onUploadProgress,
+  });
+  return data;
+}
+
 export async function setMaterialActive(id, active) {
   const { data } = await requestWithCsrf({
     method: 'patch',
@@ -81,6 +90,6 @@ function materialFormData(metadata, articleFile, image) {
   const body = new FormData();
   body.append('dados', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
   body.append('arquivo', articleFile);
-  if (image) body.append('capa', image);
+  if (image) body.append('imagem', image);
   return body;
 }

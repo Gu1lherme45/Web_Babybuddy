@@ -9,11 +9,13 @@ import {
   createMaterial,
   listAdminMaterials,
   replaceMaterialFiles,
+  replaceMaterialImage,
   updateMaterialMetadata,
   listMaterialCategories,
   createMaterialCategory,
 } from '../../services/materialService';
 import { validateArticleFile, validateArticleImage } from './materialFiles';
+import { absoluteApiUrl } from '../../services/api';
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL('pdfjs-dist/build/pdf.worker.min.mjs', import.meta.url).toString();
 
@@ -27,6 +29,8 @@ export default function MaterialForm() {
   const [form, setForm] = useState(EMPTY);
   const [articleFile, setArticleFile] = useState(null);
   const [imageFile, setImageFile] = useState(null);
+  const imageUrl = useMemo(() => imageFile ? URL.createObjectURL(imageFile) : null, [imageFile]);
+  useEffect(() => () => { if (imageUrl) URL.revokeObjectURL(imageUrl); }, [imageUrl]);
   const [categories, setCategories] = useState([]);
   const [newCategory, setNewCategory] = useState('');
   const [showCategoryForm, setShowCategoryForm] = useState(false);
@@ -102,6 +106,7 @@ export default function MaterialForm() {
       if (editing) {
         await updateMaterialMetadata(id, form);
         if (articleFile) await replaceMaterialFiles(id, articleFile, onUploadProgress);
+        if (imageFile) await replaceMaterialImage(id, imageFile, onUploadProgress);
       } else {
         await createMaterial(form, articleFile, imageFile, onUploadProgress);
       }
@@ -135,7 +140,7 @@ export default function MaterialForm() {
             onChange={(e) => update('link', e.target.value)} /></label>
         </section>
 
-        <section className={styles.panel} aria-labelledby="image-title"><h2 id="image-title">Imagem de topo</h2><div className={styles.imageUpload} onClick={() => document.getElementById('article-image-input')?.click()}><ImageIcon size={28} /><strong>{imageFile ? imageFile.name : 'Adicionar imagem opcional'}</strong><span>PNG, JPEG ou WebP até 5 MB</span><input id="article-image-input" type="file" accept="image/png,image/jpeg,image/webp" hidden onChange={(e) => acceptImage(e.target.files[0])} /></div>{imageFile && <img className={styles.imagePreview} src={URL.createObjectURL(imageFile)} alt="Pré-visualização da imagem do artigo" />}</section>
+        <section className={styles.panel} aria-labelledby="image-title"><h2 id="image-title">Imagem de topo</h2><div className={styles.imageUpload} onClick={() => document.getElementById('article-image-input')?.click()}><ImageIcon size={28} /><strong>{imageFile ? imageFile.name : 'Adicionar imagem opcional'}</strong><span>PNG, JPEG ou WebP até 5 MB</span><input id="article-image-input" type="file" accept="image/png,image/jpeg,image/webp" hidden onChange={(e) => acceptImage(e.target.files[0])} /></div>{(imageUrl || existing?.imagem || existing?.capa) && <img className={styles.imagePreview} src={imageUrl || absoluteApiUrl(existing?.imagem || existing?.capa)} alt="Pré-visualização da imagem do artigo" />}</section>
 
         <section className={styles.panel} aria-labelledby="pdf-title">
           <h2 id="pdf-title">Texto do artigo</h2>

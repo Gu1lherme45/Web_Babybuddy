@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
-import NavBar from './NavBar';
+import NavBar from './Navbar';
 import Footer from './Footer';
 import PageWrapper from '../PageWrapper';
 

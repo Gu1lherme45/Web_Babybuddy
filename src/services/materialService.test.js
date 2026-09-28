@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import api, { requestWithCsrf } from './api';
-import { createMaterial, listPublicMaterials, setMaterialActive } from './materialService';
+import { createMaterial, replaceMaterialImage, listPublicMaterials, setMaterialActive } from './materialService';
 
 vi.mock('./api', () => ({
   default: { get: vi.fn() },
@@ -25,12 +25,24 @@ describe('materialService', () => {
     expect(request.method).toBe('post');
     expect(request.url).toBe('/api/materiais');
     expect(request.data.get('arquivo')).toBe(pdf);
-    expect(request.data.get('capa')).toBe(cover);
+    expect(request.data.get('imagem')).toBe(cover);
+    expect(request.data.has('capa')).toBe(false);
   });
 
   it('usa a rota explícita de ativação', async () => {
     requestWithCsrf.mockResolvedValue({ data: { statusMaterial: 'ATIVO' } });
     await setMaterialActive(4, true);
     expect(requestWithCsrf).toHaveBeenCalledWith(expect.objectContaining({ url: '/api/materiais/4/ativar' }));
+  });
+
+  it('substitui a imagem sem reenviar o texto do artigo', async () => {
+    requestWithCsrf.mockResolvedValue({ data: { id: 9, imagem: '/api/materiais/9/imagem' } });
+    const image = new File(['image'], 'foto.png', { type: 'image/png' });
+    await replaceMaterialImage(9, image);
+    const request = requestWithCsrf.mock.calls[0][0];
+    expect(request.method).toBe('put');
+    expect(request.url).toBe('/api/materiais/9/imagem');
+    expect(request.data.get('imagem')).toBe(image);
+    expect(request.data.has('arquivo')).toBe(false);
   });
 });
