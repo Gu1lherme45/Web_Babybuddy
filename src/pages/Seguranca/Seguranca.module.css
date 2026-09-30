@@ -3,7 +3,9 @@
 .seguranca {
   width: 100%;
   background: #fff;
-  padding: 90px 6% 70px;
+  /* a navbar agora é fixed (fora do fluxo), então isso precisa
+     cobrir a altura real dela pra não ficar conteúdo escondido */
+  padding: 140px 6% 70px;
   font-family: "League Spartan", sans-serif;
 }
 

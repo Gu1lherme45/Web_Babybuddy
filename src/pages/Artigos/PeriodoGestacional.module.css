@@ -5,25 +5,30 @@
 .page {
   background-color: #f5f5f5;
   min-height: 100vh;
-  padding-top: 40px;
+  padding-top: 140px;
 }
 
 /* CONTAINER PRINCIPAL */
 .container {
   max-width: 900px;
-  margin: 0 auto;
-  padding: 24px 30px 60px;
+  margin: -24px auto 0;
+  padding: 40px 30px 60px;
   font-family: 'League Spartan', sans-serif;
   color: #2b2b2b;
-  line-height: 1.65;
+  line-height: 1.55;
   background-color: #ffffff;
   border-radius: 14px;
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.06);
 }
 
-/* HEADER */
+/* CABEÇALHO ROSA (título + descrição + tempo de leitura) */
 .header {
-  margin-bottom: 20px;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 28px 30px 64px;
+  background-color: #ffeef5;
+  border-radius: 14px;
+  font-family: 'League Spartan', sans-serif;
 }
 
 /* BREADCRUMB */
@@ -39,15 +44,16 @@
   font-size: 36px;
   font-weight: 700;
   line-height: 1.25;
-  margin-bottom: 18px;
+  color: #dc2b74;
+  margin-bottom: 10px;
 }
 
 /* SUBTÍTULO */
 .subtitle {
   font-size: 16px;
-  color: #555;
+  color: #dc2b74;
   max-width: 700px;
-  margin-bottom: 14px;
+  margin-bottom: 12px;
 }
 
 /* META */
@@ -55,44 +61,27 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  background-color: #f3d7dc;
-  color: #c2185b;
-  padding: 6px 12px;
-  border-radius: 20px;
+  color: #dc2b74;
   font-size: 13px;
-  margin-bottom: 18px;
-}
-
-/* HERO */
-.hero {
-  width: 100%;
-  border-radius: 16px;
-  overflow: hidden;
-  margin-top: -10px;
-}
-
-.hero img {
-  width: 100%;
-  height: auto;
-  display: block;
+  font-weight: 600;
 }
 
 /* SEÇÕES */
 .section {
-  margin-bottom: 36px;
+  margin-bottom: 26px;
 }
 
 .section h2 {
   font-size: 26px;
   font-weight: 700;
-  margin-bottom: 14px;
+  margin-bottom: 12px;
 }
 
 .section h3 {
   font-size: 18px;
   font-weight: 700;
-  margin-top: 22px;
-  margin-bottom: 10px;
+  margin-top: 16px;
+  margin-bottom: 8px;
 }
 
 .section p {
@@ -138,13 +127,19 @@
 /* TABLETS (até 1024px) */
 @media (max-width: 1024px) {
   .page {
-    padding-top: 32px;
+    padding-top: 124px;
   }
 
   .container {
     max-width: 92%;
-    padding: 20px 24px 48px;
+    margin: -24px auto 0;
+    padding: 36px 24px 48px;
+  }
+
+  .header {
+    max-width: 92%;
     margin: 0 auto;
+    padding: 22px 24px 58px;
   }
 
   .header h1 {
@@ -156,28 +151,32 @@
   }
 
   .section {
-    margin-bottom: 30px;
+    margin-bottom: 22px;
   }
 }
 
 /* CELULARES (até 768px) */
 @media (max-width: 768px) {
   .page {
-    padding-top: 24px;
+    padding-top: 108px;
   }
 
   .container {
     max-width: 94%;
-    padding: 18px 20px 44px;
-    margin: 0 auto;
+    margin: -20px auto 0;
+    padding: 32px 20px 44px;
     border-radius: 10px;
   }
 
   .section {
-    margin-bottom: 26px;
+    margin-bottom: 20px;
   }
 
   .header {
+    max-width: 94%;
+    margin: 0 auto;
+    padding: 18px 20px 46px;
+    border-radius: 10px;
     text-align: center;
   }
 
@@ -202,11 +201,6 @@
     font-size: 14px;
   }
 
-  .hero {
-    margin-top: -12px;
-    border-radius: 12px;
-  }
-
   .card {
     padding: 16px;
   }
@@ -215,15 +209,21 @@
 /* CELULARES PEQUENOS (até 480px) */
 @media (max-width: 480px) {
   .page {
-    padding-top: 20px;
+    padding-top: 96px;
   }
 
   .container {
-    padding: 16px 16px 36px;
+    margin: -16px auto 0;
+    padding: 28px 16px 36px;
+  }
+
+  .header {
+    margin: 0 auto;
+    padding: 16px 16px 38px;
   }
 
   .section {
-    margin-bottom: 22px;
+    margin-bottom: 18px;
   }
 
   .header h1 {
@@ -240,6 +240,5 @@
 
   .meta {
     font-size: 12px;
-    padding: 5px 10px;
   }
 }

@@ -1,12 +1,11 @@
 import styles from "./TentandoEngravidar.module.css";
-import imagem from "../../assets/art2.svg";
+import VerificationCard from "../../components/VerificationCard";
 
 export default function TentandoEngravidar() {
   return (
     <div className={styles.page}>
-    <div className={styles.container}>
 
-      {/* NOVO HEADER (SUBSTITUI O HERO) */}
+      {/* CABEÇALHO ROSA */}
       <div className={styles.articleHeader}>
 
         <span className={styles.breadcrumb}>
@@ -25,12 +24,11 @@ export default function TentandoEngravidar() {
         <div className={styles.meta}>
           ⏱️ 8 min de leitura
         </div>
-
-        <div className={styles.heroImage}>
-          <img src={imagem} alt="Tentando engravidar" />
-        </div>
-
       </div>
+
+      <VerificationCard />
+
+    <div className={styles.container}>
 
       {/* TEXTO INTRO (veio do seu hero antigo) */}
       <section className={styles.section}>

@@ -1,12 +1,42 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Search, KeyRound, ClipboardList } from 'lucide-react';
+import { Search, KeyRound } from 'lucide-react';
 import styles from './Perfil.module.css';
 import LogoutConfirm from '../../components/LogoutConfirm';
 import artFallback from '../../assets/art3.png';
+import artCuidados from '../../assets/art1.png';
+import artEngravidar from '../../assets/art2.png';
+import artGestacional from '../../assets/art3.png';
+import artAlimentacao from '../../assets/art5.png';
 import useAuth from '../../auth/useAuth';
 import { absoluteApiUrl } from '../../services/api';
 import { listPublicMaterials } from '../../services/materialService';
+
+const ARTIGOS_ESTATICOS = [
+  { id: 'estatico-cuidados-bebe', estatico: true, titulo: 'Cuidados com o Bebê', categoria: 'Cuidados com o bebê', autor: 'BabyBuddy', descricao: 'Tudo que você precisa saber para cuidar do seu bebê.', imagem: artCuidados, link: '/cuidados-bebe' },
+  { id: 'estatico-tentando-engravidar', estatico: true, titulo: 'Tentando Engravidar?', categoria: 'Tentando engravidar', autor: 'BabyBuddy', descricao: 'Quanto tempo demora a fecundação após a relação sexual?', imagem: artEngravidar, link: '/tentando-engravidar' },
+  { id: 'estatico-periodo-gestacional', estatico: true, titulo: 'Período Gestacional', categoria: 'Período gestacional', autor: 'BabyBuddy', descricao: 'Tudo que você precisa saber sobre o período gestacional!', imagem: artGestacional, link: '/periodo-gestacional' },
+  { id: 'estatico-alimentacao', estatico: true, titulo: 'Alimentação do Bebê', categoria: 'Alimentação', autor: 'BabyBuddy', descricao: 'Orientações essenciais sobre introdução alimentar e nutrição do bebê.', imagem: artAlimentacao, link: '/artigos/alimentacao' },
+];
+
+function semAcentos(texto) {
+  return (texto || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLocaleLowerCase('pt-BR');
+}
+
+function fallbackImagePorTema(material) {
+  const texto = semAcentos(`${material.categoria} ${material.titulo} ${material.descricao || ''}`);
+  if (texto.includes('aliment')) return artAlimentacao;
+  if (texto.includes('engravid') || texto.includes('fertil')) return artEngravidar;
+  if (texto.includes('cuidado') || texto.includes('bebe')) return artCuidados;
+  if (texto.includes('gesta')) return artGestacional;
+  return artFallback;
+}
+
+function materialImageSrc(material) {
+  const source = material.imagem || material.capa;
+  if (!source) return fallbackImagePorTema(material);
+  return material.estatico ? source : absoluteApiUrl(source);
+}
 
 export default function Perfil() {
   const navigate = useNavigate();
@@ -30,12 +60,18 @@ export default function Perfil() {
 
   useEffect(() => setProfile({ nome: displayName, username: user?.username || '' }), [displayName, user?.username]);
 
+  const allMaterials = useMemo(() => [...ARTIGOS_ESTATICOS, ...materials], [materials]);
+
   const filtered = useMemo(() => {
     const normalized = query.trim().toLocaleLowerCase('pt-BR');
-    return materials.filter((item) => !normalized
+    return allMaterials.filter((item) => !normalized
       || `${item.titulo} ${item.categoria} ${item.descricao || ''}`.toLocaleLowerCase('pt-BR').includes(normalized));
-  }, [materials, query]);
-  const featured = filtered[0] || materials[0];
+  }, [allMaterials, query]);
+  const featured = useMemo(() => {
+    return allMaterials.find((item) => item.link === '/periodo-gestacional'
+      || semAcentos(item.titulo).includes('periodo gestacional')
+      || semAcentos(item.categoria).includes('periodo gestacional')) || allMaterials[0];
+  }, [allMaterials]);
 
   async function saveProfile() {
     try {
@@ -72,20 +108,6 @@ export default function Perfil() {
         </button>
       </header>
 
-      <section className={styles.healthCard} aria-labelledby="health-questionnaire-title">
-        <div className={styles.healthIcon} aria-hidden="true">
-          <ClipboardList size={26} />
-        </div>
-        <div className={styles.healthContent}>
-          <span>Saúde e bem-estar</span>
-          <h2 id="health-questionnaire-title">Questionário de saúde</h2>
-          <p>Preencha quando quiser ou atualize suas respostas para manter o acompanhamento personalizado.</p>
-        </div>
-        <Link to="/questionario" className={styles.healthLink}>
-          Preencher ou atualizar questionário
-        </Link>
-      </section>
-
       <label className={styles.searchContainer}>
         <Search size={18} strokeWidth={1.5} className={styles.searchIcon} />
         <input type="search" placeholder="Pesquisar artigos..." value={query} onChange={(e) => setQuery(e.target.value)} className={styles.searchInput} />
@@ -94,7 +116,7 @@ export default function Perfil() {
 
       {featured && <section className={styles.highlight}>
         <div className={styles.card}>
-          <div className={styles.image}><img src={featured.imagem || featured.capa ? absoluteApiUrl(featured.imagem || featured.capa) : artFallback} alt={`Imagem de ${featured.titulo}`} /></div>
+          <div className={styles.image}><img src={materialImageSrc(featured)} alt={`Imagem de ${featured.titulo}`} /></div>
           <div className={styles.content}><span className={styles.category}>{featured.categoria}</span><h2>{featured.titulo}</h2>
             <p>{featured.descricao}</p><div className={styles.footer}><span>Por {featured.autor}</span>
               <Link to={materialPath(featured)} className={styles.button}>Ler agora</Link></div></div>
@@ -105,7 +127,7 @@ export default function Perfil() {
         <h2 className={styles.artigosTitle}>Artigos pensados para você</h2>
         <div className={styles.artigosGrid}>
           {filtered.map((material) => <Link key={material.id} to={materialPath(material)} className={styles.artigoCard} onClick={() => window.scrollTo(0, 0)}>
-            <img src={material.imagem || material.capa ? absoluteApiUrl(material.imagem || material.capa) : artFallback} alt={`Imagem de ${material.titulo}`} />
+            <img src={materialImageSrc(material)} alt={`Imagem de ${material.titulo}`} />
             <div className={styles.cardContent}><span>{material.categoria.toUpperCase()}</span><h3>{material.titulo.toUpperCase()}</h3><p>{material.descricao}</p></div>
           </Link>)}
         </div>

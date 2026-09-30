@@ -15,8 +15,6 @@ import Seguranca from '../pages/Seguranca/Seguranca';
 import PeriodoGestacional from '../pages/Artigos/PeriodoGestacional';
 import CuidadosBebe from '../pages/Artigos/CuidadosBebe';
 import TentandoEngravidar from '../pages/Artigos/TentandoEngravidar';
-import Alimentacao from '../pages/Artigos/Alimentação';
-import SonoArtigo from '../pages/Artigos/Sono';
 import Questionario from '../pages/Questionario/Questionario';
 import PoliticaDePrivacidade from '../pages/PoliticaDePrivacidade/PoliticaDePrivacidade';
 import TermosDeUso from '../pages/TermosDeUso/TermosDeUso';
@@ -37,8 +35,6 @@ export default function AppRoutes() {
           <Route path="/periodo-gestacional" element={<PeriodoGestacional />} />
           <Route path="/cuidados-bebe" element={<CuidadosBebe />} />
           <Route path="/tentando-engravidar" element={<TentandoEngravidar />} />
-          <Route path="/artigos/alimentacao" element={<Alimentacao />} />
-          <Route path="/artigos/sono" element={<SonoArtigo />} />
           <Route path="/artigos/:id" element={<ArtigoDetalhe />} />
           <Route path="/artigos" element={<Artigos />} />
           <Route path="/politica-de-privacidade" element={<PoliticaDePrivacidade />} />

@@ -5,6 +5,9 @@
   overflow-x: hidden;
   font-family: 'League Spartan', sans-serif;
   background: #ffffff;
+  /* a navbar agora é fixed (sai do fluxo normal), então esse padding
+     compensa o espaço que ela ocupa, sem deixar o topo vazio */
+  padding-top: 72px;
 }
 
 /* Hero */
@@ -13,7 +16,7 @@
   min-height: 88vh;
   display: flex;
   align-items: center;
-  padding: 48px 30px 64px;
+  padding: 16px 30px 0;
 }
 
 /* Container */
@@ -167,7 +170,7 @@
 /* Section baby */
 .sectionBaby {
   width: 100%;
-  padding: 1rem 8% 6rem;
+  padding: 0 8% 0.875rem;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -482,7 +485,7 @@
 
 @media (max-width: 600px) {
   .hero {
-    padding: 32px 20px 60px;
+    padding: 12px 20px 60px;
   }
 
   .left h1 {
@@ -499,6 +502,19 @@
 
   .features {
     gap: 18px;
+  }
+}
+
+/* acompanha a altura real da navbar (que também diminui nesses breakpoints) */
+@media (max-width: 768px) {
+  .home {
+    padding-top: 108px;
+  }
+}
+
+@media (max-width: 480px) {
+  .home {
+    padding-top: 96px;
   }
 }
 

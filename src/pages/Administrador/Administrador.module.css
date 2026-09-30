@@ -11,6 +11,9 @@
   display: flex;
   min-height: 100vh;
   background: #fff;
+  /* a navbar agora é fixed (fora do fluxo), então isso precisa
+     cobrir a altura real dela pra não ficar conteúdo escondido */
+  padding-top: 132px;
 }
 
 /* SIDEBAR */

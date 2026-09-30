@@ -7,7 +7,6 @@ import PageWrapper from '../PageWrapper';
 
 const STATIC_ARTICLE_PATHS = [
   '/periodo-gestacional', '/cuidados-bebe', '/tentando-engravidar',
-  '/artigos/alimentacao', '/artigos/sono',
 ];
 const NAVBAR_PATHS = ['/sobre', '/login', '/cadastro'];
 const FOOTER_PATHS = ['/seguranca', '/termos-de-uso', '/politica-de-privacidade'];
@@ -22,6 +21,7 @@ export default function Layout() {
     || /^\/artigos\/\d+$/.test(location.pathname);
   const fast = ['/login', '/cadastro', ...STATIC_ARTICLE_PATHS].includes(location.pathname) || isArticle;
   const skipLoader = location.pathname.startsWith('/administrador')
+    || (location.pathname === '/questionario' && previous === '/cadastro')
     || (location.pathname === '/' && [...NAVBAR_PATHS, ...STATIC_ARTICLE_PATHS, ...FOOTER_PATHS].includes(previous));
 
   return (

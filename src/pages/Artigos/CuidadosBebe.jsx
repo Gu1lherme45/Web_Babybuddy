@@ -1,12 +1,11 @@
 import styles from "./CuidadosBebe.module.css";
-import imagem from "../../assets/art1.svg";
+import VerificationCard from "../../components/VerificationCard";
 
 export default function CuidadosBebe() {
   return (
     <div className={styles.page}>
-    <div className={styles.container}>
 
-      {/* HEADER */}
+      {/* CABEÇALHO ROSA */}
       <div className={styles.articleHeader}>
 
         <span className={styles.breadcrumb}>
@@ -24,12 +23,11 @@ export default function CuidadosBebe() {
         <div className={styles.meta}>
           ⏱️ 6 min de leitura
         </div>
-
-        <div className={styles.heroImage}>
-          <img src={imagem} alt="Cuidados com o bebê" />
-        </div>
-
       </div>
+
+      <VerificationCard />
+
+    <div className={styles.container}>
 
       {/* INTRO */}
       <section className={styles.section}>

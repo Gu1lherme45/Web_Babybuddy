@@ -50,7 +50,7 @@ export default function Login() {
             <label htmlFor="login-email">E-mail</label>
             <div className={styles.inputWrapper}>
               <FiMail className={styles.icon} />
-              <input id="login-email" type="email" autoComplete="username" value={form.email}
+              <input id="login-email" type="email" autoComplete="username" placeholder="E-mail" value={form.email}
                 onChange={(event) => setForm({ ...form, email: event.target.value })} required />
             </div>
           </div>
@@ -59,7 +59,7 @@ export default function Login() {
             <div className={styles.inputWrapper}>
               <FiLock className={styles.icon} />
               <input id="login-password" type={showPassword ? 'text' : 'password'} autoComplete="current-password"
-                value={form.password} onChange={(event) => setForm({ ...form, password: event.target.value })} required />
+                placeholder="Senha" value={form.password} onChange={(event) => setForm({ ...form, password: event.target.value })} required />
               <button type="button" className={styles.eyeButton} onClick={() => setShowPassword((value) => !value)}
                 aria-label={showPassword ? 'Ocultar senha' : 'Mostrar senha'}>
                 {showPassword ? <FiEyeOff /> : <FiEye />}

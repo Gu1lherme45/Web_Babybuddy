@@ -1,12 +1,11 @@
 import styles from "./PeriodoGestacional.module.css";
-import imagem from "../../assets/art3.svg";
+import VerificationCard from "../../components/VerificationCard";
 
 export default function PeriodoGestacional() {
   return (
     <div className={styles.page}>
-    <div className={styles.container}>
 
-      {/* HEADER */}
+      {/* CABEÇALHO ROSA */}
       <div className={styles.header}>
 
         <span className={styles.breadcrumb}>
@@ -24,12 +23,11 @@ export default function PeriodoGestacional() {
         <div className={styles.meta}>
           ⏱️ 10 min de leitura
         </div>
-
-        <div className={styles.hero}>
-          <img src={imagem} alt="Período gestacional" />
-        </div>
-
       </div>
+
+      <VerificationCard />
+
+    <div className={styles.container}>
 
       {/* INTRO */}
       <section className={styles.section}>

@@ -1,0 +1,56 @@
+.card {
+  position: relative;
+  z-index: 5;
+  max-width: 900px;
+  margin: -40px auto 0;
+  padding: 18px 24px;
+  background-color: #e8f5f3;
+  border: 1px solid #cfe7e3;
+  border-radius: 10px;
+  box-shadow: 0 6px 18px rgba(36, 122, 115, 0.12);
+  font-family: 'League Spartan', sans-serif;
+  text-align: left;
+}
+.title {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  color: #247a73;
+  font-weight: 700;
+  font-size: 17px;
+  margin-bottom: 8px;
+}
+.icon {
+  flex-shrink: 0;
+}
+.text {
+  color: #4b6260;
+  font-size: 15px;
+  line-height: 1.5;
+}
+@media (max-width: 1024px) {
+  .card {
+    max-width: 92%;
+    margin-top: -40px;
+  }
+}
+@media (max-width: 768px) {
+  .card {
+    max-width: 94%;
+    margin-top: -32px;
+    padding: 16px 20px;
+  }
+}
+@media (max-width: 480px) {
+  .card {
+    margin-top: -26px;
+    padding: 14px 18px;
+  }
+  .title {
+    font-size: 16px;
+  }
+  .text {
+    font-size: 14px;
+  }
+}

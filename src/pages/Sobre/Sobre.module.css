@@ -1,5 +1,7 @@
 .container {
-  padding-top: 40px;
+  /* a navbar agora é fixed (fora do fluxo), então isso precisa
+     cobrir a altura real dela pra não ficar conteúdo escondido */
+  padding-top: 140px;
   background: #ffffff;
 
   max-width: 1000px;

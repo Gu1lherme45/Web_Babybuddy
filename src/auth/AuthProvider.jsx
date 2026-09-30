@@ -14,7 +14,7 @@ export function AuthProvider({ children }) {
       setUser(authenticatedUser);
       return authenticatedUser;
     } catch (error) {
-      if (error.response?.status !== 401 && error.response?.status !== 404) throw error;
+      if (error.response && error.response.status !== 401 && error.response.status !== 404) throw error;
       setUser(null);
       return null;
     }

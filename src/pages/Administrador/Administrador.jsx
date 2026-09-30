@@ -60,22 +60,13 @@ export default function AdminDashboard() {
     } finally { setBusyId(null); }
   }
 
-  async function signOut() {
-    await logout();
-    navigate('/login', { replace: true });
-  }
+ 
 
   const activeCount = materials.filter((item) => item.statusMaterial === 'ATIVO').length;
 
   return (
     <div className={styles.container}>
-      <aside className={styles.sidebar}>
-        <div className={styles.logoArea}><div className={styles.logoIcon}><img src={logo2} alt="BabyBuddy" className={styles.logoImage} /></div></div>
-        <div className={styles.menuArea}><nav className={styles.nav} aria-label="Administração">
-          <button className={styles.active}><LayoutDashboard size={20} /> Artigos</button>
-          <button type="button" onClick={signOut}><LogOut size={20} /> Sair</button>
-        </nav></div>
-      </aside>
+    
 
       <main className={styles.content}>
         <header className={styles.topbar}>

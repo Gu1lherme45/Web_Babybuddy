@@ -640,13 +640,6 @@ export default function Questionario() {
                   ? "REVISAR QUESTIONÁRIO DE SAÚDE"
                   : "INICIAR QUESTIONÁRIO DE SAÚDE"}
               </AnimatedButton>
-              <button
-                type="button"
-                className={styles.laterButton}
-                onClick={() => navigate("/perfil")}
-              >
-                Agora não
-              </button>
             </div>
           </Motion.section>
         )}
