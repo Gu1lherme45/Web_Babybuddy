@@ -121,8 +121,8 @@ export default function MaterialForm() {
   return (
     <main className={styles.page}>
       <header className={styles.header}>
-        <button type="button" onClick={() => navigate('/administrador')} className={styles.back}><ArrowLeft size={18} /> Voltar</button>
-        <div><span className={styles.eyebrow}>Dashboard administrativo</span><h1>{editing ? 'Editar artigo' : 'Novo artigo'}</h1>
+        <button type="button" onClick={() => navigate('/administrador')} className={styles.back} aria-label="Voltar"><ArrowLeft size={18} /></button>
+        <div><h1>{editing ? 'Editar artigo' : 'Novo artigo'}</h1>
           <p>Cadastre os metadados e envie o texto de apresentação do artigo.</p></div>
       </header>
 
@@ -139,8 +139,6 @@ export default function MaterialForm() {
           <label>Rota antiga (opcional)<input value={form.link} maxLength={200} placeholder="/periodo-gestacional"
             onChange={(e) => update('link', e.target.value)} /></label>
         </section>
-
-        <section className={styles.panel} aria-labelledby="image-title"><h2 id="image-title">Imagem de topo</h2><div className={styles.imageUpload} onClick={() => document.getElementById('article-image-input')?.click()}><ImageIcon size={28} /><strong>{imageFile ? imageFile.name : 'Adicionar imagem opcional'}</strong><span>PNG, JPEG ou WebP até 5 MB</span><input id="article-image-input" type="file" accept="image/png,image/jpeg,image/webp" hidden onChange={(e) => acceptImage(e.target.files[0])} /></div>{(imageUrl || existing?.imagem || existing?.capa) && <img className={styles.imagePreview} src={imageUrl || absoluteApiUrl(existing?.imagem || existing?.capa)} alt="Pré-visualização da imagem do artigo" />}</section>
 
         <section className={styles.panel} aria-labelledby="pdf-title">
           <h2 id="pdf-title">Texto do artigo</h2>
@@ -162,6 +160,8 @@ export default function MaterialForm() {
             <p>O texto selecionável do PDF será convertido para HTML. PDFs digitalizados precisam passar por OCR antes do envio.</p>
           </div>}
         </section>
+
+        <section className={styles.panel} aria-labelledby="image-title"><h2 id="image-title">Imagem de topo</h2><div className={styles.imageUpload} onClick={() => document.getElementById('article-image-input')?.click()}><ImageIcon size={28} /><strong>{imageFile ? imageFile.name : 'Adicionar imagem opcional'}</strong><span>PNG, JPEG ou WebP até 5 MB</span><input id="article-image-input" type="file" accept="image/png,image/jpeg,image/webp" hidden onChange={(e) => acceptImage(e.target.files[0])} /></div>{(imageUrl || existing?.imagem || existing?.capa) && <img className={styles.imagePreview} src={imageUrl || absoluteApiUrl(existing?.imagem || existing?.capa)} alt="Pré-visualização da imagem do artigo" />}</section>
 
         <div className={styles.actions}>
           <div aria-live="polite" className={`${styles.status} ${styles[status.type] || ''}`}>{status.message}</div>
