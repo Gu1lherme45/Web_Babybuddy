@@ -122,8 +122,10 @@ export default function MaterialForm() {
     <main className={styles.page}>
       <header className={styles.header}>
         <button type="button" onClick={() => navigate('/administrador')} className={styles.back} aria-label="Voltar"><ArrowLeft size={18} /></button>
-        <div><h1>{editing ? 'Editar artigo' : 'Novo artigo'}</h1>
-          <p>Cadastre os metadados e envie o texto de apresentação do artigo.</p></div>
+        <div>
+          <h1>{editing ? 'Editar Artigo' : 'Novo Artigo'}</h1>
+          <p>Cadastre os dados para publicação do artigo</p>
+        </div>
       </header>
 
       <form className={styles.form} onSubmit={handleSubmit}>
@@ -135,10 +137,12 @@ export default function MaterialForm() {
             {showCategoryForm && <div className={styles.newCategory}><input value={newCategory} maxLength={100} placeholder="Nova categoria" onChange={(e) => setNewCategory(e.target.value)} /><button type="button" className={styles.secondary} onClick={addCategory}>Adicionar</button></div>}
             <label>Autor<input value={form.autor} maxLength={200} onChange={(e) => update('autor', e.target.value)} required /></label>
           </div>
-          <label>Descrição<textarea value={form.descricao} maxLength={500} onChange={(e) => update('descricao', e.target.value)} /></label>
+          <label>Descrição<textarea value={form.descricao} maxLength={55} onChange={(e) => update('descricao', e.target.value)} /></label>
           <label>Rota antiga (opcional)<input value={form.link} maxLength={200} placeholder="/periodo-gestacional"
             onChange={(e) => update('link', e.target.value)} /></label>
         </section>
+
+        <section className={styles.panel} aria-labelledby="image-title"><h2 id="image-title">Imagem do Artigo</h2><div className={styles.imageUpload} onClick={() => document.getElementById('article-image-input')?.click()}><ImageIcon size={28} /><strong>{imageFile ? imageFile.name : 'Adicionar imagem opcional'}</strong><span>PNG, JPEG ou WebP até 5 MB</span><input id="article-image-input" type="file" accept="image/png,image/jpeg,image/webp" hidden onChange={(e) => acceptImage(e.target.files[0])} /></div>{(imageUrl || existing?.imagem || existing?.capa) && <img className={styles.imagePreview} src={imageUrl || absoluteApiUrl(existing?.imagem || existing?.capa)} alt="Pré-visualização da imagem do artigo" />}</section>
 
         <section className={styles.panel} aria-labelledby="pdf-title">
           <h2 id="pdf-title">Texto do artigo</h2>
@@ -160,8 +164,6 @@ export default function MaterialForm() {
             <p>O texto selecionável do PDF será convertido para HTML. PDFs digitalizados precisam passar por OCR antes do envio.</p>
           </div>}
         </section>
-
-        <section className={styles.panel} aria-labelledby="image-title"><h2 id="image-title">Imagem de topo</h2><div className={styles.imageUpload} onClick={() => document.getElementById('article-image-input')?.click()}><ImageIcon size={28} /><strong>{imageFile ? imageFile.name : 'Adicionar imagem opcional'}</strong><span>PNG, JPEG ou WebP até 5 MB</span><input id="article-image-input" type="file" accept="image/png,image/jpeg,image/webp" hidden onChange={(e) => acceptImage(e.target.files[0])} /></div>{(imageUrl || existing?.imagem || existing?.capa) && <img className={styles.imagePreview} src={imageUrl || absoluteApiUrl(existing?.imagem || existing?.capa)} alt="Pré-visualização da imagem do artigo" />}</section>
 
         <div className={styles.actions}>
           <div aria-live="polite" className={`${styles.status} ${styles[status.type] || ''}`}>{status.message}</div>

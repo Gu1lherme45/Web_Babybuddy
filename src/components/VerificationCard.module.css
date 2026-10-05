@@ -23,6 +23,11 @@
 }
 .icon {
   flex-shrink: 0;
+  display: block;
+}
+.title span {
+  position: relative;
+  top: 2px;
 }
 .text {
   color: #4b6260;

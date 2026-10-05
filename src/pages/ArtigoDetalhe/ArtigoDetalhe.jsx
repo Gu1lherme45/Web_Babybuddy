@@ -1,15 +1,46 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { Document, Page, pdfjs } from 'react-pdf';
-import { ArrowLeft, ChevronLeft, ChevronRight, Download, ExternalLink, ZoomIn, ZoomOut } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Download, ExternalLink, ZoomIn, ZoomOut } from 'lucide-react';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 import 'react-pdf/dist/Page/TextLayer.css';
 import styles from './ArtigoDetalhe.module.css';
+import VerificationCard from '../../components/VerificationCard';
+import Loader from '../../components/Loader';
 import { absoluteApiUrl } from '../../services/api';
 import { getMaterialContent, getPublicMaterial } from '../../services/materialService';
-import defaultArticleImage from '../../assets/logo2.svg';
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL('pdfjs-dist/build/pdf.worker.min.mjs', import.meta.url).toString();
+
+function escapeHtml(texto) {
+  return texto.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+// Garante parágrafos reais (com espaçamento padrão via CSS) e remove tamanhos de
+// fonte herdados da conversão do PDF, para que todo artigo use a fonte padrão do site.
+function normalizarConteudo(html) {
+  if (!html) return '';
+  const documento = new DOMParser().parseFromString(html, 'text/html');
+
+  documento.body.querySelectorAll('[style]').forEach((elemento) => {
+    elemento.style.removeProperty('font-size');
+    elemento.style.removeProperty('line-height');
+    elemento.style.removeProperty('font-family');
+  });
+
+  const blocos = documento.body.querySelectorAll('p, h1, h2, h3, h4, h5, h6, ul, ol, blockquote, table');
+  if (blocos.length > 1) return documento.body.innerHTML;
+
+  const texto = (documento.body.textContent || '').trim();
+  if (!texto) return documento.body.innerHTML;
+
+  const porLinhaDupla = texto.split(/\n\s*\n+/).map((parte) => parte.trim()).filter(Boolean);
+  const paragrafos = porLinhaDupla.length > 1 ? porLinhaDupla
+    : texto.split(/\n+/).map((parte) => parte.trim()).filter(Boolean);
+
+  if (paragrafos.length <= 1) return `<p>${escapeHtml(texto)}</p>`;
+  return paragrafos.map((paragrafo) => `<p>${escapeHtml(paragrafo)}</p>`).join('');
+}
 
 export default function ArtigoDetalhe() {
   const { id } = useParams();
@@ -24,6 +55,7 @@ export default function ArtigoDetalhe() {
   const [articleHtml, setArticleHtml] = useState('');
   const [contentLoading, setContentLoading] = useState(false);
   const [contentError, setContentError] = useState('');
+  const [pdfText, setPdfText] = useState('');
 
   useEffect(() => {
     getPublicMaterial(id).then(setMaterial).catch(() => setError('Este artigo não está disponível.')).finally(() => setLoading(false));
@@ -48,67 +80,95 @@ export default function ArtigoDetalhe() {
   }, [material]);
 
   const pdfUrl = useMemo(() => absoluteApiUrl(material?.arquivo), [material]);
-  const coverUrl = useMemo(() => absoluteApiUrl(material?.imagem || material?.capa) || defaultArticleImage, [material]);
   const isPdf = material?.mimeType === 'application/pdf' || (!material?.mimeType && Boolean(material?.arquivo));
 
-  if (loading) return <main className={styles.state} aria-live="polite">Carregando artigo...</main>;
+  useEffect(() => {
+    if (!isPdf || !pdfUrl) { setPdfText(''); return undefined; }
+    let active = true;
+    pdfjs.getDocument(pdfUrl).promise.then(async (documento) => {
+      let texto = '';
+      for (let numero = 1; numero <= documento.numPages; numero += 1) {
+        const pagina = await documento.getPage(numero);
+        const conteudo = await pagina.getTextContent();
+        texto += conteudo.items.map((item) => item.str).join(' ') + ' ';
+      }
+      if (active) setPdfText(texto);
+    }).catch(() => { if (active) setPdfText(''); });
+    return () => { active = false; };
+  }, [isPdf, pdfUrl]);
+
+  // Tempo de leitura calculado a partir da quantidade de letras do conteúdo real
+  // (texto extraído do PDF ou HTML convertido), ~1000 letras por minuto.
+  const readingMinutes = useMemo(() => {
+    const fonte = isPdf ? pdfText : articleHtml.replace(/<[^>]+>/g, ' ');
+    if (!fonte) return null;
+    const letras = (fonte.match(/\p{L}/gu) || []).length;
+    if (!letras) return null;
+    return Math.max(1, Math.round(letras / 1000));
+  }, [isPdf, pdfText, articleHtml]);
+
+  const conteudoFormatado = useMemo(() => normalizarConteudo(articleHtml), [articleHtml]);
+
+  const aguardandoTexto = !isPdf && material?.mimeType?.startsWith('text/') && contentLoading;
+
+  if (loading || aguardandoTexto) {
+    return (
+      <main className={styles.page} aria-live="polite" aria-busy="true">
+        <div className={styles.heartbeat}><Loader /></div>
+      </main>
+    );
+  }
   if (error || !material) return <main className={styles.state}><h1>Artigo indisponível</h1><p>{error}</p><Link to="/">Voltar ao início</Link></main>;
 
   return (
     <main className={styles.page}>
-      <article className={styles.article}>
-        <Link to="/perfil" className={styles.back}><ArrowLeft size={18} /> Voltar aos artigos</Link>
-        <header className={styles.hero}>
-          <div className={styles.copy}>
-            <span className={styles.category}>{material.categoria}</span>
-            <h1>{material.titulo}</h1>
-            <p>{material.descricao}</p>
-            <div className={styles.meta}><span>Por {material.autor}</span><span>{formatDate(material.dataPublicacao)}</span></div>
-          </div>
-          <img src={coverUrl} alt={`Imagem do artigo ${material.titulo}`} className={styles.cover} />
-        </header>
+      <div className={styles.header}>
+        <span className={styles.breadcrumb}><Link to="/perfil" className={styles.breadcrumbLink}>Artigos</Link> {material.categoria && `> ${material.categoria}`}</span>
+        <h1>{material.titulo}</h1>
+        {material.descricao && <p className={styles.subtitle}>{material.descricao}</p>}
+        <div className={styles.meta}>
+          {readingMinutes ? `⏱️ ${readingMinutes} min de leitura` : '⏱️ Calculando leitura...'}
+        </div>
+      </div>
 
-        {isPdf ? (
-          <section className={styles.reader} aria-label="Leitor do documento PDF">
-            <div className={styles.toolbar}>
-              <div className={styles.pageControls}>
-                <button type="button" onClick={() => setPage((value) => Math.max(1, value - 1))} disabled={page <= 1} aria-label="Página anterior"><ChevronLeft /></button>
-                <span>Página {page} de {pages || '—'}</span>
-                <button type="button" onClick={() => setPage((value) => Math.min(pages, value + 1))} disabled={!pages || page >= pages} aria-label="Próxima página"><ChevronRight /></button>
-              </div>
-              <div className={styles.documentActions}>
-                <button type="button" onClick={() => setZoom((value) => Math.max(.7, value - .1))} aria-label="Diminuir zoom"><ZoomOut /></button>
-                <span>{Math.round(zoom * 100)}%</span>
-                <button type="button" onClick={() => setZoom((value) => Math.min(1.8, value + .1))} aria-label="Aumentar zoom"><ZoomIn /></button>
-                <a href={pdfUrl} target="_blank" rel="noreferrer" aria-label="Abrir PDF original"><ExternalLink /></a>
-                <a href={pdfUrl} download={material.nomeArquivo || true} aria-label="Baixar PDF"><Download /></a>
-              </div>
+      <VerificationCard />
+
+      {isPdf ? (
+        <section className={styles.reader} aria-label="Leitor do documento PDF">
+          <div className={styles.toolbar}>
+            <div className={styles.pageControls}>
+              <button type="button" onClick={() => setPage((value) => Math.max(1, value - 1))} disabled={page <= 1} aria-label="Página anterior"><ChevronLeft /></button>
+              <span>Página {page} de {pages || '—'}</span>
+              <button type="button" onClick={() => setPage((value) => Math.min(pages, value + 1))} disabled={!pages || page >= pages} aria-label="Próxima página"><ChevronRight /></button>
             </div>
-            <div className={styles.viewer} ref={viewerRef}>
-              <Document file={pdfUrl} suspense={false} loading={<p>Carregando documento...</p>}
-                error={<p>Não foi possível abrir este documento.</p>}
-                onLoadSuccess={({ numPages }) => { setPages(numPages); setPage(1); }}>
-                <Page pageNumber={page} width={containerWidth} scale={zoom} suspense={false} />
-              </Document>
+            <div className={styles.documentActions}>
+              <button type="button" onClick={() => setZoom((value) => Math.max(.7, value - .1))} aria-label="Diminuir zoom"><ZoomOut /></button>
+              <span>{Math.round(zoom * 100)}%</span>
+              <button type="button" onClick={() => setZoom((value) => Math.min(1.8, value + .1))} aria-label="Aumentar zoom"><ZoomIn /></button>
+              <a href={pdfUrl} target="_blank" rel="noreferrer" aria-label="Abrir PDF original"><ExternalLink /></a>
+              <a href={pdfUrl} download={material.nomeArquivo || true} aria-label="Baixar PDF"><Download /></a>
             </div>
-          </section>
-        ) : material.mimeType?.startsWith('text/') ? (
-          <section className={styles.textReader} aria-label="Texto do artigo">
-            {contentLoading ? <p className={styles.contentState}>Carregando texto do artigo...</p>
-              : contentError ? <p className={styles.contentState}>{contentError}</p>
-                : <div className={styles.articleBody} dangerouslySetInnerHTML={{ __html: articleHtml }} />}
-          </section>
-        ) : material.link ? (
-          <section className={styles.legacy}><h2>Conteúdo no formato anterior</h2><p>Este artigo ainda não possui PDF migrado.</p><Link to={material.link}>Ler artigo</Link></section>
-        ) : (
-          <section className={styles.legacy}><h2>PDF indisponível</h2><p>O documento ainda não foi publicado.</p></section>
-        )}
-      </article>
+          </div>
+          <div className={styles.viewer} ref={viewerRef}>
+            <Document file={pdfUrl} suspense={false} loading={<p>Carregando documento...</p>}
+              error={<p>Não foi possível abrir este documento.</p>}
+              onLoadSuccess={({ numPages }) => { setPages(numPages); setPage(1); }}>
+              <Page pageNumber={page} width={containerWidth} scale={zoom} suspense={false} />
+            </Document>
+          </div>
+        </section>
+      ) : (
+        <div className={styles.container}>
+          {material.mimeType?.startsWith('text/') ? (
+            contentError ? <p className={styles.contentState}>{contentError}</p>
+              : <div className={styles.articleBody} dangerouslySetInnerHTML={{ __html: conteudoFormatado }} />
+          ) : material.link ? (
+            <section className={styles.legacy}><h2>Conteúdo no formato anterior</h2><p>Este artigo ainda não possui PDF migrado.</p><Link to={material.link}>Ler artigo</Link></section>
+          ) : (
+            <section className={styles.legacy}><h2>PDF indisponível</h2><p>O documento ainda não foi publicado.</p></section>
+          )}
+        </div>
+      )}
     </main>
   );
-}
-
-function formatDate(value) {
-  if (!value) return '';
-  return new Intl.DateTimeFormat('pt-BR', { dateStyle: 'long' }).format(new Date(value));
 }

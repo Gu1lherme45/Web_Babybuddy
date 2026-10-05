@@ -417,11 +417,11 @@
 }
 
 .entrandoProximo {
-  animation: entrarDaDireita 0.35s ease both;
+  animation: entrarDaDireita 0.2s ease-out both;
 }
 
 .entrandoAnterior {
-  animation: entrarDaEsquerda 0.35s ease both;
+  animation: entrarDaEsquerda 0.2s ease-out both;
 }
 
 @keyframes entrarDaDireita {
@@ -446,7 +446,7 @@
   box-shadow:
     0 10px 24px rgba(220, 43, 116, 0.06);
 
-  transition: 0.3s;
+  transition: opacity 0.15s ease-out, transform 0.15s ease-out, box-shadow 0.3s;
 }
 
 .card:hover {

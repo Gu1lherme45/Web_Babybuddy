@@ -12,13 +12,6 @@ import useAuth from '../../auth/useAuth';
 import { absoluteApiUrl } from '../../services/api';
 import { listPublicMaterials } from '../../services/materialService';
 
-const ARTIGOS_ESTATICOS = [
-  { id: 'estatico-cuidados-bebe', estatico: true, titulo: 'Cuidados com o Bebê', categoria: 'Cuidados com o bebê', autor: 'BabyBuddy', descricao: 'Tudo que você precisa saber para cuidar do seu bebê.', imagem: artCuidados, link: '/cuidados-bebe' },
-  { id: 'estatico-tentando-engravidar', estatico: true, titulo: 'Tentando Engravidar?', categoria: 'Tentando engravidar', autor: 'BabyBuddy', descricao: 'Quanto tempo demora a fecundação após a relação sexual?', imagem: artEngravidar, link: '/tentando-engravidar' },
-  { id: 'estatico-periodo-gestacional', estatico: true, titulo: 'Período Gestacional', categoria: 'Período gestacional', autor: 'BabyBuddy', descricao: 'Tudo que você precisa saber sobre o período gestacional!', imagem: artGestacional, link: '/periodo-gestacional' },
-  { id: 'estatico-alimentacao', estatico: true, titulo: 'Alimentação do Bebê', categoria: 'Alimentação', autor: 'BabyBuddy', descricao: 'Orientações essenciais sobre introdução alimentar e nutrição do bebê.', imagem: artAlimentacao, link: '/artigos/alimentacao' },
-];
-
 function semAcentos(texto) {
   return (texto || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLocaleLowerCase('pt-BR');
 }
@@ -35,7 +28,7 @@ function fallbackImagePorTema(material) {
 function materialImageSrc(material) {
   const source = material.imagem || material.capa;
   if (!source) return fallbackImagePorTema(material);
-  return material.estatico ? source : absoluteApiUrl(source);
+  return absoluteApiUrl(source);
 }
 
 export default function Perfil() {
@@ -60,18 +53,16 @@ export default function Perfil() {
 
   useEffect(() => setProfile({ nome: displayName, username: user?.username || '' }), [displayName, user?.username]);
 
-  const allMaterials = useMemo(() => [...ARTIGOS_ESTATICOS, ...materials], [materials]);
-
   const filtered = useMemo(() => {
     const normalized = query.trim().toLocaleLowerCase('pt-BR');
-    return allMaterials.filter((item) => !normalized
+    return materials.filter((item) => !normalized
       || `${item.titulo} ${item.categoria} ${item.descricao || ''}`.toLocaleLowerCase('pt-BR').includes(normalized));
-  }, [allMaterials, query]);
+  }, [materials, query]);
   const featured = useMemo(() => {
-    return allMaterials.find((item) => item.link === '/periodo-gestacional'
+    return materials.find((item) => item.link === '/periodo-gestacional'
       || semAcentos(item.titulo).includes('periodo gestacional')
-      || semAcentos(item.categoria).includes('periodo gestacional')) || allMaterials[0];
-  }, [allMaterials]);
+      || semAcentos(item.categoria).includes('periodo gestacional')) || materials[0];
+  }, [materials]);
 
   async function saveProfile() {
     try {

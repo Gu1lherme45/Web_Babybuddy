@@ -1,11 +1,13 @@
 import styles from './Navbar.module.css';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { LogOut } from 'lucide-react';
 import logo from '../../assets/logoofc3.svg';
 import useAuth from '../../auth/useAuth';
 
 export default function Navbar() {
   const location = useLocation();
-  const { user } = useAuth();
+  const navigate = useNavigate();
+  const { user, logout } = useAuth();
   const isAdmin = user?.nivelAcesso?.toUpperCase() === 'ADMIN';
   const hidden = location.pathname.startsWith('/administrador') || [
     '/questionario', '/cadastro', '/login', '/perfil',
@@ -13,6 +15,11 @@ export default function Navbar() {
   ].includes(location.pathname);
 
   if (hidden) return null;
+
+  async function signOut() {
+    await logout();
+    navigate('/', { replace: true });
+  }
 
   return (
     <nav className={styles.navbar}>
@@ -28,10 +35,13 @@ export default function Navbar() {
         </div>
 
         <div className={styles.actions}>
-          {isAdmin ? null : user ? (
-            <Link to="/perfil" className={styles.login}>
-              Minha conta
-            </Link>
+          {user ? (
+            <>
+              {!isAdmin && <Link to="/perfil" className={styles.login}>Minha conta</Link>}
+              <button type="button" onClick={signOut} className={`${styles.cadastro} ${styles.actionButton}`}>
+                <LogOut size={18} /> Sair
+              </button>
+            </>
           ) : (
             <>
               <Link to="/login" className={styles.login}>Login</Link>

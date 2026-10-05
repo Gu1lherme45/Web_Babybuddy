@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import styles from "./CuidadosBebe.module.css";
 import VerificationCard from "../../components/VerificationCard";
 
@@ -9,7 +10,7 @@ export default function CuidadosBebe() {
       <div className={styles.articleHeader}>
 
         <span className={styles.breadcrumb}>
-          Artigos &gt; Cuidados com o bebê
+          <Link to="/perfil" className={styles.breadcrumbLink}>Artigos</Link> &gt; Cuidados com o bebê
         </span>
 
         <h1>

@@ -92,6 +92,9 @@
 }
 
 .cadastro {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   text-decoration: none;
   background: linear-gradient(90deg, #ff4fa0, #d81b78);
   color: #fff;

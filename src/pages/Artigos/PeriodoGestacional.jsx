@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import styles from "./PeriodoGestacional.module.css";
 import VerificationCard from "../../components/VerificationCard";
 
@@ -9,7 +10,7 @@ export default function PeriodoGestacional() {
       <div className={styles.header}>
 
         <span className={styles.breadcrumb}>
-          Artigos &gt; Período Gestacional
+          <Link to="/perfil" className={styles.breadcrumbLink}>Artigos</Link> &gt; Período Gestacional
         </span>
 
         <h1>

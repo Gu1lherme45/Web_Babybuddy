@@ -62,7 +62,7 @@ export default function AdminDashboard() {
     timerRef.current = setTimeout(() => {
       setIndice(proximo);
       setTransicao({ fase: 'entrando', direcao });
-    }, 250);
+    }, 150);
   }
 
   async function toggle(material) {

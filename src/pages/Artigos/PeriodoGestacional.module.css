@@ -39,6 +39,17 @@
   margin-bottom: 10px;
 }
 
+.breadcrumbLink {
+  color: #7a7a7a;
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.breadcrumbLink:hover {
+  color: #dc2b74;
+  text-decoration: underline;
+}
+
 /* TÍTULO */
 .header h1 {
   font-size: 36px;

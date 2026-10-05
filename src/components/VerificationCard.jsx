@@ -9,7 +9,7 @@ export default function VerificationCard() {
         <span>Conteúdo verificado</span>
       </div>
       <p className={styles.text}>
-        Este conteúdo foi elaborado com base em fontes confiáveis e informações de saúde, priorizando orientações seguras e relevantes para a gestação e os cuidados com o bebê.
+        As informações apresentadas nos artigos do BabyBuddy são elaboradas com base em fontes confiáveis e materiais de referência relacionados à gestação, saúde materna, cuidados com o bebê e bem-estar familiar. Nosso objetivo é oferecer conteúdos claros, responsáveis e de fácil compreensão para ajudar você a encontrar informações úteis durante cada etapa dessa jornada.
       </p>
     </div>
   );

@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import styles from "./TentandoEngravidar.module.css";
 import VerificationCard from "../../components/VerificationCard";
 
@@ -9,7 +10,7 @@ export default function TentandoEngravidar() {
       <div className={styles.articleHeader}>
 
         <span className={styles.breadcrumb}>
-          Artigos &gt; Tentando engravidar
+          <Link to="/perfil" className={styles.breadcrumbLink}>Artigos</Link> &gt; Tentando engravidar
         </span>
 
         <h1>
