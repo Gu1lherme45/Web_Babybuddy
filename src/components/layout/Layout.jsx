@@ -10,6 +10,12 @@ const STATIC_ARTICLE_PATHS = [
 ];
 const NAVBAR_PATHS = ['/sobre', '/login', '/cadastro'];
 const FOOTER_PATHS = ['/seguranca', '/termos-de-uso', '/politica-de-privacidade'];
+// Cor de fundo de cada página, para a onda do footer ficar igual ao fundo acima dela
+const WAVE_COLORS = {
+  '/termos-de-uso': '#f5f5f5',
+  '/politica-de-privacidade': '#f5f5f5',
+  '/artigos': '#fff8fb',
+};
 
 export default function Layout() {
   const location = useLocation();
@@ -21,7 +27,8 @@ export default function Layout() {
     || /^\/artigos\/\d+$/.test(location.pathname);
   const fast = ['/login', '/cadastro', ...STATIC_ARTICLE_PATHS].includes(location.pathname) || isArticle;
   const skipLoader = location.pathname.startsWith('/administrador')
-    || (location.pathname === '/questionario' && previous === '/cadastro')
+    || (location.pathname === '/questionario' && ['/cadastro', '/perfil'].includes(previous))
+    || (location.pathname === '/perfil' && previous === '/questionario')
     || (location.pathname === '/' && [...NAVBAR_PATHS, ...STATIC_ARTICLE_PATHS, ...FOOTER_PATHS].includes(previous));
 
   return (
@@ -32,7 +39,7 @@ export default function Layout() {
           <Outlet />
         </PageWrapper>
       </AnimatePresence>
-      <Footer waveColor={FOOTER_PATHS.includes(location.pathname) || isArticle ? '#f5f5f5' : '#ffffff'} />
+      <Footer waveColor={isArticle ? '#f5f5f5' : WAVE_COLORS[location.pathname] || '#ffffff'} />
     </>
   );
 }

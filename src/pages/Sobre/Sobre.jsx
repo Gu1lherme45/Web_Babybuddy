@@ -7,9 +7,6 @@ import icon3 from '../../assets/icon3.svg';
 import icon4 from '../../assets/icon4.svg';
 
 // imagens segunda parte
-import sobre1 from '../../assets/sobre1.svg';
-import sobre2 from '../../assets/sobre2.svg';
-import sobre3 from '../../assets/sobre3.svg';
 
 export default function Sobre() {
   return (
@@ -21,7 +18,7 @@ export default function Sobre() {
           Bem-vinda ao nosso espaço de cuidado,<br />
           informação e tranquilidade durante a gestação.
         </h1>
-        <p>Aqui você encontra:</p>
+        <div className={styles.line}></div>
 
 
 
@@ -74,7 +71,6 @@ export default function Sobre() {
       {/* FEATURES */}
       <section className={styles.features}>
         <div className={styles.feature}>
-          <img src={sobre1} alt="" />
           <h3>Acompanhe o crescimento do seu bebê</h3>
           <p>
             Descubra o tamanho aproximado do seu bebê comparando com frutas, objetos do dia a dia ou animais fofos — uma forma simples e divertida de visualizar cada etapa da gestação.
@@ -82,7 +78,6 @@ export default function Sobre() {
         </div>
 
         <div className={styles.feature}>
-          <img src={sobre2} alt="" />
           <h3>Personalize seus artigos</h3>
           <p>
             Escolha os temas que mais te interessam — saúde, bem-estar, alimentação, exercícios e mais — e receba conteúdos personalizados, feitos especialmente para a sua fase da gestação.
@@ -90,7 +85,6 @@ export default function Sobre() {
         </div>
 
         <div className={styles.feature}>
-          <img src={sobre3} alt="" />
           <h3>Tenha lembretes inteligentes</h3>
           <p>
             Adicione lembretes e receba notificações automáticas sobre consultas, exames e datas importantes, garantindo que você nunca perca um compromisso durante sua gestação.

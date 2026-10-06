@@ -181,60 +181,27 @@ h2 {
   color: #111;
 }
 
-/* SELECT */
-.select {
-  width: 100%;
-  padding: 14px 44px 14px 16px;
-
-  border-radius: 14px;
-  border: 1px solid #ececec;
-
-  background-color: #f7f7f7;
-  color: #333;
-
-  font-size: 16px;
-  font-weight: 500;
-
-  outline: none;
-  cursor: pointer;
-
-  transition: all 0.25s ease;
-
-  appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
-
-  background-repeat: no-repeat;
-  background-position: right 14px center;
-  background-size: 18px;
-}
-
-.select:hover {
-  background-color: #f2f2f2;
-}
-
-.select:focus {
-  background-color: #ffffff;
-  border-color: #dddddd;
-
-  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.04);
+/* SELECT (dropdown compartilhado com a criação de artigos) */
+.selectDropdown {
+  --sd-height: 50px;
+  --sd-padding-x: 16px;
+  --sd-radius: 14px;
+  --sd-border: #ececec;
+  --sd-bg: #f7f7f7;
+  --sd-color: #333;
+  --sd-font-size: 16px;
+  --sd-font-weight: 500;
+  --sd-accent: #666;
+  --sd-focus-ring: rgba(0, 0, 0, 0.05);
+  --sd-error: #DC2B74;
+  --sd-placeholder: #888;
 }
 
 /* SELECT - TIPO SANGUÍNEO */
 .selectTipoSanguineo {
-  border-radius: 18px;
-  font-family: 'League Spartan', sans-serif;
-  font-weight: 700;
+  --sd-radius: 18px;
+  --sd-font-weight: 700;
 }
-
-.selectTipoSanguineo option {
-  font-family: 'League Spartan', sans-serif;
-  font-weight: 700;
-}
-
-.selectPlaceholder {
-  font-weight: 600;
-}
-
 
 /* CAMPOS DE TEXTO / NÚMERO / DATA */
 .input {
@@ -426,11 +393,11 @@ h2 {
 
   padding: 14px;
 
-  border: none;
-  border-radius: 16px;
+  border: 1px solid #DC2B74;
+  border-radius: 14px;
 
-  background: linear-gradient(135deg, #ff6fa5, #DC2B74);
-  color: white;
+  background: #DC2B74;
+  color: #fff;
 
   font-size: 16px;
   font-weight: 600;
@@ -438,19 +405,14 @@ h2 {
 
   cursor: pointer;
 
-  transition: all 0.25s ease;
-  box-shadow: 0 10px 22px rgba(220, 43, 116, 0.18);
+  transition: all 0.3s;
+  box-shadow: 6px 6px 12px rgba(160, 20, 80, 0.28), -6px -6px 12px #ffffff;
   margin-top: 6px;
 }
 
-.button:hover:not(:disabled) {
-  transform: translateY(-1px);
-
-  box-shadow: 0 14px 26px rgba(220, 43, 116, 0.22);
-}
-
-.button:active {
-  transform: scale(0.98);
+.button:active:not(:disabled) {
+  color: #ffe4ef;
+  box-shadow: inset 4px 4px 12px rgba(160, 20, 80, 0.35), inset -4px -4px 12px rgba(255, 110, 165, 0.45);
 }
 
 .button:disabled {
@@ -746,11 +708,15 @@ h2 {
     width: 340px;
   }
 
-  .input,
-  .select {
+  .input {
     font-size: 15px;
     padding-top: 13px;
     padding-bottom: 13px;
+  }
+
+  .selectDropdown {
+    --sd-font-size: 15px;
+    --sd-height: 46px;
   }
 
   .checkboxText {
@@ -794,14 +760,14 @@ h2 {
     width: 250px;
   }
 
-  .input,
-  .select {
+  .input {
     font-size: 14px;
     padding: 12px 14px;
   }
 
-  .select {
-    padding-right: 40px;
+  .selectDropdown {
+    --sd-font-size: 14px;
+    --sd-height: 44px;
   }
 
   .fieldLabel {
@@ -820,4 +786,56 @@ h2 {
     width: 16px;
     height: 16px;
   }
+}
+
+/* CARD DA DPP SUGERIDA (mesmo estilo do aviso de conteúdo verificado) */
+.dppCard {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  margin-top: 8px;
+  padding: 10px 14px 10px 22px;
+  background-color: #fff0f6;
+  border: 1px solid #d81b78;
+  border-radius: 10px;
+  box-shadow: 0 6px 18px rgba(216, 27, 120, 0.12);
+  color: #a41658;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.dppIcon {
+  flex-shrink: 0;
+}
+
+.dppText {
+  position: relative;
+  top: 1px;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ANIMAÇÃO DE CARREGAMENTO (batimento) */
+.heartbeat {
+  width: clamp(140px, 20vmin, 260px);
+  aspect-ratio: 64 / 48;
+  margin: 10vh auto 0;
+}
+
+/* SELETOR DE DATA (calendário em português com o tema do projeto) */
+.dateDropdown {
+  --dp-height: 50px;
+  --dp-padding-x: 16px;
+  --dp-radius: 14px;
+  --dp-border: #ececec;
+  --dp-bg: #f7f7f7;
+  --dp-color: #333;
+  --dp-font-size: 16px;
+  --dp-font-weight: 500;
+  --dp-placeholder: #888;
 }

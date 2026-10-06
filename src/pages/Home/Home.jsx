@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import {
   CalendarDays,
@@ -21,14 +21,19 @@ import Mobile from "../../assets/mobile.svg";
 import imgGravida from "../../assets/imggravidahome3.svg";
 
 import art1 from "../../assets/art1.png";
-import art2 from "../../assets/art2.png";
-import art3 from "../../assets/art3.png";
+import { absoluteApiUrl } from "../../services/api";
+import { listPublicMaterials } from "../../services/materialService";
 import facilidade from "../../assets/facilidade.png";
 import informacoes from "../../assets/informações.png";
 import privacidade from "../../assets/privacidade.png";
 
 export default function Home() {
   const location = useLocation();
+  const [materiais, setMateriais] = useState([]);
+
+  useEffect(() => {
+    listPublicMaterials().then(setMateriais).catch(() => setMateriais([]));
+  }, []);
 
   useEffect(() => {
     if (location.hash) {
@@ -279,35 +284,18 @@ export default function Home() {
           <h2 className={styles.artigosTitle}>Principais Artigos</h2>
 
           <div className={styles.artigosGrid}>
-            <Link
-              to="/cuidados-bebe"
-              className={styles.artigoCard}
-              onClick={() => window.scrollTo(0, 0)}
-            >
-              <img src={art1} alt="Cuidados com o bebê" />
-              <h3>CUIDADOS COM O BEBÊ</h3>
-              <p>Tudo que você precisa saber para cuidar do seu bebê.</p>
-            </Link>
-
-            <Link
-              to="/tentando-engravidar"
-              className={styles.artigoCard}
-              onClick={() => window.scrollTo(0, 0)}
-            >
-              <img src={art2} alt="Tentando engravidar" />
-              <h3>TENTANDO ENGRAVIDAR?</h3>
-              <p>Quanto tempo demora a fecundação após a relação sexual?</p>
-            </Link>
-
-            <Link
-              to="/periodo-gestacional"
-              className={styles.artigoCard}
-              onClick={() => window.scrollTo(0, 0)}
-            >
-              <img src={art3} alt="Período gestacional" />
-              <h3>PERÍODO GESTACIONAL</h3>
-              <p>Tudo que você precisa saber sobre o período gestacional!</p>
-            </Link>
+            {materiais.map((material) => (
+              <Link
+                key={material.id}
+                to={material.arquivo ? `/artigos/${material.id}` : material.link || `/artigos/${material.id}`}
+                className={styles.artigoCard}
+                onClick={() => window.scrollTo(0, 0)}
+              >
+                <img src={material.imagem || material.capa ? absoluteApiUrl(material.imagem || material.capa) : art1} alt={`Imagem de ${material.titulo}`} />
+                <h3>{material.titulo.toUpperCase()}</h3>
+                <p>{material.descricao}</p>
+              </Link>
+            ))}
           </div>
         </div>
       </section>

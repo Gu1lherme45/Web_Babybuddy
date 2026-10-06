@@ -1,13 +1,13 @@
 import styles from './Navbar.module.css';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { LogOut } from 'lucide-react';
+import { LayoutDashboard, LogOut } from 'lucide-react';
 import logo from '../../assets/logoofc3.svg';
 import useAuth from '../../auth/useAuth';
-
 export default function Navbar() {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, logout } = useAuth();
+  const isAdmin = user?.nivelAcesso?.toUpperCase() === 'ADMIN';
   const hidden = location.pathname.startsWith('/administrador') || [
     '/questionario', '/cadastro', '/login', '/perfil',
     '/termos-de-uso', '/politica-de-privacidade',
@@ -34,7 +34,11 @@ export default function Navbar() {
         </div>
 
         <div className={styles.actions}>
-          {user ? (
+          {isAdmin ? (
+            <Link to="/administrador" className={styles.cadastro}>
+              <LayoutDashboard size={18} /> Dashboard
+            </Link>
+          ) : user ? (
             <button type="button" onClick={signOut} className={`${styles.cadastro} ${styles.actionButton}`}>
               <LogOut size={18} /> Sair
             </button>

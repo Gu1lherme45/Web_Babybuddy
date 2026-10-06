@@ -1,0 +1,115 @@
+:where(.dropdown) {
+  --sd-height: 48px;
+  --sd-padding-x: 14px;
+  --sd-radius: 12px;
+  --sd-border: #e9bfd2;
+  --sd-bg: #fffafd;
+  --sd-color: #2f1020;
+  --sd-font-size: 1rem;
+  --sd-font-weight: 400;
+  --sd-accent: #dc2b74;
+  --sd-hover-bg: #fff1f6;
+  --sd-focus-ring: rgba(220, 43, 116, 0.13);
+  --sd-error: #dc2b74;
+  --sd-placeholder: #9aa3b2;
+}
+
+.dropdown {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+  font-family: inherit;
+}
+
+.trigger {
+  width: 100%;
+  height: var(--sd-height);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 0 var(--sd-padding-x);
+  border: 1px solid var(--sd-border);
+  border-radius: var(--sd-radius);
+  background: var(--sd-bg);
+  color: var(--sd-color);
+  font: inherit;
+  font-size: var(--sd-font-size);
+  font-weight: var(--sd-font-weight);
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s;
+}
+
+.trigger:hover {
+  border-color: var(--sd-accent);
+}
+
+.trigger:focus-visible,
+.trigger[aria-expanded='true'] {
+  outline: none;
+  border-color: var(--sd-accent);
+  box-shadow: 0 0 0 3px var(--sd-focus-ring);
+}
+
+.invalid {
+  border-color: var(--sd-error);
+  background-color: #fff5f8;
+}
+
+.placeholder {
+  color: var(--sd-placeholder);
+}
+
+.chevron {
+  flex-shrink: 0;
+  color: var(--sd-accent);
+  transition: transform 0.2s;
+}
+
+.chevronOpen {
+  transform: rotate(180deg);
+}
+
+.menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  z-index: 30;
+  list-style: none;
+  margin: 0;
+  padding: 6px;
+  max-height: 260px;
+  overflow-y: auto;
+  background: #fff;
+  border: 1px solid #f2d4e1;
+  border-radius: 14px;
+  box-shadow: 0 12px 30px rgba(117, 25, 65, 0.14);
+}
+
+.item {
+  padding: 10px 12px;
+  border-radius: 10px;
+  color: var(--sd-color);
+  font-size: var(--sd-font-size);
+  font-weight: 400;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.itemActive {
+  background: var(--sd-hover-bg);
+  color: var(--sd-accent);
+}
+
+.itemSelected {
+  font-weight: 700;
+  color: var(--sd-accent);
+}
+
+.empty {
+  padding: 10px 12px;
+  color: #916b7c;
+  font-size: 0.9rem;
+}

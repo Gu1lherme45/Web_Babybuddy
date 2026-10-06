@@ -16,6 +16,7 @@ import {
 } from '../../services/materialService';
 import { validateArticleFile, validateArticleImage } from './materialFiles';
 import { absoluteApiUrl } from '../../services/api';
+import SelectDropdown from '../../components/SelectDropdown';
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL('pdfjs-dist/build/pdf.worker.min.mjs', import.meta.url).toString();
 
@@ -96,6 +97,10 @@ export default function MaterialForm() {
 
   async function handleSubmit(event) {
     event.preventDefault();
+    if (!form.categoria) {
+      setStatus({ type: 'error', message: 'Selecione uma categoria.' });
+      return;
+    }
     if (!editing && !articleFile) {
       setStatus({ type: 'error', message: 'Selecione o arquivo do artigo.' });
       return;
@@ -133,7 +138,7 @@ export default function MaterialForm() {
           <h2 id="metadata-title">Informações do artigo</h2>
           <label>Título<input value={form.titulo} maxLength={150} onChange={(e) => update('titulo', e.target.value)} required /></label>
           <div className={styles.row}>
-            <label>Categoria<div className={styles.categoryRow}><select value={form.categoria} onChange={(e) => update('categoria', e.target.value)} required><option value="">Selecione...</option>{categories.map((item) => <option key={item.id} value={item.nome}>{item.nome}</option>)}</select><button type="button" className={styles.addCategory} onClick={() => setShowCategoryForm((value) => !value)} aria-label="Adicionar categoria"><Plus size={18} /></button></div></label>
+            <label>Categoria<div className={styles.categoryRow}><SelectDropdown className={styles.categoryDropdown} value={form.categoria} opcoes={categories.map((item) => item.nome)} onChange={(nome) => update('categoria', nome)} /><button type="button" className={styles.addCategory} onClick={() => setShowCategoryForm((value) => !value)} aria-label="Adicionar categoria"><Plus size={18} /></button></div></label>
             {showCategoryForm && <div className={styles.newCategory}><input value={newCategory} maxLength={100} placeholder="Nova categoria" onChange={(e) => setNewCategory(e.target.value)} /><button type="button" className={styles.secondary} onClick={addCategory}>Adicionar</button></div>}
             <label>Autor<input value={form.autor} maxLength={200} onChange={(e) => update('autor', e.target.value)} required /></label>
           </div>

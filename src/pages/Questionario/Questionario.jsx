@@ -1,12 +1,15 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { AnimatePresence, motion as Motion } from "framer-motion";
+import { Info } from "lucide-react";
 import styles from "./Questionario.module.css";
 
 import logo from "../../assets/logoofc3.svg";
 import heartQuestion from "../../assets/heartquestion.png";
 import AnimatedButton from "../../components/AnimatedButton";
 import LiquidRadioGroup from "../../components/LiquidRadioGroup";
+import SelectDropdown from "../../components/SelectDropdown";
+import DatePicker from "../../components/DatePicker";
 import useAuth from "../../auth/useAuth";
 import {
   atualizarGestante,
@@ -20,6 +23,30 @@ import {
 
 // formato YYYY-MM-DD (exigido pelo input date) respeitando o fuso local
 const hoje = new Date().toLocaleDateString("sv-SE");
+
+const SEMANAS_GESTACAO_PADRAO = 40;
+const TOLERANCIA_DPP_DIAS = 7;
+const MENSAGEM_DPP_INCOMPATIVEL =
+  "A data prevista do parto não corresponde ao período gestacional informado. Verifique as informações preenchidas.";
+
+function calcularDppPorSemanas(semanas) {
+  const semanasRestantes = SEMANAS_GESTACAO_PADRAO - Number(semanas);
+  const data = new Date();
+  data.setDate(data.getDate() + semanasRestantes * 7);
+  return data.toLocaleDateString("sv-SE");
+}
+
+function diasEntreDatas(dataA, dataB) {
+  const [anoA, mesA, diaA] = dataA.split("-").map(Number);
+  const [anoB, mesB, diaB] = dataB.split("-").map(Number);
+  return Math.round((Date.UTC(anoA, mesA - 1, diaA) - Date.UTC(anoB, mesB - 1, diaB)) / 86400000);
+}
+
+function dppCompativel(dpp, semanas) {
+  if (!dpp || !semanas) return true;
+  const esperada = calcularDppPorSemanas(semanas);
+  return Math.abs(diasEntreDatas(dpp, esperada)) <= TOLERANCIA_DPP_DIAS;
+}
 
 // remove acentos para bater com os valores aceitos pelas CHECK constraints
 // do banco (ex.: "Hipertensão" -> "Hipertensao", "Não" -> "Nao")
@@ -218,7 +245,6 @@ export default function Questionario() {
   const [erroCarregamento, setErroCarregamento] = useState("");
   const [gestanteExistente, setGestanteExistente] = useState(null);
   const [questionarioExistente, setQuestionarioExistente] = useState(null);
-  const [resultado, setResultado] = useState("criado");
 
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -227,6 +253,12 @@ export default function Questionario() {
   const progress = (step / ETAPAS.length) * 100;
   const fase =
     step === 0 ? "inicio" : step <= ETAPAS.length ? "perguntas" : "final";
+
+  useEffect(() => {
+    if (fase !== "final") return undefined;
+    const timer = setTimeout(() => navigate("/perfil"), 4000);
+    return () => clearTimeout(timer);
+  }, [fase, navigate]);
 
   useEffect(() => {
     let ativo = true;
@@ -274,7 +306,13 @@ export default function Questionario() {
   }, [user.id]);
 
   function handleChange(campo, valor) {
-    setDados((prev) => ({ ...prev, [campo]: valor }));
+    setDados((prev) => {
+      const proximo = { ...prev, [campo]: valor };
+      if (campo === "semanaGestacao" && valor) {
+        proximo.dpp = calcularDppPorSemanas(valor);
+      }
+      return proximo;
+    });
     setErrors((prev) => ({ ...prev, [campo]: undefined }));
   }
 
@@ -298,6 +336,9 @@ export default function Questionario() {
         }
       } else if (valor < hoje) {
         novosErros[campo] = "A data não pode ser anterior a hoje.";
+      }
+      if (campo === "dpp" && valor && !dppCompativel(valor, dados.semanaGestacao)) {
+        novosErros[campo] = MENSAGEM_DPP_INCOMPATIVEL;
       }
     }
 
@@ -366,13 +407,11 @@ export default function Questionario() {
         payload,
       );
       setQuestionarioExistente(atualizado);
-      setResultado("atualizado");
       return;
     }
 
     const criado = await criarQuestionario(payload);
     setQuestionarioExistente(criado);
-    setResultado("criado");
   }
 
   async function nextStep() {
@@ -380,6 +419,12 @@ export default function Questionario() {
 
     if (step < ETAPAS.length) {
       setStep((prev) => prev + 1);
+      return;
+    }
+
+    if (!dppCompativel(dados.dpp, dados.semanaGestacao)) {
+      setErrors((prev) => ({ ...prev, dpp: MENSAGEM_DPP_INCOMPATIVEL }));
+      setStep(ETAPAS.findIndex((etapa) => etapa.campo === "dpp") + 1);
       return;
     }
 
@@ -432,16 +477,23 @@ export default function Questionario() {
 
       return (
         <div className={styles.fieldGroup}>
-          <input
-            type="date"
-            lang="pt-BR"
-            {...limiteData}
-            className={`${styles.input} ${
-              errors[campo] ? styles.inputError : ""
-            }`}
+          <DatePicker
+            className={styles.dateDropdown}
             value={dados[campo]}
-            onChange={(e) => handleChange(campo, e.target.value)}
+            min={limiteData.min}
+            max={limiteData.max}
+            invalid={Boolean(errors[campo])}
+            onChange={(valor) => handleChange(campo, valor)}
           />
+
+          {campo === "dpp" && dados.semanaGestacao && !errors[campo] && (
+            <div className={styles.dppCard}>
+              <Info size={16} className={styles.dppIcon} aria-hidden="true" />
+              <span className={styles.dppText}>
+                Data sugerida para {dados.semanaGestacao} semanas de gestação - ajuste +{TOLERANCIA_DPP_DIAS} dias
+              </span>
+            </div>
+          )}
 
           {errors[campo] && (
             <p className={styles.errorText}>{errors[campo]}</p>
@@ -453,23 +505,16 @@ export default function Questionario() {
     if (tipo === "select") {
       return (
         <div className={styles.fieldGroup}>
-          <select
-            className={`${styles.select} ${
+          <SelectDropdown
+            className={`${styles.selectDropdown} ${
               campo === "tipoSanguineo" ? styles.selectTipoSanguineo : ""
-            } ${errors[campo] ? styles.inputError : ""}`}
+            }`}
             value={dados[campo]}
-            onChange={(e) => handleChange(campo, e.target.value)}
-          >
-            <option value="" className={styles.selectPlaceholder}>
-              Selecionar
-            </option>
-
-            {opcoes.map((opt, index) => (
-              <option key={index} value={opt}>
-                {opt}
-              </option>
-            ))}
-          </select>
+            opcoes={opcoes}
+            placeholder="Selecionar"
+            invalid={Boolean(errors[campo])}
+            onChange={(valor) => handleChange(campo, valor)}
+          />
 
           {errors[campo] && (
             <p className={styles.errorText}>{errors[campo]}</p>
@@ -618,7 +663,7 @@ export default function Questionario() {
 
             <h1>
               {questionarioExistente
-                ? "Atualize suas informações de saúde"
+                ? "Atualize seus dados de saúde"
                 : "Sua saúde importa"}
             </h1>
 
@@ -681,7 +726,9 @@ export default function Questionario() {
               {step === ETAPAS.length
                 ? enviando
                   ? "Enviando..."
-                  : "Finalizar questionario"
+                  : questionarioExistente
+                    ? "Atualizar dados"
+                    : "Finalizar questionario"
                 : "Continuar"}
             </button>
           </Motion.div>
@@ -697,41 +744,9 @@ export default function Questionario() {
             exit={{ opacity: 0, y: -16 }}
             transition={{ duration: 0.45, ease: [0.22, 0.9, 0.25, 1] }}
           >
-            <div className={styles.finishIllustration}>
-              <div className={styles.circle}></div>
-
-              <div className={styles.clipboard}>
-                <div className={styles.clipHeader}></div>
-
-                <div className={styles.clipLines}>
-                  <span></span>
-                  <span></span>
-                  <span></span>
-                  <span></span>
-                </div>
-              </div>
-
-              <div className={styles.checkIcon}>✓</div>
-            </div>
-
-            <h1 className={styles.finishTitle}>
-              {resultado === "atualizado"
-                ? "Informações atualizadas!"
-                : "Tudo pronto!"}
-            </h1>
-
-            <p className={styles.finishText}>
-              {resultado === "atualizado"
-                ? "Suas informações de saúde foram atualizadas com sucesso."
-                : "Seu questionário foi salvo. Você pode alterá-lo quando quiser pelo seu perfil."}
+            <p className={styles.loadingText} role="status">
+              Carregando suas informações de saúde...
             </p>
-
-            <button
-              className={styles.finishButton}
-              onClick={() => navigate("/perfil")}
-            >
-              Voltar para meu perfil
-            </button>
           </Motion.div>
         )}
       </AnimatePresence>

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Search, KeyRound } from 'lucide-react';
+import { Search, KeyRound, ClipboardList } from 'lucide-react';
 import styles from './Perfil.module.css';
 import LogoutConfirm from '../../components/LogoutConfirm';
 import artFallback from '../../assets/art3.png';
@@ -37,6 +37,7 @@ export default function Perfil() {
   const displayName = user?.nome?.trim() || user?.username?.split('@')[0] || 'Usuária';
   const avatarInitial = displayName.charAt(0).toUpperCase();
   const [materials, setMaterials] = useState([]);
+  const [destaqueSlot, setDestaqueSlot] = useState(slotDestaqueAtual);
   const [query, setQuery] = useState('');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [editing, setEditing] = useState(false);
@@ -58,11 +59,13 @@ export default function Perfil() {
     return materials.filter((item) => !normalized
       || `${item.titulo} ${item.categoria} ${item.descricao || ''}`.toLocaleLowerCase('pt-BR').includes(normalized));
   }, [materials, query]);
-  const featured = useMemo(() => {
-    return materials.find((item) => item.link === '/periodo-gestacional'
-      || semAcentos(item.titulo).includes('periodo gestacional')
-      || semAcentos(item.categoria).includes('periodo gestacional')) || materials[0];
-  }, [materials]);
+  const featured = materials.length ? materials[destaqueSlot % materials.length] : undefined;
+
+  useEffect(() => {
+    const proximaTroca = (destaqueSlot + 1) * INTERVALO_DESTAQUE_MS - Date.now();
+    const timer = setTimeout(() => setDestaqueSlot(slotDestaqueAtual()), proximaTroca);
+    return () => clearTimeout(timer);
+  }, [destaqueSlot]);
 
   async function saveProfile() {
     try {
@@ -134,15 +137,14 @@ export default function Perfil() {
           <div className={styles.informacoesUsuario}>
             <ProfileField label="Nome completo" editing={editing} value={profile.nome} onChange={(value) => setProfile({ ...profile, nome: value })} />
             <ProfileField label="E-mail" editing={editing} value={profile.username} type="email" onChange={(value) => setProfile({ ...profile, username: value })} />
-            <div className={styles.infoItem}><span>Senha</span>
-              {!passwordOpen && <button type="button" className={styles.botaoAlterarSenha} onClick={() => setPasswordOpen(true)}><KeyRound size={15} /> Alterar senha</button>}
-              {passwordOpen && <div className={styles.areaSenha}>
-                <div className={styles.campoSenha}><input type="password" placeholder="Nova senha" value={password} onChange={(e) => setPassword(e.target.value)} /></div>
-                <div className={styles.campoSenha}><input type="password" placeholder="Confirmar nova senha" value={confirmation} onChange={(e) => setConfirmation(e.target.value)} /></div>
-                <div className={styles.acoesSenha}><button className={styles.cancelarSenha} onClick={() => setPasswordOpen(false)}>Cancelar</button>
-                  <button className={styles.salvarSenha} onClick={savePassword}>Salvar nova senha</button></div>
-              </div>}
-            </div>
+            <button type="button" className={styles.botaoAlterarSenha} onClick={() => navigate('/questionario')}><ClipboardList size={15} /> Revisar questionário</button>
+            {!passwordOpen && <button type="button" className={styles.botaoAlterarSenha} onClick={() => setPasswordOpen(true)}><KeyRound size={15} /> Alterar senha</button>}
+            {passwordOpen && <div className={styles.areaSenha}>
+              <div className={styles.campoSenha}><input type="password" placeholder="Nova senha" value={password} onChange={(e) => setPassword(e.target.value)} /></div>
+              <div className={styles.campoSenha}><input type="password" placeholder="Confirmar nova senha" value={confirmation} onChange={(e) => setConfirmation(e.target.value)} /></div>
+              <div className={styles.acoesSenha}><button className={styles.cancelarSenha} onClick={() => setPasswordOpen(false)}>Cancelar</button>
+                <button className={styles.salvarSenha} onClick={savePassword}>Salvar nova senha</button></div>
+            </div>}
           </div>
           <div className={styles.acoesSidebar}>
             {editing ? <button className={styles.salvarAlteracoes} onClick={saveProfile}>Salvar alterações</button>
@@ -153,6 +155,13 @@ export default function Perfil() {
       {confirmLogout && <div className={styles.overlayConfirmarSaida}><LogoutConfirm onConfirm={signOut} onCancel={() => setConfirmLogout(false)} /></div>}
     </div>
   );
+}
+
+// Rodízio do artigo em destaque: troca a cada 5 horas, sempre no mesmo horário fixo.
+const INTERVALO_DESTAQUE_MS = 5 * 60 * 60 * 1000;
+
+function slotDestaqueAtual() {
+  return Math.floor(Date.now() / INTERVALO_DESTAQUE_MS);
 }
 
 function materialPath(material) {
