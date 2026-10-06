@@ -8,7 +8,6 @@ export default function Navbar() {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, logout } = useAuth();
-  const isAdmin = user?.nivelAcesso?.toUpperCase() === 'ADMIN';
   const hidden = location.pathname.startsWith('/administrador') || [
     '/questionario', '/cadastro', '/login', '/perfil',
     '/termos-de-uso', '/politica-de-privacidade',
@@ -36,12 +35,9 @@ export default function Navbar() {
 
         <div className={styles.actions}>
           {user ? (
-            <>
-              {!isAdmin && <Link to="/perfil" className={styles.login}>Minha conta</Link>}
-              <button type="button" onClick={signOut} className={`${styles.cadastro} ${styles.actionButton}`}>
-                <LogOut size={18} /> Sair
-              </button>
-            </>
+            <button type="button" onClick={signOut} className={`${styles.cadastro} ${styles.actionButton}`}>
+              <LogOut size={18} /> Sair
+            </button>
           ) : (
             <>
               <Link to="/login" className={styles.login}>Login</Link>
