@@ -62,7 +62,7 @@ export default function ArtigoDetalhe() {
   }, [id]);
 
   useEffect(() => {
-    if (!material || material.mimeType === 'application/pdf' || !material.mimeType) return;
+    if (!material || material.mimeType === 'application/pdf' || !material.mimeType || !material.mimeType.startsWith('text/')) return;
     let active = true;
     setContentLoading(true);
     getMaterialContent(id)
@@ -157,6 +157,10 @@ export default function ArtigoDetalhe() {
             </Document>
           </div>
         </section>
+      ) : material.mimeType?.startsWith('image/') ? (
+        <div className={styles.container}><img src={absoluteApiUrl(material.arquivo)} alt={material.titulo} style={{ display: 'block', maxWidth: '100%', height: 'auto', margin: '0 auto' }} /></div>
+      ) : material.mimeType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' ? (
+        <div className={styles.container}><section className={styles.legacy}><h2>Documento Word</h2><p>Baixe o arquivo para abrir o documento.</p><a href={absoluteApiUrl(material.arquivo)} download={material.nomeArquivo || true}>Baixar {material.nomeArquivo || 'documento DOCX'}</a></section></div>
       ) : (
         <div className={styles.container}>
           {material.mimeType?.startsWith('text/') ? (
