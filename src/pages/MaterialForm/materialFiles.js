@@ -10,13 +10,18 @@ export function validateArticleImage(file) {
 }
 
 export function validateArticleFile(file) {
-  if (!file) return 'Selecione um arquivo PDF, HTML ou Markdown.';
+  if (!file) return 'Selecione um arquivo JPG, PNG, Markdown, PDF ou DOCX.';
   const name = file.name.toLowerCase();
   if (name.endsWith('.pdf')) return validatePdf(file);
-  const isHtml = name.endsWith('.html') || name.endsWith('.htm');
   const isMarkdown = name.endsWith('.md') || name.endsWith('.markdown');
-  if (!isHtml && !isMarkdown) return 'Use um arquivo PDF, HTML ou Markdown.';
-  if (file.size > MAX_TEXT_BYTES) return 'O arquivo HTML/Markdown deve ter no máximo 5 MB.';
+  const isImage = /\.(jpe?g|png)$/.test(name);
+  const isDocx = name.endsWith('.docx');
+  if (!isMarkdown && !isImage && !isDocx) return 'Use JPG, PNG, Markdown, PDF ou DOCX.';
+  const expectedType = name.endsWith('.png') ? 'image/png' : name.endsWith('.jpg') || name.endsWith('.jpeg') ? 'image/jpeg'
+    : isDocx ? 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' : 'text/markdown';
+  if (file.type && file.type !== 'application/octet-stream' && file.type !== expectedType) return 'O tipo do arquivo não corresponde à extensão informada.';
+  const maxBytes = isMarkdown ? MAX_TEXT_BYTES : isImage ? 25 * 1024 * 1024 : isDocx ? 25 * 1024 * 1024 : MAX_TEXT_BYTES;
+  if (file.size > maxBytes) return isMarkdown ? 'O Markdown deve ter no máximo 5 MB.' : 'O arquivo deve ter no máximo 25 MB.';
   return '';
 }
 

@@ -77,7 +77,7 @@ export default function MaterialForm() {
     if (validationError) return setStatus({ type: 'error', message: validationError });
     setArticleFile(file);
     setDirty(true);
-    setStatus({ type: 'info', message: file.name.toLowerCase().endsWith('.pdf') ? 'O PDF será convertido em texto HTML no servidor e salvo no banco.' : 'Arquivo validado. O artigo será exibido com o estilo BabyBuddy.' });
+    setStatus({ type: 'info', message: file.name.toLowerCase().endsWith('.pdf') || /\.(md|markdown)$/i.test(file.name) ? 'O conteúdo será preparado para leitura no aplicativo.' : 'Arquivo validado. O arquivo original ficará disponível para download.' });
   }
 
   function acceptImage(file) {
@@ -155,8 +155,8 @@ export default function MaterialForm() {
             onClick={() => inputRef.current?.click()} onKeyDown={(e) => ['Enter', ' '].includes(e.key) && inputRef.current?.click()}
             onDragOver={(e) => { e.preventDefault(); setDragging(true); }} onDragLeave={() => setDragging(false)}
             onDrop={(e) => { e.preventDefault(); setDragging(false); acceptArticle(e.dataTransfer.files[0]); }}>
-            <UploadCloud size={34} /><strong>Arraste o arquivo ou clique para selecionar</strong><span>PDF até 25 MB (convertido para HTML); HTML ou Markdown até 5 MB</span>
-            <input ref={inputRef} type="file" accept="application/pdf,.pdf,text/html,.html,.htm,text/markdown,.md,.markdown" hidden onChange={(e) => acceptArticle(e.target.files[0])} />
+            <UploadCloud size={34} /><strong>Arraste o arquivo ou clique para selecionar</strong><span>JPG, PNG ou DOCX até 25 MB; PDF até 25 MB; Markdown até 5 MB</span>
+            <input ref={inputRef} type="file" accept="application/pdf,.pdf,text/markdown,.md,.markdown,image/jpeg,.jpg,.jpeg,image/png,.png,application/vnd.openxmlformats-officedocument.wordprocessingml.document,.docx" hidden onChange={(e) => acceptArticle(e.target.files[0])} />
           </div>
           {(articleFile || existing?.nomeArquivo) && <div className={styles.fileInfo}><FileText size={20} />
             <div><strong>{articleFile?.name || existing.nomeArquivo}</strong><span>{articleFile ? `${(articleFile.size / 1024 / 1024).toFixed(2)} MB` : 'Arquivo atual'}</span></div></div>}
