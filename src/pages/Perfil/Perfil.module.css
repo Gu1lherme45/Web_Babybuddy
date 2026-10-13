@@ -148,7 +148,7 @@
   right: 0;
   width: 420px;
   height: 100vh;
-  background: #ffffff;
+  background: #f5f5f5;
   padding: 40px 35px;
   box-shadow: -8px 0 25px rgba(0, 0, 0, 0.12);
   z-index: 20;
@@ -156,6 +156,123 @@
   flex-direction: column;
   overflow-y: auto;
   animation: abrirSidebar 0.3s ease;
+}
+
+/* TELA DE ALTERAR SENHA (substitui a sidebar por inteiro enquanto aberta) */
+.senhaTela {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 420px;
+  height: 100vh;
+  background: #f5f5f5;
+  box-shadow: -8px 0 25px rgba(0, 0, 0, 0.12);
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  animation: abrirSidebar 0.3s ease;
+}
+
+.senhaTopo {
+  display: grid;
+  grid-template-columns: 40px 1fr 40px;
+  align-items: center;
+  padding: 24px 12px;
+}
+
+.senhaVoltar {
+  grid-column: 1;
+  width: 36px;
+  height: 36px;
+  border: 0;
+  background: transparent;
+  color: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.senhaTitulo {
+  grid-column: 2;
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #000;
+  text-align: center;
+}
+
+.senhaCorpo {
+  padding: 16px 24px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.senhaCampo {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.senhaCampo span {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #1d1d1d;
+}
+
+.senhaInputBox {
+  display: flex;
+  align-items: center;
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 0 14px;
+  height: 40px;
+}
+
+.senhaInputBox input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: none;
+  background: transparent;
+  font-size: 1rem;
+  font-family: inherit;
+  color: #1d1d1d;
+}
+
+.senhaInputBox input[type="password"] {
+  letter-spacing: 2px;
+}
+
+.senhaInputBox button {
+  border: 0;
+  background: transparent;
+  color: #1d1d1d;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  padding: 4px;
+  flex-shrink: 0;
+}
+
+.senhaSalvar {
+  margin-top: 8px;
+  height: 42px;
+  border: 0;
+  border-radius: 21px;
+  background: #DC2B74;
+  color: #ffffff;
+  font-size: 1.05rem;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.senhaSalvar:hover {
+  opacity: 0.95;
 }
 
 
@@ -180,28 +297,49 @@
   gap: 15px;
 }
 
-/* ÁREA PRINCIPAL DO PERFIL */
+/* ÁREA PRINCIPAL DO PERFIL: ícone, nome e e-mail lado a lado, num card */
 .sidebarPerfil {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding-top: 55px;
-  padding-bottom: 25px;
-  border-bottom: 1px solid #f4dbe5;
-  margin-bottom: 40px;
-  line-height: 0.35px;
+  align-items: stretch;
+  gap: 14px;
+  padding-top: 45px;
+  padding-bottom: 0;
+  margin-bottom: 24px;
 }
 
+.perfilCard {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  background: #ffffff;
+  border: 1px solid #f6d8e5;
+  border-radius: 16px;
+  text-align: left;
+}
+
+.perfilTexto {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.perfilEmail {
+  font-size: 13px;
+  color: #2b6cb0;
+  text-decoration: underline;
+  overflow-wrap: anywhere;
+}
 
 /* Nome do usuário */
 .sidebarPerfil h2 {
-  font-size: 26px;
-  color: #333;
-  margin: 8px 0 5px;
+  font-size: 17px;
+  color: #1d1d1d;
+  margin: 0;
   font-weight: 700;
-  text-align: center;
+  text-align: left;
 }
 
 
@@ -214,20 +352,18 @@
   text-align: center;
 }
 
-/* ÁREA DO PERFIL */
+/* ÍCONE DO PERFIL */
 .sidebarAvatar {
-  width: 90px;
-  height: 90px;
+  width: 48px;
+  height: 48px;
+  min-width: 48px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #DC2B74, #F06292);
-  color: white;
+  background: #fce4ec;
+  color: #DC2B74;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 34px;
-  font-weight: 700;
-  line-height: 1;
-  margin: 0 auto 15px;
+  margin: 0;
 }
 
 
@@ -299,21 +435,18 @@
   justify-content: center;
   align-items: center;
   padding: 0;
-  border: 1px solid #DC2B74;
-  border-radius: 50%;
-  background: #fff;
+  border: 0;
+  background: transparent;
   color: #DC2B74;
-  font-size: 24px;
+  font-size: 34px;
   line-height: 1;
   cursor: pointer;
   transition: .25s;
 }
 
 .fecharTopo:hover {
-  background: #DC2B74;
-  color: #fff;
+  color: #b9205d;
   transform: scale(1.05);
-  box-shadow: 0 4px 12px rgba(220, 43, 116, 0.2);
 }
 
 .senhaContainer {
@@ -432,19 +565,19 @@
 .informacoesUsuario {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
 }
 
 
 /* CARD DE CADA INFORMAÇÃO */
 .infoItem {
-  background: #fff5f9;
-  border: 1px solid #f6d8e5;
-  border-radius: 12px;
-  padding: 7px 12px;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 0;
+  gap: 3px;
 }
 
 
@@ -457,10 +590,15 @@
 }
 
 
-/* TEXTO NORMAL */
+/* TEXTO NORMAL (caixa igual à do Editar Perfil) */
 .infoItem p {
   margin: 0;
-  line-height: 1.3;
+  height: 40px;
+  padding: 0 14px;
+  display: flex;
+  align-items: center;
+  background: #ffffff;
+  border-radius: 12px;
   font-size: 14px;
   color: #333;
   font-weight: 500;
@@ -485,50 +623,6 @@
 .infoItem input:focus {
   border-color: #DC2B74;
   box-shadow: 0 0 0 3px #fdecef;
-}
-
-
-/* BOTÃO EDITAR PERFIL */
-.editarPerfil {
-    display: block;
-    width: fit-content;
-    margin: 0 auto 18px auto;
-    padding: 8px 18px;
-    border: 1px solid #DC2B74;
-    border-radius: 30px;
-    background: #fff;
-    color: #DC2B74;
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: .25s ease;
-    box-shadow: 0 2px 8px rgba(220, 43, 116, 0.12);
-}
-
-.editarPerfil:hover{
-    background: #DC2B74;
-    color: white;
-    transform: translateY(-1px);
-}
-
-
-/* BOTÃO CANCELAR */
-.cancelarEdicao {
-  width: 50%;
-  padding: 10px;
-  margin: 8px auto 0;
-  border-radius: 10px;
-  border: 1px solid #DC2B74;
-  background: transparent;
-  color: #DC2B74;
-  font-size: 10px;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-
-.cancelarEdicao:hover {
-  background: #fdecef;
 }
 
 
@@ -562,7 +656,7 @@
     justify-content: center;
     gap: 8px;
     width: 100%;
-    margin-top: 5px;
+    margin-top: 2px;
     padding: 10px;
     border: 1px solid #f2d3e1;
     border-radius: 10px;
@@ -579,180 +673,10 @@
     border-color: #DC2B74;
 }
 
-
-.areaSenha {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-top: 4px;
-  animation: apareceSenha 0.2s ease;
+/* afasta só o primeiro botão do campo de e-mail acima dele */
+.informacoesUsuario > .botaoAlterarSenha:first-of-type {
+    margin-top: 16px;
 }
-
-@keyframes apareceSenha {
-  from {
-    opacity: 0;
-    transform: translateY(-4px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-
-/* CAMPO COM BOTÃO DE VISIBILIDADE */
-.campoSenha {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-
-.campoSenha input {
-  width: 100%;
-  box-sizing: border-box;
-  padding: 11px 40px 11px 12px;
-  border-radius: 10px;
-  border: 1px solid #e9bfd2;
-  background: white;
-  font-size: 14px;
-  outline: none;
-  transition: border-color .2s ease;
-}
-
-.campoSenha input:focus {
-  border-color: #DC2B74;
-  box-shadow: 0 0 0 3px #fdecef;
-}
-
-.botaoOlhoInput {
-  position: absolute;
-  right: 10px;
-  border: none;
-  background: transparent;
-  color: #a06b80;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-}
-
-.botaoOlhoInput:hover {
-  color: #DC2B74;
-}
-
-
-/* AÇÕES DO FORMULÁRIO */
-.acoesSenha {
-  display: flex;
-  gap: 10px;
-  margin-top: 4px;
-}
-
-.cancelarSenha {
-  flex: 1;
-  padding: 10px;
-  border-radius: 10px;
-  border: 1px solid #DC2B74;
-  background: transparent;
-  color: #DC2B74;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: .25s ease;
-}
-
-.cancelarSenha:hover {
-  background: #fdecef;
-}
-
-
-/* BOTÃO CONFIRMAR SENHA */
-.salvarSenha {
-  flex: 1;
-  padding: 10px;
-  border-radius: 10px;
-  border: none;
-  background: #DC2B74;
-  color: white;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: 0.25s ease;
-}
-
-
-.salvarSenha:hover {
-  background: #b9205d;
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-.erroSenha {
-    margin: 0;
-    padding: 8px 10px;
-    border-radius: 8px;
-    background: #fff2f2;
-    border: 1px solid #ffcaca;
-    color: #d32f2f;
-    font-size: 12px;
-    font-weight: 500;
-    text-align: center;
-}
-
-.salvarAlteracoes {
-    display: block;
-    width: 330px;
-    margin: 0 auto;
-    padding: 10px 18px;
-    border: 1.5px solid #DC2B74;
-    border-radius: 30px;
-    background: #fff;
-    color: #DC2B74;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all .25s ease;
-    box-shadow: 0 2px 8px rgba(220, 43, 116, 0.12);
-}
-
-
-.salvarAlteracoes:hover {
-    background: #DC2B74;
-    color: #fff;
-    border-color: #DC2B74;
-    transform: translateY(-2px);
-    box-shadow: 0 5px 12px rgba(220, 43, 116, 0.25);
-}
-
-
-.salvarAlteracoes:active {
-    transform: scale(0.97);
-}
-
-
 
 
 
@@ -1052,40 +976,129 @@
   }
 
   .header {
-    flex-direction: column;
-    gap: 24px;
-  }
-
-  .title {
-    font-size: 2.3rem;
-  }
-
-  .highlight {
-    flex-direction: column;
+    gap: 10px;
     align-items: flex-start;
-    gap: 30px;
-    padding: 30px;
+    margin-bottom: 18px;
+  }
+
+  /* caixa de pesquisa menor e mais perto do texto de boas-vindas */
+  .searchContainer {
+    margin-bottom: 16px;
+  }
+
+  .searchInput {
+    height: 42px;
+    padding: 0 16px 0 40px;
+    border-radius: 13px;
+    font-size: 0.85rem;
+  }
+
+  .searchIcon {
+    left: 12px;
+  }
+
+  .header > div {
+    min-width: 0;
+  }
+
+  /* "Olá, Nome" continua numa linha só; encolhe o quanto precisar pra
+     caber ao lado do avatar (o nome já é rosa, via ".title span") */
+  .title {
+    font-size: clamp(1.3rem, 6vw, 2rem);
+    margin-bottom: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .subtitle {
+    font-size: 0.85rem;
+  }
+
+  .avatar {
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
+    font-size: 1rem;
+    flex-shrink: 0;
+  }
+
+  /* sem padding: o card em destaque precisa ter a mesma largura dos
+     outros cards, que ficam dentro de um container sem padding próprio */
+  .highlight {
+    padding: 0;
   }
 
   .highlight h2 {
     font-size: 1.7rem;
-  } 
+  }
 
   .icon {
     display: none;
   }
 
+  /* CARD EM DESTAQUE: agora usa exatamente as mesmas classes dos outros
+     artigos (.artigoCard/.cardContent), então fica idêntico a eles — sem
+     "Ler agora", sem rodapé — e já herda o estilo deles definido abaixo */
+
   .artigosTitle {
-    font-size: 2rem;
-    margin-bottom: 40px;
+    font-size: 1.3rem;
+    margin-bottom: 20px;
   }
 
+  /* ARTIGOS DA LISTA: mesmo card fino, um por linha */
   .artigosGrid {
-    gap: 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
   }
 
   .artigoCard {
     width: 100%;
-    max-width: 320px;
+    max-width: none;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: #fff;
+    border-radius: 14px;
+    padding: 8px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
+  }
+
+  .artigoCard img {
+    width: 84px;
+    height: 84px;
+    flex-shrink: 0;
+    margin-bottom: 0;
+    border-radius: 10px;
+  }
+
+  .cardContent {
+    padding: 0;
+    min-width: 0;
+  }
+
+  .cardContent span {
+    display: none;
+  }
+
+  .artigoCard h3 {
+    margin-top: 0;
+    margin-bottom: 4px;
+    font-size: 0.88rem;
+  }
+
+  .artigoCard p {
+    font-size: 0.8rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* SIDEBAR: ocupa a tela inteira no mobile */
+  .sidebar,
+  .senhaTela {
+    width: 100%;
   }
 }

@@ -26,6 +26,10 @@ const StyledWrapper = styled.div`
     background-color: var(--bg-color);
     padding: 2.5rem 4rem;
     border-radius: 1.25rem;
+    /* mantém a frase numa linha só, do tamanho natural dela — sem isso,
+       numa tela estreita o texto espreme e quebra em várias linhas antes
+       mesmo do scale() entrar em ação */
+    width: max-content;
   }
   .loader {
     color: #000000;
@@ -65,6 +69,22 @@ const StyledWrapper = styled.div`
     padding-left: 6px;
     color: #DC2B74;
     animation: spin_4991 4s infinite;
+  }
+
+  /* no mobile a animação fica grande demais em relação à tela; encolhe
+     o card inteiro (texto, palavras e tudo) de forma proporcional. A frase
+     tem ~1049px de largura natural (ela não quebra linha, ver .card acima),
+     então a escala precisa reduzir bastante pra caber na tela. */
+  @media (max-width: 768px) {
+    .card {
+      transform: scale(0.42);
+    }
+  }
+
+  @media (max-width: 480px) {
+    .card {
+      transform: scale(0.28);
+    }
   }
 
   @keyframes spin_4991 {

@@ -1,0 +1,12 @@
+.loaderBox {
+  width: clamp(140px, 20vmin, 260px);
+  aspect-ratio: 64 / 48;
+}
+
+/* no mobile o batimento fica proporcionalmente menor, igual os outros
+   ajustes de responsividade feitos no site */
+@media (max-width: 768px) {
+  .loaderBox {
+    width: clamp(90px, 24vmin, 200px);
+  }
+}

@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { LayoutDashboard, Search, Pencil, Trash2, Ban, CheckCircle2, Plus, LogOut, ArrowLeft, ChevronLeft, ChevronRight } from 'lucide-react';
 import styles from './Administrador.module.css';
-import logo2 from '../../assets/logo2.svg';
+import logo2 from '../../assets/logoofc3.svg';
 import useAuth from '../../auth/useAuth';
 import api, { absoluteApiUrl } from '../../services/api';
 import { deleteMaterial, listAdminMaterials, setMaterialActive } from '../../services/materialService';

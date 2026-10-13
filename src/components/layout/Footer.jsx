@@ -3,19 +3,25 @@ import styles from './Footer.module.css';
 import logo from '../../assets/logoofcc.png';
 import googlePlayBadge from '../../assets/googleplay-badge-ptbr.png';
 import appStoreBadge from '../../assets/appstore-badge-ptbr.svg';
+import useIsMobile from '../../hooks/useIsMobile';
 
 export default function Footer({ waveColor = "#ffffff" }) {
+  const isMobile = useIsMobile();
+
   return (
     <footer className={styles.footer}>
 
-      {/* 🌊 ONDA NO TOPO */}
+      {/* 🌊 ONDA NO TOPO (no mobile, uma onda só, no mesmo estilo da onda
+          que fica acima do footer na home, pra combinar com ela) */}
       <svg
         viewBox="0 0 1440 120"
         preserveAspectRatio="none"
         className={styles.footerWave}
       >
         <path
-          d="M0,40C120,80,240,80,360,60C480,40,600,0,720,0C840,0,960,40,1080,60C1200,80,1320,80,1440,40L1440,0L0,0Z"
+          d={isMobile
+            ? "M0,0C480,90,960,90,1440,0L1440,0L0,0Z"
+            : "M0,40C120,80,240,80,360,60C480,40,600,0,720,0C840,0,960,40,1080,60C1200,80,1320,80,1440,40L1440,0L0,0Z"}
           fill={waveColor}
         />
       </svg>
@@ -70,6 +76,7 @@ export default function Footer({ waveColor = "#ffffff" }) {
           <div>
             <h4>CONTEÚDO</h4>
             <a href="/#artigoshome">Artigos</a>
+            <Link to="/sobre">Sobre</Link>
             <Link to="/cadastro">Cadastro</Link>
           </div>
 

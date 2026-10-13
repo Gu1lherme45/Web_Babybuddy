@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Search, KeyRound, ClipboardList } from 'lucide-react';
+import { Search, KeyRound, ClipboardList, ChevronLeft, Eye, EyeOff, User, Pencil } from 'lucide-react';
 import styles from './Perfil.module.css';
+import useIsMobile from '../../hooks/useIsMobile';
 import LogoutConfirm from '../../components/LogoutConfirm';
 import artFallback from '../../assets/art3.png';
 import artCuidados from '../../assets/art1.png';
@@ -33,6 +34,7 @@ function materialImageSrc(material) {
 
 export default function Perfil() {
   const navigate = useNavigate();
+  const isMobile = useIsMobile(900);
   const { user, updateProfile, changePassword, logout } = useAuth();
   const displayName = user?.nome?.trim() || user?.username?.split('@')[0] || 'Usuária';
   const avatarInitial = displayName.charAt(0).toUpperCase();
@@ -45,6 +47,8 @@ export default function Perfil() {
   const [passwordOpen, setPasswordOpen] = useState(false);
   const [password, setPassword] = useState('');
   const [confirmation, setConfirmation] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmation, setShowConfirmation] = useState(false);
   const [message, setMessage] = useState('');
   const [confirmLogout, setConfirmLogout] = useState(false);
 
@@ -109,12 +113,19 @@ export default function Perfil() {
       {message && <p className={styles.profileMessage} role="status">{message}</p>}
 
       {featured && <section className={styles.highlight}>
-        <div className={styles.card}>
-          <div className={styles.image}><img src={materialImageSrc(featured)} alt={`Imagem de ${featured.titulo}`} /></div>
-          <div className={styles.content}><span className={styles.category}>{featured.categoria}</span><h2>{featured.titulo}</h2>
-            <p>{featured.descricao}</p><div className={styles.footer}><span>Por {featured.autor}</span>
-              <Link to={materialPath(featured)} className={styles.button}>Ler agora</Link></div></div>
-        </div>
+        {isMobile ? (
+          <Link to={materialPath(featured)} className={styles.artigoCard} onClick={() => window.scrollTo(0, 0)}>
+            <img src={materialImageSrc(featured)} alt={`Imagem de ${featured.titulo}`} />
+            <div className={styles.cardContent}><span>{featured.categoria?.toUpperCase()}</span><h3>{featured.titulo.toUpperCase()}</h3><p>{featured.descricao}</p></div>
+          </Link>
+        ) : (
+          <div className={styles.card}>
+            <div className={styles.image}><img src={materialImageSrc(featured)} alt={`Imagem de ${featured.titulo}`} /></div>
+            <div className={styles.content}><span className={styles.category}>{featured.categoria}</span><h2>{featured.titulo}</h2>
+              <p>{featured.descricao}</p><div className={styles.footer}><span>Por {featured.autor}</span>
+                <Link to={materialPath(featured)} className={styles.button}>Ler agora</Link></div></div>
+          </div>
+        )}
       </section>}
 
       <section className={styles.artigosContainer}>
@@ -128,29 +139,85 @@ export default function Perfil() {
       </section>
 
       {sidebarOpen && <><div className={styles.overlay} onClick={() => setSidebarOpen(false)} />
+        {passwordOpen ? (
+        <aside className={styles.senhaTela} aria-label="Alterar senha">
+          <div className={styles.senhaTopo}>
+            <button type="button" className={styles.senhaVoltar} onClick={() => setPasswordOpen(false)} aria-label="Voltar">
+              <ChevronLeft size={24} />
+            </button>
+            <h2 className={styles.senhaTitulo}>Alterar Senha</h2>
+          </div>
+          <div className={styles.senhaCorpo}>
+            <label className={styles.senhaCampo}>
+              <span>Nova senha</span>
+              <div className={styles.senhaInputBox}>
+                <input type={showPassword ? 'text' : 'password'} value={password} onChange={(e) => setPassword(e.target.value)} />
+                <button type="button" onClick={() => setShowPassword((value) => !value)} aria-label={showPassword ? 'Ocultar senha' : 'Mostrar senha'}>
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
+            </label>
+            <label className={styles.senhaCampo}>
+              <span>Confirmar nova senha</span>
+              <div className={styles.senhaInputBox}>
+                <input type={showConfirmation ? 'text' : 'password'} value={confirmation} onChange={(e) => setConfirmation(e.target.value)} />
+                <button type="button" onClick={() => setShowConfirmation((value) => !value)} aria-label={showConfirmation ? 'Ocultar senha' : 'Mostrar senha'}>
+                  {showConfirmation ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
+            </label>
+            <button type="button" className={styles.senhaSalvar} onClick={savePassword}>Salvar senha</button>
+          </div>
+        </aside>
+        ) : editing ? (
+        <aside className={styles.senhaTela} aria-label="Editar perfil">
+          <div className={styles.senhaTopo}>
+            <button type="button" className={styles.senhaVoltar} onClick={() => setEditing(false)} aria-label="Voltar">
+              <ChevronLeft size={24} />
+            </button>
+            <h2 className={styles.senhaTitulo}>Editar Perfil</h2>
+          </div>
+          <div className={styles.senhaCorpo}>
+            <label className={styles.senhaCampo}>
+              <span>Nome completo</span>
+              <div className={styles.senhaInputBox}>
+                <input type="text" value={profile.nome} onChange={(e) => setProfile({ ...profile, nome: e.target.value })} />
+              </div>
+            </label>
+            <label className={styles.senhaCampo}>
+              <span>E-mail</span>
+              <div className={styles.senhaInputBox}>
+                <input type="email" value={profile.username} onChange={(e) => setProfile({ ...profile, username: e.target.value })} />
+              </div>
+            </label>
+            <button type="button" className={styles.senhaSalvar} onClick={saveProfile}>Salvar alterações</button>
+          </div>
+        </aside>
+        ) : (
         <aside className={styles.sidebar} aria-label="Dados da conta">
           <button className={styles.fecharTopo} onClick={() => setSidebarOpen(false)} aria-label="Fechar perfil">×</button>
-          <div className={styles.sidebarPerfil}><div className={styles.sidebarAvatar}>{avatarInitial}</div>
-            <p>Usuária BabyBuddy</p><h2>{displayName}</h2>
-            <button className={styles.editarPerfil} onClick={() => setEditing((value) => !value)}>{editing ? 'Cancelar' : 'Editar perfil'}</button>
+          <div className={styles.sidebarPerfil}>
+            <div className={styles.perfilCard}>
+              <div className={styles.sidebarAvatar}><User size={22} /></div>
+              <div className={styles.perfilTexto}>
+                <h2>{displayName}</h2>
+                <a href={`mailto:${profile.username}`} className={styles.perfilEmail}>{profile.username}</a>
+              </div>
+            </div>
           </div>
           <div className={styles.informacoesUsuario}>
-            <ProfileField label="Nome completo" editing={editing} value={profile.nome} onChange={(value) => setProfile({ ...profile, nome: value })} />
-            <ProfileField label="E-mail" editing={editing} value={profile.username} type="email" onChange={(value) => setProfile({ ...profile, username: value })} />
+            <ProfileField label="Nome completo" editing={false} value={profile.nome} />
+            <ProfileField label="E-mail" editing={false} value={profile.username} type="email" />
+            <button type="button" className={styles.botaoAlterarSenha} onClick={() => setEditing(true)}><Pencil size={15} /> Editar perfil</button>
             <button type="button" className={styles.botaoAlterarSenha} onClick={() => navigate('/questionario')}><ClipboardList size={15} /> Revisar questionário</button>
-            {!passwordOpen && <button type="button" className={styles.botaoAlterarSenha} onClick={() => setPasswordOpen(true)}><KeyRound size={15} /> Alterar senha</button>}
-            {passwordOpen && <div className={styles.areaSenha}>
-              <div className={styles.campoSenha}><input type="password" placeholder="Nova senha" value={password} onChange={(e) => setPassword(e.target.value)} /></div>
-              <div className={styles.campoSenha}><input type="password" placeholder="Confirmar nova senha" value={confirmation} onChange={(e) => setConfirmation(e.target.value)} /></div>
-              <div className={styles.acoesSenha}><button className={styles.cancelarSenha} onClick={() => setPasswordOpen(false)}>Cancelar</button>
-                <button className={styles.salvarSenha} onClick={savePassword}>Salvar nova senha</button></div>
-            </div>}
+            <button type="button" className={styles.botaoAlterarSenha} onClick={() => setPasswordOpen(true)}><KeyRound size={15} /> Alterar senha</button>
           </div>
           <div className={styles.acoesSidebar}>
-            {editing ? <button className={styles.salvarAlteracoes} onClick={saveProfile}>Salvar alterações</button>
-              : <button className={styles.sairConta} onClick={() => setConfirmLogout(true)}>Sair da conta</button>}
+            <button className={styles.sairConta} onClick={() => setConfirmLogout(true)}>Sair da conta</button>
           </div>
-        </aside></>}
+        </aside>
+        )}
+      </>}
 
       {confirmLogout && <div className={styles.overlayConfirmarSaida}><LogoutConfirm onConfirm={signOut} onCancel={() => setConfirmLogout(false)} /></div>}
     </div>

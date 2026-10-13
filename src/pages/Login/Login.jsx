@@ -29,7 +29,7 @@ export default function Login() {
       const destination = requested && !requested.startsWith('/administrador')
         ? requested
         : '/perfil';
-      window.setTimeout(() => navigate(destination, { replace: true }), 1200);
+      window.setTimeout(() => navigate(destination, { replace: true }), 7000);
     } catch (requestError) {
       setError(requestError.response?.status === 401
         ? 'E-mail ou senha inválidos.'

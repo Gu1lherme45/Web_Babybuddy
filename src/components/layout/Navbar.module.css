@@ -148,13 +148,12 @@
   }
 
   .logoImg {
-    height: 150px;
+    height: 184px;
 
   }
 
   .links {
-    display: flex;
-    gap: 8px 20px;
+    display: none;
   }
 
   .actions {
@@ -162,12 +161,12 @@
   }
 
   .login {
-    font-size: 14px;
+    font-size: 17px;
   }
 
   .cadastro {
-    font-size: 14px;
-    padding: 8px 14px;
+    font-size: 16px;
+    padding: 7px 16px;
   }
 }
 
@@ -178,17 +177,17 @@
   }
 
   .logoImg {
-    height: 110px;
+    height: 136px;
 
   }
 
   .login {
-    font-size: 13px;
+    font-size: 15px;
   }
 
   .cadastro {
-    font-size: 13px;
-    padding: 7px 12px;
+    font-size: 14px;
+    padding: 6px 14px;
   }
 }
 
@@ -200,11 +199,11 @@
   text-align: center;
 }
 @media (max-width: 768px) {
-  .logo { flex-basis: 120px; height: 52px; }
+  .logo { flex-basis: 140px; height: 66px; }
 }
 @media (max-width: 480px) {
   .navbar { padding: 16px 0; }
   .container { gap: 12px; }
-  .logo { flex-basis: 96px; height: 44px; }
+  .logo { flex-basis: 116px; height: 56px; }
   .actions { gap: 10px; }
 }

@@ -426,6 +426,7 @@
 }
 
 .artigoCard {
+  display: block;
   width: 260px;
   text-align: left;
 }
@@ -567,12 +568,38 @@
 @media (max-width: 768px) {
   .benefitsContainer {
     flex-direction: column;
-    align-items: flex-start;
-    padding: 2rem 1.5rem;
+    align-items: stretch;
+    gap: 16px;
+    margin: 2.5rem 1.25rem;
+    padding: 0;
+    background: transparent;
+    box-shadow: none;
+    border-radius: 0;
   }
 
   .benefitCard {
     width: 100%;
+    background: #FFD8DC;
+    border-radius: 20px;
+    padding: 1.1rem 1.25rem;
+    gap: 0.85rem;
+    box-shadow: 0 10px 24px rgba(220, 43, 116, 0.08);
+  }
+
+  .iconCircle {
+    width: 54px;
+    height: 54px;
+    min-width: 54px;
+    font-size: 1.2rem;
+  }
+
+  .benefitCard h3 {
+    font-size: 1.05rem;
+    margin-bottom: 0.2rem;
+  }
+
+  .benefitCard p {
+    font-size: 0.95rem;
   }
 }
 
@@ -602,11 +629,162 @@
   }
 }
 
+/* MOBILE: texto do hero alinhado à esquerda, sem a imagem da gestante
+   e sem os ícones redondos, com o espaçamento ajustado para ficar
+   mais próximo da navbar e da próxima section */
+@media (max-width: 768px) {
+  .hero {
+    min-height: auto;
+    padding: 56px 16px 24px;
+  }
+
+  .container {
+    text-align: left;
+    align-items: center;
+    padding-left: 0;
+  }
+
+  .left {
+    max-width: 100%;
+    padding-left: 22px;
+  }
+
+  .left h1 {
+    font-size: 2.1rem;
+    margin-bottom: 12px;
+  }
+
+  .left p {
+    margin: 0 0 18px;
+  }
+
+  .left :global(.animated-button) {
+    padding: 8px 18px;
+    font-size: 13px;
+    border-width: 2px;
+    box-shadow: 0 0 0 1.5px #DC2B74;
+  }
+
+  .left :global(.animated-button) svg {
+    width: 18px;
+  }
+
+  .features {
+    display: none;
+  }
+
+  .right {
+    display: none;
+  }
+
+  .sectionBabyTitle,
+  .sectionBabyText {
+    text-align: left;
+  }
+
+  /* imagem do celular um pouco maior, sangrando até a borda da tela */
+  .sectionBabyImage {
+    max-width: none;
+    width: calc(100% + 32px);
+    margin: 0 -16px;
+  }
+
+  /* carrossel dos artigos: um card centralizado por vez, com setas */
+  .artigoCarrossel {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    margin-bottom: 24px;
+  }
+
+  .artigoCarrosselTrack {
+    overflow: hidden;
+  }
+
+  .artigoCarrossel .artigoCard {
+    width: min(52vw, 175px);
+  }
+
+  .artigoCarrossel .artigoCard img {
+    margin-bottom: 8px;
+  }
+
+  .artigoCarrossel .artigoCard h3 {
+    font-size: 0.75rem;
+    margin-bottom: 4px;
+  }
+
+  .artigoCarrossel .artigoCard p {
+    font-size: 0.7rem;
+    line-height: 1.25;
+  }
+
+  .setaArtigo {
+    flex-shrink: 0;
+    border: 0;
+    background: none;
+    padding: 10px;
+    color: #DC2B74;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 3;
+  }
+
+  .setaArtigo:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+
+  .artigoDots {
+    position: absolute;
+    bottom: -26px;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+  }
+
+  .dot,
+  .dotAtivo {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #f3cde0;
+  }
+
+  .dotAtivo {
+    background: #DC2B74;
+    width: 16px;
+    border-radius: 4px;
+  }
+
+  .artigosTitle {
+    margin-bottom: 28px;
+  }
+}
+
 @media (max-width: 768px) {
   .sectionBaby,
   .sectionFeatures,
   .sectionArtigos {
     padding: 80px 16px;
+  }
+
+  /* "Principais Artigos" + carrossel centralizados entre as duas ondas
+     (a de cima, com a section Features, e a de baixo, com o footer) */
+  .sectionArtigos {
+    padding-top: 88px;
+    padding-bottom: 30px;
+  }
+
+  /* imagem do celular mais próxima do fim da home */
+  .sectionBaby {
+    padding-top: 48px;
   }
 
   .babyTitle,

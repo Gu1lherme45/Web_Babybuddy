@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
+import { AnimatePresence, motion } from "framer-motion";
 import {
   CalendarDays,
   ClipboardCheck,
@@ -12,28 +13,70 @@ import {
   ShieldCheck,
   Heart,
   BarChart3,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 
 import styles from "./Home.module.css";
 import AnimatedButton from "../../components/AnimatedButton";
+import useIsMobile from "../../hooks/useIsMobile";
 
 import Mobile from "../../assets/mobile.svg";
 import imgGravida from "../../assets/imggravidahome3.svg";
 
 import art1 from "../../assets/art1.png";
+import art2 from "../../assets/art2.png";
+import art3 from "../../assets/art3.png";
 import { absoluteApiUrl } from "../../services/api";
 import { listPublicMaterials } from "../../services/materialService";
 import facilidade from "../../assets/facilidade.png";
 import informacoes from "../../assets/informações.png";
 import privacidade from "../../assets/privacidade.png";
 
+function semAcentos(texto) {
+  return (texto || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLocaleLowerCase("pt-BR");
+}
+
+// Se o artigo ainda não tem imagem própria cadastrada no painel, usa o
+// retrato de reserva do seu próprio card (não de um tema "adivinhado" pelo
+// texto, pra nunca pegar a imagem errada entre os 3 destaques).
+function imagemMaterial(material) {
+  const origem = material.imagem || material.capa;
+  return origem ? absoluteApiUrl(origem) : (material.imagemPadrao || art1);
+}
+
+// Os 3 artigos fixos que sempre aparecem em "Principais Artigos", nesta ordem.
+// O match é pela rota (ou, na falta dela, pelo título exato) — nunca por
+// categoria "parecida", pra um artigo como "Amamentação" (mesma categoria de
+// "Cuidados com o Bebê") não entrar aqui por engano.
+const ARTIGOS_DESTAQUE = [
+  { rota: "/periodo-gestacional", titulo: "periodo gestacional", imagemPadrao: art3 },
+  { rota: "/tentando-engravidar", titulo: "tentando engravidar", imagemPadrao: art2 },
+  { rota: "/cuidados-bebe", titulo: "cuidados com o bebe", imagemPadrao: art1 },
+];
+
 export default function Home() {
   const location = useLocation();
   const [materiais, setMateriais] = useState([]);
+  const [artigoIndex, setArtigoIndex] = useState(0);
+  const [direcaoArtigo, setDirecaoArtigo] = useState(1);
+  const isMobile = useIsMobile();
+
+  const destaques = useMemo(() => ARTIGOS_DESTAQUE
+    .map(({ rota, titulo, imagemPadrao }) => {
+      const material = materiais.find((item) => item.link === rota)
+        || materiais.find((item) => semAcentos(item.titulo) === titulo);
+      return material ? { ...material, imagemPadrao } : null;
+    })
+    .filter(Boolean), [materiais]);
 
   useEffect(() => {
     listPublicMaterials().then(setMateriais).catch(() => setMateriais([]));
   }, []);
+
+  useEffect(() => {
+    setArtigoIndex(0);
+  }, [destaques.length]);
 
   useEffect(() => {
     if (location.hash) {
@@ -275,7 +318,9 @@ export default function Home() {
           className={styles.waveTopArtigos}
         >
           <path
-            d="M0,0C120,60,240,100,360,90C480,80,600,40,720,40C840,40,960,80,1080,90C1200,100,1320,60,1440,0L1440,0L0,0Z"
+            d={isMobile
+              ? "M0,0C480,110,960,110,1440,0L1440,0L0,0Z"
+              : "M0,0C120,60,240,100,360,90C480,80,600,40,720,40C840,40,960,80,1080,90C1200,100,1320,60,1440,0L1440,0L0,0Z"}
             fill="#FFD8DC"
           />
         </svg>
@@ -283,22 +328,72 @@ export default function Home() {
         <div className={styles.artigosContainer}>
           <h2 className={styles.artigosTitle}>Principais Artigos</h2>
 
-          <div className={styles.artigosGrid}>
-            {materiais.map((material) => (
-              <Link
-                key={material.id}
-                to={material.arquivo ? `/artigos/${material.id}` : material.link || `/artigos/${material.id}`}
-                className={styles.artigoCard}
-                onClick={() => window.scrollTo(0, 0)}
-              >
-                <img src={material.imagem || material.capa ? absoluteApiUrl(material.imagem || material.capa) : art1} alt={`Imagem de ${material.titulo}`} />
-                <h3>{material.titulo.toUpperCase()}</h3>
-                <p>{material.descricao}</p>
-              </Link>
-            ))}
-          </div>
+          {isMobile ? (
+            destaques.length > 0 && (
+              <div className={styles.artigoCarrossel}>
+                <button
+                  type="button"
+                  className={styles.setaArtigo}
+                  onClick={() => { setDirecaoArtigo(-1); setArtigoIndex((i) => i - 1); }}
+                  disabled={artigoIndex <= 0}
+                  aria-label="Artigo anterior"
+                >
+                  <ChevronLeft size={16} />
+                </button>
+
+                <div className={styles.artigoCarrosselTrack}>
+                  <AnimatePresence mode="wait" initial={false} custom={direcaoArtigo}>
+                    <motion.div
+                      key={destaques[artigoIndex].id}
+                      custom={direcaoArtigo}
+                      initial={{ opacity: 0, x: direcaoArtigo * 28 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -direcaoArtigo * 28 }}
+                      transition={{ duration: 0.28, ease: "easeOut" }}
+                    >
+                      <ArtigoCard material={destaques[artigoIndex]} />
+                    </motion.div>
+                  </AnimatePresence>
+                </div>
+
+                <button
+                  type="button"
+                  className={styles.setaArtigo}
+                  onClick={() => { setDirecaoArtigo(1); setArtigoIndex((i) => i + 1); }}
+                  disabled={artigoIndex >= destaques.length - 1}
+                  aria-label="Próximo artigo"
+                >
+                  <ChevronRight size={16} />
+                </button>
+
+                <div className={styles.artigoDots}>
+                  {destaques.map((material, i) => (
+                    <span key={material.id} className={i === artigoIndex ? styles.dotAtivo : styles.dot} />
+                  ))}
+                </div>
+              </div>
+            )
+          ) : (
+            <div className={styles.artigosGrid}>
+              {destaques.map((material) => <ArtigoCard key={material.id} material={material} />)}
+            </div>
+          )}
         </div>
       </section>
     </div>
+  );
+}
+
+function ArtigoCard({ material }) {
+  return (
+    <Link
+      to={material.arquivo ? `/artigos/${material.id}` : material.link || `/artigos/${material.id}`}
+      className={styles.artigoCard}
+      onClick={() => window.scrollTo(0, 0)}
+    >
+      <img src={imagemMaterial(material)} alt={`Imagem de ${material.titulo}`} />
+      <h3>{material.titulo.toUpperCase()}</h3>
+      <p>{material.descricao}</p>
+    </Link>
   );
 }

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { motion as Motion, AnimatePresence } from "framer-motion";
 import Loader from "./Loader";
+import styles from "./PageWrapper.module.css";
 
 const pageVariants = {
   initial: { opacity: 0, y: 12 },
@@ -9,7 +10,6 @@ const pageVariants = {
 };
 
 const LOADER_DURATION = 700;
-const LOADER_SIZE = "clamp(140px, 20vmin, 260px)";
 
 export default function PageWrapper({ children, skipLoader = false, duration = LOADER_DURATION }) {
   const [loading, setLoading] = useState(!skipLoader);
@@ -38,7 +38,7 @@ export default function PageWrapper({ children, skipLoader = false, duration = L
             background: "#ffffff",
           }}
         >
-          <div style={{ width: LOADER_SIZE, aspectRatio: "64 / 48" }}>
+          <div className={styles.loaderBox}>
             <Loader />
           </div>
         </Motion.div>

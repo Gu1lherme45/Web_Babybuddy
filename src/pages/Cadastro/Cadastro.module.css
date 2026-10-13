@@ -195,6 +195,57 @@
   color: #9aa3b2;
 }
 
+/* DICAS DE SENHA (aparecem ao usar o campo, no lugar do texto fixo) */
+.passwordHints {
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 10px 14px;
+  border: 1px solid #dfe3eb;
+  border-radius: 12px;
+  background: #fafbfc;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  animation: aparecerDicas 0.15s ease;
+}
+
+@keyframes aparecerDicas {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.passwordHints li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12.5px;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.hintIcon {
+  flex-shrink: 0;
+  font-size: 14px !important;
+}
+
+.hintPendente {
+  color: #6b7280;
+}
+
+.hintPendente .hintIcon {
+  color: #9aa3b2;
+}
+
+.hintOk {
+  color: #2e7d4f;
+}
+
+.hintOk .hintIcon {
+  color: #2e7d4f;
+}
+
 .eye {
   cursor: pointer;
 }
@@ -409,8 +460,10 @@
     font-size: 38px;
   }
 
-  .description {
-    font-size: 15px;
+  /* no mobile fica só o título; descrição e os 3 itens com ícone somem */
+  .description,
+  .features {
+    display: none;
   }
 
   .card {

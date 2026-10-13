@@ -152,6 +152,9 @@
   .toolbar { align-items: flex-start; flex-direction: column; }
   .documentActions, .pageControls { width: 100%; justify-content: center; }
   .viewer { padding: 10px; }
+
+  /* batimento proporcionalmente menor no mobile */
+  .heartbeat { width: clamp(90px, 24vmin, 200px); }
 }
 
 @media (max-width: 480px) {

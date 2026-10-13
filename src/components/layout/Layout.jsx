@@ -25,6 +25,9 @@ export default function Layout() {
 
   const isArticle = STATIC_ARTICLE_PATHS.includes(location.pathname)
     || /^\/artigos\/\d+$/.test(location.pathname);
+  // Páginas de cadastro/edição de artigo no painel têm fundo rosa clarinho
+  // (MaterialForm.module.css), diferente do branco das demais telas do admin
+  const isMaterialForm = location.pathname.startsWith('/administrador/materiais');
   const fast = ['/login', '/cadastro', ...STATIC_ARTICLE_PATHS].includes(location.pathname) || isArticle;
   const skipLoader = location.pathname.startsWith('/administrador')
     || (location.pathname === '/questionario' && ['/cadastro', '/perfil'].includes(previous))
@@ -39,7 +42,7 @@ export default function Layout() {
           <Outlet />
         </PageWrapper>
       </AnimatePresence>
-      <Footer waveColor={isArticle ? '#f5f5f5' : WAVE_COLORS[location.pathname] || '#ffffff'} />
+      <Footer waveColor={isArticle ? '#f5f5f5' : isMaterialForm ? '#fff8fb' : WAVE_COLORS[location.pathname] || '#ffffff'} />
     </>
   );
 }
