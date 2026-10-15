@@ -389,6 +389,12 @@
   top: 24px;
   left: 50%;
   transform: translateX(-50%);
+  /* "left:50%" sozinho faz o navegador calcular a largura automática
+     como se o espaço disponível fosse só até a borda direita da tela
+     (o translateX de recentralização só é aplicado depois, visualmente),
+     então o texto quebrava linha no mobile sem necessidade */
+  width: max-content;
+  white-space: nowrap;
   z-index: 1000;
   display: flex;
   align-items: center;

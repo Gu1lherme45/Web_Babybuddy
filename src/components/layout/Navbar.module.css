@@ -44,6 +44,11 @@
   max-width: none;
   flex-shrink: 0;
   display: block;
+  /* o texto "BABYBUDDY" dentro do svg fica na metade de baixo do próprio
+     canvas (tem muito espaço vazio acima dele), então centralizar a
+     imagem inteira no recorte de 64px deixa o texto visivelmente mais
+     baixo que a linha dos links — esse ajuste sobe só o texto de volta */
+  transform: translateY(-4px);
 }
 .navbar a:focus-visible {
   outline: 3px solid #a41658;

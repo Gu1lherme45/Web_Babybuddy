@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { AnimatePresence, motion as Motion } from "framer-motion";
 import { Info } from "lucide-react";
 import styles from "./Questionario.module.css";
+import useIsMobile from "../../hooks/useIsMobile";
 
 import logo from "../../assets/logoofc3.svg";
 import heartQuestion from "../../assets/heartquestion.png";
@@ -23,6 +24,12 @@ import {
 
 // formato YYYY-MM-DD (exigido pelo input date) respeitando o fuso local
 const hoje = new Date().toLocaleDateString("sv-SE");
+
+// idade mínima permitida para usar o app: 13 anos
+const IDADE_MINIMA = 13;
+const dataLimiteIdadeMinima = new Date();
+dataLimiteIdadeMinima.setFullYear(dataLimiteIdadeMinima.getFullYear() - IDADE_MINIMA);
+const dataMaximaNascimento = dataLimiteIdadeMinima.toLocaleDateString("sv-SE");
 
 const SEMANAS_GESTACAO_PADRAO = 40;
 const TOLERANCIA_DPP_DIAS = 7;
@@ -237,6 +244,7 @@ const ETAPAS = [
 ];
 
 export default function Questionario() {
+  const isMobile = useIsMobile();
   const [step, setStep] = useState(0);
   const [dados, setDados] = useState(ESTADO_INICIAL);
   const [errors, setErrors] = useState({});
@@ -245,6 +253,7 @@ export default function Questionario() {
   const [erroCarregamento, setErroCarregamento] = useState("");
   const [gestanteExistente, setGestanteExistente] = useState(null);
   const [questionarioExistente, setQuestionarioExistente] = useState(null);
+  const [dppTextoExpandido, setDppTextoExpandido] = useState(false);
 
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -333,6 +342,8 @@ export default function Questionario() {
       } else if (campo === "dataNascimento") {
         if (valor > hoje) {
           novosErros[campo] = "A data de nascimento não pode ser no futuro.";
+        } else if (valor > dataMaximaNascimento) {
+          novosErros[campo] = `Você precisa ter pelo menos ${IDADE_MINIMA} anos para usar o BabyBuddy.`;
         }
       } else if (valor < hoje) {
         novosErros[campo] = "A data não pode ser anterior a hoje.";
@@ -473,7 +484,7 @@ export default function Questionario() {
 
     if (tipo === "date") {
       const limiteData =
-        campo === "dataNascimento" ? { max: hoje } : { min: hoje };
+        campo === "dataNascimento" ? { max: dataMaximaNascimento } : { min: hoje };
 
       return (
         <div className={styles.fieldGroup}>
@@ -488,8 +499,20 @@ export default function Questionario() {
 
           {campo === "dpp" && dados.semanaGestacao && !errors[campo] && (
             <div className={styles.dppCard}>
-              <Info size={16} className={styles.dppIcon} aria-hidden="true" />
-              <span className={styles.dppText}>
+              {isMobile ? (
+                <button
+                  type="button"
+                  className={styles.dppIconButton}
+                  onClick={() => setDppTextoExpandido((valor) => !valor)}
+                  aria-label={dppTextoExpandido ? "Ocultar texto completo" : "Mostrar texto completo"}
+                  aria-expanded={dppTextoExpandido}
+                >
+                  <Info size={16} className={styles.dppIcon} aria-hidden="true" />
+                </button>
+              ) : (
+                <Info size={16} className={styles.dppIcon} aria-hidden="true" />
+              )}
+              <span className={`${styles.dppText} ${isMobile && dppTextoExpandido ? styles.dppTextExpanded : ""}`}>
                 Data sugerida para {dados.semanaGestacao} semanas de gestação - ajuste +{TOLERANCIA_DPP_DIAS} dias
               </span>
             </div>
@@ -667,10 +690,26 @@ export default function Questionario() {
                 : "Sua saúde importa"}
             </h1>
 
-            <p>
-              {questionarioExistente
-                ? "Revise suas respostas quando quiser para manter seu acompanhamento atualizado."
-                : "Para oferecer a melhor experiência personalizada, começaremos com um rápido questionário de saúde."}
+            <p className={isMobile ? styles.reviewText : undefined}>
+              {questionarioExistente ? (
+                isMobile ? (
+                  <>
+                    Revise suas respostas quando quiser
+                    <br />
+                    para manter seu acompanhamento atualizado.
+                  </>
+                ) : (
+                  "Revise suas respostas quando quiser para manter seu acompanhamento atualizado."
+                )
+              ) : isMobile ? (
+                <>
+                  Para a melhor experiência personalizada
+                  <br />
+                  começaremos com um questionário de saúde.
+                </>
+              ) : (
+                "Para oferecer a melhor experiência personalizada, começaremos com um rápido questionário de saúde."
+              )}
             </p>
 
             {erroCarregamento && (
@@ -682,8 +721,8 @@ export default function Questionario() {
             <div className={styles.introActions}>
               <AnimatedButton large onClick={() => setStep(1)}>
                 {questionarioExistente
-                  ? "REVISAR QUESTIONÁRIO DE SAÚDE"
-                  : "INICIAR QUESTIONÁRIO DE SAÚDE"}
+                  ? (isMobile ? "Revisar questionário" : "REVISAR QUESTIONÁRIO DE SAÚDE")
+                  : (isMobile ? "Questionário de saúde" : "INICIAR QUESTIONÁRIO DE SAÚDE")}
               </AnimatedButton>
             </div>
           </Motion.section>

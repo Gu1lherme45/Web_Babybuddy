@@ -580,26 +580,31 @@
   .benefitCard {
     width: 100%;
     background: #FFD8DC;
-    border-radius: 20px;
-    padding: 1.1rem 1.25rem;
-    gap: 0.85rem;
+    border-radius: 18px;
+    padding: 0.85rem 1rem;
+    gap: 0.7rem;
     box-shadow: 0 10px 24px rgba(220, 43, 116, 0.08);
   }
 
   .iconCircle {
-    width: 54px;
-    height: 54px;
-    min-width: 54px;
-    font-size: 1.2rem;
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    font-size: 1rem;
+  }
+
+  .iconCircle svg {
+    width: 20px;
+    height: 20px;
   }
 
   .benefitCard h3 {
-    font-size: 1.05rem;
-    margin-bottom: 0.2rem;
+    font-size: 0.92rem;
+    margin-bottom: 0.15rem;
   }
 
   .benefitCard p {
-    font-size: 0.95rem;
+    font-size: 0.82rem;
   }
 }
 
@@ -645,8 +650,8 @@
   }
 
   .left {
+    width: 100%;
     max-width: 100%;
-    padding-left: 22px;
   }
 
   .left h1 {
@@ -658,15 +663,33 @@
     margin: 0 0 18px;
   }
 
-  .left :global(.animated-button) {
-    padding: 8px 18px;
-    font-size: 13px;
+  /* especificidade dobrada de propósito: o styled-components do
+     AnimatedButton injeta `.algumaClasse .animated-button` com a mesma
+     especificidade dessa regra, e como o CSS dele é injetado depois,
+     ele vencia a cascata e o botão nunca encolhia de fato no mobile */
+  .left :global(.animated-button.animated-button) {
+    padding: 9px 30px 9px 22px;
+    font-size: 14px;
     border-width: 2px;
     box-shadow: 0 0 0 1.5px #DC2B74;
+    justify-content: center;
   }
 
-  .left :global(.animated-button) svg {
-    width: 18px;
+  .left :global(.animated-button.animated-button) svg {
+    width: 16px;
+  }
+
+  /* afasta um pouco mais a seta do texto */
+  .left :global(.animated-button.animated-button) :global(.arr-1) {
+    right: 10px;
+  }
+
+  /* o .text é o único filho do botão que fica no fluxo normal (as setas e
+     o círculo são position:absolute), e o styled-component desloca ele
+     -12px pra esquerda — proporção boa no botão grande, mas no mobile
+     (bem menor) isso sozinho já desequilibra o texto pro lado esquerdo */
+  .left :global(.animated-button.animated-button) :global(.text) {
+    transform: translateX(-8px);
   }
 
   .features {
@@ -682,11 +705,45 @@
     text-align: left;
   }
 
-  /* imagem do celular um pouco maior, sangrando até a borda da tela */
-  .sectionBabyImage {
-    max-width: none;
-    width: calc(100% + 32px);
-    margin: 0 -16px;
+  /* imagem do celular removida no mobile */
+  .sectionBabyLeft {
+    display: none;
+  }
+
+  /* conteúdo da section "BabyBuddy" um pouco mais compacto no mobile */
+  .sectionBabyTitle {
+    font-size: 1.7rem;
+    margin-bottom: 12px;
+  }
+
+  .sectionBabyText {
+    font-size: 0.92rem;
+    margin-bottom: 20px;
+  }
+
+  .sectionBabyItem {
+    gap: 12px;
+    padding: 10px 0;
+  }
+
+  .sectionBabyIcon {
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
+  }
+
+  .sectionBabyIcon svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .sectionBabyItem h3 {
+    font-size: 0.95rem;
+    margin-bottom: 2px;
+  }
+
+  .sectionBabyItem p {
+    font-size: 0.82rem;
   }
 
   /* carrossel dos artigos: um card centralizado por vez, com setas */
@@ -795,6 +852,24 @@
   .containerFeatures {
     flex-direction: column;
     align-items: center;
+    gap: 28px;
+  }
+
+  /* conteúdo da section Features mais compacto no mobile: ícone mais perto
+     do título, título menor (quebra menos linha) e texto mais enxuto */
+  .featureItem img {
+    width: 64px;
+    margin-bottom: 6px;
+  }
+
+  .featureItem h3 {
+    font-size: 1.1rem;
+    margin-bottom: 6px;
+  }
+
+  .featureItem p {
+    font-size: 0.85rem;
+    line-height: 1.35;
   }
 
   .waveBottomFeatures,

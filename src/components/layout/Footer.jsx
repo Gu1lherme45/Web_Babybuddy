@@ -1,8 +1,6 @@
 import { Link } from 'react-router-dom';
 import styles from './Footer.module.css';
-import logo from '../../assets/logoofcc.png';
-import googlePlayBadge from '../../assets/googleplay-badge-ptbr.png';
-import appStoreBadge from '../../assets/appstore-badge-ptbr.svg';
+import logo from '../../assets/logoofcpink.svg';
 import useIsMobile from '../../hooks/useIsMobile';
 
 export default function Footer({ waveColor = "#ffffff" }) {
@@ -28,35 +26,9 @@ export default function Footer({ waveColor = "#ffffff" }) {
 
       <div className={styles.container}>
 
-        {/* Logo + Stores */}
+        {/* Logo */}
         <div className={styles.left}>
           <img src={logo} alt="BabyBuddy Logo" className={styles.logo} />
-
-          <div className={styles.stores}>
-            <a
-              href="https://play.google.com/store"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <img
-                src={googlePlayBadge}
-                alt="Disponível no Google Play"
-                className={`${styles.storeIcon} ${styles.play}`}
-              />
-            </a>
-
-            <a
-              href="https://www.apple.com/app-store/"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <img
-                src={appStoreBadge}
-                alt="Baixar na App Store"
-                className={`${styles.storeIcon} ${styles.apple}`}
-              />
-            </a>
-          </div>
         </div>
 
         {/* Links */}

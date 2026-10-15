@@ -117,30 +117,6 @@
 }
 
 
-.fecharTopo {
-  position: absolute;
-  top: 25px;
-  right: 25px;
-  border: none;
-  background: #fdecef;
-  color: #DC2B74;
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  font-size: 25px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: 0.3s;
-}
-
-.fecharTopo:hover {
-  background: #DC2B74;
-  color: white;
-}
-
-
 /* SIDEBAR */
 .sidebar {
   position: fixed;
@@ -231,6 +207,11 @@
   height: 40px;
 }
 
+/* usada só nos campos de nome/e-mail do Editar Perfil */
+.senhaInputBoxBordered {
+  border: 1px solid #f0d7e0;
+}
+
 .senhaInputBox input {
   flex: 1;
   min-width: 0;
@@ -290,12 +271,6 @@
 }
 
 
-
-.informacoesUsuario {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-}
 
 /* ÁREA PRINCIPAL DO PERFIL: ícone, nome e e-mail lado a lado, num card */
 .sidebarPerfil {
@@ -446,6 +421,7 @@
 
 .fecharTopo:hover {
   color: #b9205d;
+  background: transparent;
   transform: scale(1.05);
 }
 
@@ -476,66 +452,6 @@
   background: #fdecef;
 }
 
-.infoItem {
-  background: #fff4f8;
-  border-radius: 12px;
-  padding: 12px 15px;
-  border: 1px solid #fde1eb;
-}
-
-
-
-.infoItem span {
-  font-size: 12px;
-  color: #a06b80;
-  margin-bottom: 4px;
-}
-
-
-.infoItem p {
-  font-size: 14px;
-  color: #333;
-  font-weight: 500;
-}
-
-
-.acoesSidebar {
-  margin-top: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-
-.sairConta {
-  display: block;
-  width: 280px;
-  margin: 25px auto 0;
-  padding: 11px 20px;
-  border: 1.5px solid #DC2B74;
-  border-radius: 30px;
-  background: #fff;
-  color: #DC2B74;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all .25s ease;
-  box-shadow: 0 2px 8px rgba(220, 43, 116, 0.12);
-}
-
-.sairConta:hover {
-  background: #DC2B74;
-  color: #fff;
-  border-color: #DC2B74;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 15px rgba(220, 43, 116, 0.25);
-}
-
-.sairConta:hover {
-  background: #b9215d;
-}
-
-
 .fecharSidebar {
   background: #f7dce7;
   color: #DC2B74;
@@ -558,72 +474,6 @@
 
 }
 
-
-
-/* INFORMAÇÕES DO USUÁRIO */
-
-.informacoesUsuario {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-
-/* CARD DE CADA INFORMAÇÃO */
-.infoItem {
-  background: transparent;
-  border: 0;
-  border-radius: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-}
-
-
-/* TITULO DO CAMPO */
-.infoItem span {
-  font-size: 11px;
-  line-height: 1.2;
-  color: #a06b80;
-  font-weight: 600;
-}
-
-
-/* TEXTO NORMAL (caixa igual à do Editar Perfil) */
-.infoItem p {
-  margin: 0;
-  height: 40px;
-  padding: 0 14px;
-  display: flex;
-  align-items: center;
-  background: #ffffff;
-  border-radius: 12px;
-  font-size: 14px;
-  color: #333;
-  font-weight: 500;
-}
-
-
-
-
-/* INPUTS DE EDIÇÃO */
-.infoItem input {
-  width: 90%;
-  padding: 8px 10px;
-  border-radius: 8px;
-  border: 1px solid #e9bfd2;
-  backGround: white;
-  font-size: 14px;
-  outline: none;
-  margin-top: 5px;
-}
-
-
-.infoItem input:focus {
-  border-color: #DC2B74;
-  box-shadow: 0 0 0 3px #fdecef;
-}
 
 
 /* SENHA */
@@ -649,33 +499,75 @@
   align-items: center;
 }
 
-/* ALTERAÇÃO DE SENHA */
-.botaoAlterarSenha {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    width: 100%;
-    margin-top: 2px;
-    padding: 10px;
-    border: 1px solid #f2d3e1;
-    border-radius: 10px;
-    background: #fff;
-    color: #DC2B74;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: .25s ease;
+/* MENU DA SIDEBAR (Minha conta / Informações / Sessão) */
+.menuSection {
+  margin-top: 22px;
 }
 
-.botaoAlterarSenha:hover {
-    background: #fdecef;
-    border-color: #DC2B74;
+.menuSection:first-of-type {
+  margin-top: 0;
 }
 
-/* afasta só o primeiro botão do campo de e-mail acima dele */
-.informacoesUsuario > .botaoAlterarSenha:first-of-type {
-    margin-top: 16px;
+.menuSectionLabel {
+  display: block;
+  margin-bottom: 10px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: #9a9a9a;
+  text-transform: uppercase;
+}
+
+.menuGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.menuItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #f0f0f0;
+  border-radius: 14px;
+  background: #fff;
+  color: #1d1d1d;
+  text-decoration: none;
+  font-family: inherit;
+  cursor: pointer;
+  transition: .2s ease;
+}
+
+.menuItem:is(button, a):hover {
+  border-color: #f2d3e1;
+  background: #fffafb;
+}
+
+.menuItemIcon {
+  width: 34px;
+  height: 34px;
+  min-width: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  background: #f6f6f6;
+  color: #333;
+}
+
+.menuItemLabel {
+  flex: 1;
+  text-align: left;
+  font-size: 14px;
+  font-weight: 600;
+  color: #1d1d1d;
+}
+
+.menuItemChevron {
+  flex-shrink: 0;
+  color: #c7c7c7;
 }
 
 

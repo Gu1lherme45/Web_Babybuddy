@@ -688,11 +688,13 @@ h2 {
 @media (max-width: 768px) {
   .firstSection h1 {
     font-size: 52px;
+    margin-bottom: 8px;
   }
 
   .firstSection p {
     font-size: 22px;
     max-width: 90%;
+    margin-top: 0;
   }
 
   .startButton {
@@ -700,8 +702,28 @@ h2 {
     height: 65px;
   }
 
+  /* botão "INICIAR/REVISAR QUESTIONÁRIO DE SAÚDE": é o AnimatedButton
+     variante "large", cujo styled-component usa `&.large .animated-button`
+     (3 classes de especificidade) — precisa de 4 aqui pra vencer, já que
+     ele é injetado depois e empate de especificidade vai por ordem */
+  .introActions :global(.animated-button.animated-button.animated-button) {
+    height: 48px;
+    padding: 0 22px;
+    font-size: 14px;
+    text-transform: uppercase;
+  }
+
+  .introActions :global(.animated-button.animated-button.animated-button) svg {
+    width: 18px;
+  }
+
   .heartImage {
-    width: 130px;
+    width: 165px;
+  }
+
+  .logo {
+    width: 150px;
+    margin-top: -24px;
   }
 
   .stepsImage {
@@ -738,7 +760,7 @@ h2 {
   }
 
   .logo {
-    width: 72px;
+    width: 110px;
     margin-top: -15px;
   }
 
@@ -748,6 +770,18 @@ h2 {
 
   .firstSection p {
     font-size: 18px;
+  }
+
+  /* garante que cada linha do <br/> manual fique numa única linha, sem
+     quebrar de novo sozinha por falta de espaço (.firstSection p tem
+     max-width:90%, então precisa de mais especificidade pra vencer) */
+  .firstSection p.reviewText {
+    /* .firstSection é flex com align-items:center, então um filho sem
+       width explícita encolhe pro tamanho do próprio conteúdo em vez de
+       ocupar o espaço disponível — max-width sozinho não adianta aqui */
+    width: 100%;
+    max-width: 100%;
+    font-size: 14px;
   }
 
   .startButton {
@@ -811,6 +845,19 @@ h2 {
   flex-shrink: 0;
 }
 
+/* só existe no mobile: o ícone vira um botão clicável pra revelar o
+   texto completo da dica, que fica cortado com reticências na tela
+   estreita */
+.dppIconButton {
+  display: flex;
+  flex-shrink: 0;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
 .dppText {
   position: relative;
   top: 1px;
@@ -818,6 +865,12 @@ h2 {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.dppTextExpanded {
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
 }
 
 /* ANIMAÇÃO DE CARREGAMENTO (batimento) */

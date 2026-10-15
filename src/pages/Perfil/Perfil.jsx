@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Search, KeyRound, ClipboardList, ChevronLeft, Eye, EyeOff, User, Pencil } from 'lucide-react';
+import { Search, ClipboardList, ChevronLeft, ChevronRight, Eye, EyeOff, User, Pencil, Shield, FileText, Check, Globe, LogOut } from 'lucide-react';
 import styles from './Perfil.module.css';
 import useIsMobile from '../../hooks/useIsMobile';
 import LogoutConfirm from '../../components/LogoutConfirm';
@@ -180,13 +180,13 @@ export default function Perfil() {
           <div className={styles.senhaCorpo}>
             <label className={styles.senhaCampo}>
               <span>Nome completo</span>
-              <div className={styles.senhaInputBox}>
+              <div className={`${styles.senhaInputBox} ${styles.senhaInputBoxBordered}`}>
                 <input type="text" value={profile.nome} onChange={(e) => setProfile({ ...profile, nome: e.target.value })} />
               </div>
             </label>
             <label className={styles.senhaCampo}>
               <span>E-mail</span>
-              <div className={styles.senhaInputBox}>
+              <div className={`${styles.senhaInputBox} ${styles.senhaInputBoxBordered}`}>
                 <input type="email" value={profile.username} onChange={(e) => setProfile({ ...profile, username: e.target.value })} />
               </div>
             </label>
@@ -205,15 +205,56 @@ export default function Perfil() {
               </div>
             </div>
           </div>
-          <div className={styles.informacoesUsuario}>
-            <ProfileField label="Nome completo" editing={false} value={profile.nome} />
-            <ProfileField label="E-mail" editing={false} value={profile.username} type="email" />
-            <button type="button" className={styles.botaoAlterarSenha} onClick={() => setEditing(true)}><Pencil size={15} /> Editar perfil</button>
-            <button type="button" className={styles.botaoAlterarSenha} onClick={() => navigate('/questionario')}><ClipboardList size={15} /> Revisar questionário</button>
-            <button type="button" className={styles.botaoAlterarSenha} onClick={() => setPasswordOpen(true)}><KeyRound size={15} /> Alterar senha</button>
+          <div className={styles.menuSection}>
+            <span className={styles.menuSectionLabel}>Minha conta</span>
+            <div className={styles.menuGroup}>
+              <button type="button" className={styles.menuItem} onClick={() => setEditing(true)}>
+                <span className={styles.menuItemIcon}><Pencil size={18} /></span>
+                <span className={styles.menuItemLabel}>Dados Pessoais</span>
+                <ChevronRight size={18} className={styles.menuItemChevron} />
+              </button>
+              <button type="button" className={styles.menuItem} onClick={() => setPasswordOpen(true)}>
+                <span className={styles.menuItemIcon}><Shield size={18} /></span>
+                <span className={styles.menuItemLabel}>Alterar Senha</span>
+                <ChevronRight size={18} className={styles.menuItemChevron} />
+              </button>
+              <button type="button" className={styles.menuItem} onClick={() => navigate('/questionario')}>
+                <span className={styles.menuItemIcon}><ClipboardList size={18} /></span>
+                <span className={styles.menuItemLabel}>Revisar Questionário</span>
+                <ChevronRight size={18} className={styles.menuItemChevron} />
+              </button>
+            </div>
           </div>
-          <div className={styles.acoesSidebar}>
-            <button className={styles.sairConta} onClick={() => setConfirmLogout(true)}>Sair da conta</button>
+
+          <div className={styles.menuSection}>
+            <span className={styles.menuSectionLabel}>Informações</span>
+            <div className={styles.menuGroup}>
+              <Link to="/politica-de-privacidade" className={styles.menuItem}>
+                <span className={styles.menuItemIcon}><FileText size={18} /></span>
+                <span className={styles.menuItemLabel}>Política de Privacidade</span>
+                <ChevronRight size={18} className={styles.menuItemChevron} />
+              </Link>
+              <Link to="/termos-de-uso" className={styles.menuItem}>
+                <span className={styles.menuItemIcon}><Check size={18} /></span>
+                <span className={styles.menuItemLabel}>Termos de Uso</span>
+                <ChevronRight size={18} className={styles.menuItemChevron} />
+              </Link>
+              <div className={styles.menuItem}>
+                <span className={styles.menuItemIcon}><Globe size={18} /></span>
+                <span className={styles.menuItemLabel}>Português - Brasil</span>
+              </div>
+            </div>
+          </div>
+
+          <div className={styles.menuSection}>
+            <span className={styles.menuSectionLabel}>Sessão</span>
+            <div className={styles.menuGroup}>
+              <button type="button" className={styles.menuItem} onClick={() => setConfirmLogout(true)}>
+                <span className={styles.menuItemIcon}><LogOut size={18} /></span>
+                <span className={styles.menuItemLabel}>Sair</span>
+                <ChevronRight size={18} className={styles.menuItemChevron} />
+              </button>
+            </div>
           </div>
         </aside>
         )}
@@ -233,10 +274,4 @@ function slotDestaqueAtual() {
 
 function materialPath(material) {
   return material.arquivo ? `/artigos/${material.id}` : material.link || `/artigos/${material.id}`;
-}
-
-function ProfileField({ label, editing, value, onChange, type = 'text' }) {
-  return <div className={styles.infoItem}><span>{label}</span>{editing
-    ? <input type={type} value={value} onChange={(event) => onChange(event.target.value)} />
-    : <p>{value}</p>}</div>;
 }

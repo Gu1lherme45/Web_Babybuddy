@@ -88,31 +88,125 @@
   margin-bottom: 10px;
 }
 
-.titulo {
-  color: var(--dp-color);
-  font-size: 0.95rem;
-  font-weight: 700;
-  text-transform: capitalize;
-}
-
-.navegar {
-  width: 32px;
-  height: 32px;
+.seletores {
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid #f2d4e1;
-  border-radius: 50%;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
+}
+
+.seletorWrapper {
+  position: relative;
+  min-width: 0;
+}
+
+.seletorWrapper:first-child {
+  flex: 1 1 auto;
+}
+
+.seletorWrapper:last-child {
+  flex: 0 0 60px;
+}
+
+/* botão no estilo iOS: pílula cinza-clara, sem borda, texto em negrito */
+.seletorBotao {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  width: 100%;
+  border: 0;
+  border-radius: 8px;
+  background: #f2f2f4;
+  color: var(--dp-color);
+  font-family: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 6px 6px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.seletorBotao:hover {
+  background: #e8e8ec;
+}
+
+.seletorBotao[aria-expanded='true'] {
+  background: var(--dp-soft);
+  color: var(--dp-accent);
+}
+
+.seletorChevron {
+  flex-shrink: 0;
+  opacity: 0.55;
+}
+
+/* cardápio flutuante das opções, também no estilo iOS: cantos bem
+   arredondados, sombra suave, linha selecionada em rosa sólido */
+.seletorMenu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  z-index: 40;
+  max-height: 190px;
+  overflow-y: auto;
+  margin: 0;
+  padding: 4px;
+  list-style: none;
   background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 12px 30px rgba(47, 16, 32, 0.18);
+}
+
+.seletorMenuAno {
+  left: auto;
+  right: 0;
+  min-width: 84px;
+}
+
+.seletorItem {
+  padding: 8px 10px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  color: var(--dp-color);
+  cursor: pointer;
+  text-align: center;
+}
+
+.seletorItem:hover {
+  background: var(--dp-soft);
+}
+
+.seletorItemSelecionado {
+  background: var(--dp-accent);
+  color: #fff;
+  font-weight: 700;
+}
+
+.seletorItemSelecionado:hover {
+  background: var(--dp-accent-dark);
+}
+
+/* setas de navegação no estilo iOS: só o chevron, sem círculo/borda */
+.navegar {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  background: transparent;
   color: var(--dp-accent);
   cursor: pointer;
-  transition: background 0.2s, color 0.2s, border-color 0.2s;
+  transition: opacity 0.15s;
 }
 
 .navegar:hover {
-  background: var(--dp-accent-dark);
-  border-color: var(--dp-accent-dark);
-  color: #fff;
+  opacity: 0.55;
 }
 
 .grade {

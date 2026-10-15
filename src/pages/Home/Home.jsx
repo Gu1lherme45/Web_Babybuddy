@@ -110,7 +110,7 @@ export default function Home() {
             </p>
 
             <Link to="/cadastro">
-              <AnimatedButton>Começar agora!</AnimatedButton>
+              <AnimatedButton>{isMobile ? 'Começar agora' : 'Começar agora!'}</AnimatedButton>
             </Link>
 
             {/* BENEFÍCIOS */}
@@ -168,7 +168,15 @@ export default function Home() {
 
           <div className={styles.sectionBabyRight}>
             <h2 className={styles.sectionBabyTitle}>
-              O que posso fazer com o aplicativo BabyBuddy?
+              {isMobile ? (
+                <>
+                  O que posso fazer com o
+                  <br />
+                  aplicativo BabyBuddy?
+                </>
+              ) : (
+                'O que posso fazer com o aplicativo BabyBuddy?'
+              )}
             </h2>
 
             <p className={styles.sectionBabyText}>

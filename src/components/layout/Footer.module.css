@@ -5,7 +5,7 @@
   --onda-folga: 28px;
   width: 100%;
   background: #FFD8DC; /* cor do footer */
-  padding: 0 0 28px;
+  padding: 0 0 20px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -37,59 +37,43 @@
   padding: calc(var(--onda-altura) + var(--onda-folga)) 40px 0;
   display: flex;
   flex-wrap: wrap;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 40px;
+  align-items: center;
+  justify-content: center;
+  gap: 50px;
   position: relative;
   z-index: 2;
 }
 
-/* LOGO + STORES */
+/* LOGO */
 .left {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  gap: 16px;
+  align-items: center;
+  /* fundo igual ao do footer logo atrás da logo, pra o multiply abaixo
+     ter com o que se fundir (o .container tem z-index próprio, então o
+     blend não enxerga o background lá de cima do .footer) */
+  background: #FFD8DC;
 }
 
 .logo {
-  width: 170px;
-  height: auto;
-  display: block;
-}
-
-.stores {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.storeIcon,
-.apple {
-  width: auto;
-  height: 38px;
-  object-fit: contain;
-  transition: transform 0.25s ease;
-}
-
-.storeIcon:hover {
-  transform: translateY(-2px);
+  width: 300px;
+  /* o arquivo logoofcpink.svg tem um fundo branco sólido embutido
+     (é um PNG exportado dentro do SVG, sem transparência); multiply
+     funde o branco com a cor do footer em vez de mostrar uma caixa */
+  mix-blend-mode: multiply;
 }
 
 /* LINKS */
 .links {
   display: flex;
-  flex: 1 1 320px;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  gap: 24px;
+  justify-content: center;
+  gap: 70px;
 }
 
 .links div {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  min-width: 120px;
 }
 
 .links h4 {
