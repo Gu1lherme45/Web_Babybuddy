@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import styles from './Footer.module.css';
-import logo from '../../assets/logoofcpink.svg';
+import logo from '../../assets/logofooter.svg';
 import useIsMobile from '../../hooks/useIsMobile';
 
 export default function Footer({ waveColor = "#ffffff" }) {
