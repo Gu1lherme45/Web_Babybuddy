@@ -439,6 +439,11 @@
 
   .left,
   .right {
+    /* reseta o flex:1 herdado do layout em linha do desktop: em coluna
+       esse valor passa a esticar .left/.right verticalmente pra dividir
+       a altura do .container (min-height:100vh), abrindo um vão enorme
+       entre o título e o card do formulário */
+    flex: 0 1 auto;
     width: 100%;
     justify-content: center;
   }
@@ -458,12 +463,13 @@
 
 @media (max-width: 768px) {
   .container {
-    padding: 25px 16px;
-    gap: 40px;
+    padding: 25px 10px;
+    gap: 18px;
   }
 
   .leftContent h1 {
-    font-size: 38px;
+    font-size: 30px;
+    margin-bottom: 0;
   }
 
   /* no mobile fica só o título; descrição e os 3 itens com ícone somem */
@@ -472,12 +478,45 @@
     display: none;
   }
 
+  /* form um pouco mais largo (menos padding lateral do .container acima)
+     e mais compacto na vertical (campos, botão e espaçamentos menores) */
   .card {
-    padding: 22px 18px;
+    max-width: 480px;
+    padding: 18px 16px;
   }
 
   .title {
-    font-size: 28px;
+    font-size: 24px;
+    margin-bottom: 2px;
+  }
+
+  .subtitle {
+    font-size: 13px;
+    margin-bottom: 14px;
+  }
+
+  .form {
+    gap: 8px;
+  }
+
+  .inputBox {
+    height: 38px;
+  }
+
+  .btn {
+    height: 38px;
+  }
+
+  .divider {
+    margin: 10px 0;
+  }
+
+  .googleButton {
+    height: 38px;
+  }
+
+  .loginText {
+    margin-top: 10px;
   }
 
   .featureItem h3 {

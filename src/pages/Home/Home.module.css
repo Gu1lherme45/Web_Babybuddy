@@ -135,8 +135,15 @@
 /* Imagem da grávida */
 .image {
   width: 100%;
-  max-width: 450px;
-  height: auto;
+  max-width: 580px;
+  /* o novo imggravidahome3.svg tem bastante espaço vazio (transparente)
+     acima e abaixo da foto dentro do próprio arquivo — igualar só a
+     largura deixava a foto visivelmente menor que antes. aspect-ratio +
+     object-fit:cover recorta esse vazio e preenche a mesma caixa de
+     antes (450 x ~634, a mesma proporção que a imagem antiga tinha) */
+  aspect-ratio: 450 / 634;
+  object-fit: cover;
+  object-position: center;
   margin-top: -75px;
 }
 
@@ -705,9 +712,11 @@
     text-align: left;
   }
 
-  /* imagem do celular removida no mobile */
+  /* imagem do celular de volta no mobile: mesmo tamanho que já tinha
+     (herda width/max-width do .sectionBabyImage base), só alinhada à
+     esquerda pra começar no mesmo ponto que o texto da section */
   .sectionBabyLeft {
-    display: none;
+    justify-content: flex-start;
   }
 
   /* conteúdo da section "BabyBuddy" um pouco mais compacto no mobile */

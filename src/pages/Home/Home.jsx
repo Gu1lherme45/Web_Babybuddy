@@ -21,7 +21,7 @@ import styles from "./Home.module.css";
 import AnimatedButton from "../../components/AnimatedButton";
 import useIsMobile from "../../hooks/useIsMobile";
 
-import Mobile from "../../assets/mobile.svg";
+import Mobile from "../../assets/mobilehomeoficial.svg";
 import imgGravida from "../../assets/imggravidahome3.svg";
 
 import art1 from "../../assets/art1.png";

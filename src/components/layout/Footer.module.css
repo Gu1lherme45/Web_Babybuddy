@@ -56,7 +56,7 @@
 }
 
 .logo {
-  width: 300px;
+  width: 340px;
   /* o arquivo logoofcpink.svg tem um fundo branco sólido embutido
      (é um PNG exportado dentro do SVG, sem transparência); multiply
      funde o branco com a cor do footer em vez de mostrar uma caixa */
